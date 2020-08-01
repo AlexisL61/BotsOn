@@ -16,15 +16,15 @@ const api = require("./main_scripts/api.js")
 const botHosting = require("./main_scripts/hosting.js")
 
 console.log(process.arch)
-const server = 'https://update.electronjs.org'
-const feed = `${server}/AlexisL61/BotsOn/${process.platform}-${process.arch}/${app.getVersion()}`
-console.log(feed)
-if (!isDev){
-  autoUpdater.setFeedURL(feed)
-setInterval(() => {
-  autoUpdater.checkForUpdates()
-},  10 * 1000)
-}
+//const server = 'https://update.electronjs.org'
+//const feed = `${server}/AlexisL61/BotsOn/${process.platform}-${process.arch}/${app.getVersion()}`
+//console.log(feed)
+//if (!isDev){
+//  autoUpdater.setFeedURL(feed)
+//setInterval(() => {
+//  autoUpdater.checkForUpdates()
+//},  10 * 1000)
+//}
 
 function createWindow() {
 
@@ -42,7 +42,7 @@ function createWindow() {
   mainWindow.loadFile('index.html')
   mainWindow.setMenu(null)
 
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 }
 
 app.on("ready", () => {
@@ -87,7 +87,7 @@ ipc.on("checkDiscordToken", async function (event, args) {
   console.log("checkToken")
   var verifierData = await discordTokenVerify.verify(args.token, discord)
   console.log(verifierData)
-  if (args.addBot == true) {
+  if (args.addBot == true && verifierData.success) {
     var botData = verifierData.bot
     botData.token = args.token
     if (!fs.existsSync(dataFolder + "\\bots")) {
@@ -96,7 +96,7 @@ ipc.on("checkDiscordToken", async function (event, args) {
     fs.mkdirSync(dataFolder + "\\bots\\" + botData.id)
     fs.writeFileSync(dataFolder + "\\bots\\" + botData.id + "\\botdata.json", JSON.stringify(botData))
   }
-  if (args.modifyBot == true){
+  if (args.modifyBot == true && verifierData.success == true){
     if (args.botId != verifierData.bot.id){
       verifierData = {success:false}
     }else{

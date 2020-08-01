@@ -32,10 +32,10 @@ function cleanData(botData,cleanArray){
           if (cleanArray[i].childToKeep && cleanArray[i].childToKeep.length>=1 && channel[cleanArray[i].data]){
             data[cleanArray[i].data] = {}
             for (var a in cleanArray[i].childToKeep){
-                data[cleanArray[i]][cleanArray[i].childToKeep[a]] = channel[cleanArray[i]][cleanArray[i].childToKeep[a]]
+                data[cleanArray[i].data][cleanArray[i].childToKeep[a]] = channel[cleanArray[i].data][cleanArray[i].childToKeep[a]]
             }
           }else{
-            data[cleanArray[i]] = channel[cleanArray[i]]
+            data[cleanArray[i].data] = channel[cleanArray[i].data]
           }
       }
       dataArray.push(data)
@@ -44,7 +44,7 @@ function cleanData(botData,cleanArray){
 }
 module.exports = {
     async getBotGuilds(discord, token, id) {
-        var dataToKeep = ["id", "name"]
+        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]}]
         if (!client || !client.user || client.user.id != id) {
             var connectBotData = await connectBot(discord, token)
             if (connectBotData.success == false) {
@@ -56,7 +56,7 @@ module.exports = {
     },
     async getGuildChannels(discord,token,id,guildId){
         console.log("getGuildChannels")
-        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]},{"data":"parent","childToKeep":[]},{"data":"type","childToKeep":[]}]
+        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]},{"data":"parent","childToKeep":["id","name"]},{"data":"type","childToKeep":[]}]
         if (!client || !client.user || client.user.id!=id){
             var connectBotData = await connectBot(discord,token)
             if (connectBotData.success == false){
