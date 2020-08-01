@@ -13,7 +13,7 @@ module.exports = {
             var botImg = client.user.displayAvatarURL()
             var botName = client.user.username
             var botId = client.user.id
-            client.emit("botLogin",{"success":true,"bot":{"name":botName,"avatar":botImg,"id":botId}})
+            client.emit("botLogin",{"success":true,"bot":{"name":botName,"avatar":botImg,"id":botId,"token":token}})
             client.destroy()
         })
         client.once("error",function(){

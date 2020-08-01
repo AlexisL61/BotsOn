@@ -69,6 +69,13 @@
 						Extension
 					</h4>
 				</div>
+				<div class="main-menu-button" onclick="openBotParametersMenu()">
+					<img src="https://img.icons8.com/ios-filled/50/000000/settings.png">
+					<h4>
+						Paramètres
+					</h4>
+					
+				</div>
 				</div>
 				</div>
 		</div>
@@ -117,6 +124,20 @@
 		<div id="extension-config-div" style="display:none">
 			<iframe id="extension-config-import">
 			</iframe>
+		</div>
+		<div id="bot-parameters-div" style="display:none;text-align:center">
+			<p class="title">
+				Paramètres
+			</p>
+			<div class="input-group token-modify-input">
+			<div class="input-group-prepend">
+				<span class="input-group-text" id="token-addon">Token</span>
+			  </div>
+			<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control "
+			placeholder="Token">
+			</div>
+			<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">Mettre à jour</button>
+			
 		</div>
 	</section>
 	<section id="add-extension-section" style="display: none;" class="center all-screen-size">

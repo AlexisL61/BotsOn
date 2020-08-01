@@ -124,6 +124,7 @@ async function openBot(id) {
 function openExtensionMenu(){
 	document.getElementById("extension-config-div").style.display = "none"
 	document.getElementById("bot-extensions-list").style.display = "block"
+	document.getElementById("bot-parameters-div").style.display = "none"
 	closeMenu()
 }
 
@@ -284,6 +285,26 @@ async function verifyBotToken() {
 		}
 	})
 	ipcRenderer.send("checkDiscordToken", { "token": token, "addBot": true })
+}
+
+function openBotParametersMenu(){
+	openExtensionMenu()
+	document.getElementById("bot-extensions-list").style.display="none"
+	document.getElementById("bot-parameters-div").style.display = "block"
+	var botData = ipcRenderer.sendSync("getBotPrivateData",{"botId":currentBotOpenId})
+	console.log(botData)
+	document.getElementById("bot-token-parameters-input").value = botData.token
+}
+
+function editBotData(){
+	ipcRenderer.send("checkDiscordToken", { "token": document.getElementById("bot-token-parameters-input").value, "modifyBot":true,"botId":currentBotOpenId })
+	document.getElementById("edit-bot-data-btn").setAttribute("disabled",true)
+	ipcRenderer.once("checkDiscordTokenResult",function(event,result){
+		document.getElementById("edit-bot-data-btn").removeAttribute("disabled")
+		if (result.success == true){
+			openBot(result.bot.id)
+		}
+	})
 }
 
 async function closeAddBot() {

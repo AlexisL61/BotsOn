@@ -87,7 +87,6 @@ ipc.on("checkDiscordToken", async function (event, args) {
   console.log("checkToken")
   var verifierData = await discordTokenVerify.verify(args.token, discord)
   console.log(verifierData)
-  event.sender.send("checkDiscordTokenResult", verifierData)
   if (args.addBot == true) {
     var botData = verifierData.bot
     botData.token = args.token
@@ -97,6 +96,14 @@ ipc.on("checkDiscordToken", async function (event, args) {
     fs.mkdirSync(dataFolder + "\\bots\\" + botData.id)
     fs.writeFileSync(dataFolder + "\\bots\\" + botData.id + "\\botdata.json", JSON.stringify(botData))
   }
+  if (args.modifyBot == true){
+    if (args.botId != verifierData.bot.id){
+      verifierData = {success:false}
+    }else{
+      fs.writeFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json", JSON.stringify(verifierData.bot))
+    }
+  }
+  event.sender.send("checkDiscordTokenResult", verifierData)
 })
 
 ipc.on("installExtension",function(event,args){
@@ -119,6 +126,11 @@ ipc.on("getConfigData",function(event,args){
 ipc.on("saveConfigData",function(event,args){
   fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json",JSON.stringify(args.config))
   event.sender.send("saveConfigData",{"success":true})
+})
+
+ipc.on("getBotPrivateData",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  event.returnValue = botData
 })
 
 ipc.on("modifyExtensionActivation",function(event,args){
