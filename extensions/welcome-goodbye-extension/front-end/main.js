@@ -3,8 +3,8 @@ var botGuilds
 var configData = {}
 console.log("a")
 ipcRenderer.send("getConfigData", { "botId": parent.currentBotOpenId, "extensionId": "welcome-goodbye-extension" })
-ipcRenderer.send("getBotGuilds", { "botId": parent.currentBotOpenId })
-ipcRenderer.on("getBotGuilds", async function (event, guildsData) {
+ipcRenderer.send("getGuilds", { "botId": parent.currentBotOpenId })
+ipcRenderer.on("getGuilds", async function (event, guildsData) {
     if (guildsData.success == true) {
         botGuilds = guildsData.data
         document.getElementById("serverSelect").innerHTML = `<option value="default">--Choisissez un serveur--</option>`

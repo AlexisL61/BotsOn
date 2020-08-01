@@ -143,11 +143,11 @@ function getToken(id){
   return JSON.parse(fs.readFileSync(dataFolder + "\\bots\\" + id + "\\botdata.json")).token
 }
 
-ipc.on("getBotGuilds", async function (event, args) {
+ipc.on("getGuilds", async function (event, args) {
   var thisBotToken = getToken(args.botId)
   var guilds = await api.getBotGuilds(discord,thisBotToken,args.botId)
   console.log(guilds)
-  event.sender.send("getBotGuilds",guilds)
+  event.sender.send("getGuilds",guilds)
 })
 
 ipc.on("getGuildChannels", async function (event, args) {
