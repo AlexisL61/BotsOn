@@ -21,7 +21,7 @@ module.exports = {
             console.log(extensions)
             for (var i in extensions){
                 if (extensions[i].active){
-                    var thisExtensionHost = require(directory+"/extensions/"+extensions[i].id+"/back-end/main.js")
+                    var thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
                     thisExtensionHost.client = client
                     thisExtensionHost.dataFolder = dataExtensionFolder+"/"+extensions[i].id+"/data"
                     console.log("thisExtensionHost")

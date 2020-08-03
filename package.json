@@ -9,10 +9,11 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "dist": "build"
   },
   "keywords": [],
-  "author": "alexi",
+  "author": "AlexisL61",
   "license": "MIT",
   "config": {
     "forge": {
@@ -21,7 +22,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "my_app"
+            "name": "BotsOn"
           }
         },
         {
@@ -46,7 +47,10 @@
     "discord.js": "^12.2.0",
     "electron-forge": "^5.2.4",
     "electron-is-dev": "^1.2.0",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "extract-zip": "^2.0.1",
+    "unzip": "^0.1.11",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.52",
@@ -54,7 +58,21 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.51",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.51",
     "@electron-forge/maker-zip": "^6.0.0-beta.51",
-    "electron": "^9.0.5",
-    "electron-prebuilt-compile": "1.8.4"
+    "electron": "^9.0.5"
+  },
+  "build": {
+    "appId": "botson",
+    "mac": {
+      "category": ""
+    },
+    "protocols": [
+      {
+        "name": "botson",
+        "role": "Viewer",
+        "schemes": [
+          "botson"
+        ]
+      }
+    ]
   }
 }

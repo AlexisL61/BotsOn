@@ -33,7 +33,7 @@ var extensionActivateBtn = `<div class="extension-bot-menu-btn {inactiveClass}" 
   </label>
 </div>`
 
-var extensionAvailableBtn = `<div onclick="{onClickFunction}" class="extension-available-menu-btn">
+var extensionAvailableBtn = `<div onclick="{onClickFunction}" class="extension-available-menu-btn {inactiveClass}">
 		<img src="{extensionImg}" class="">
 		<div>
 			<h3>
@@ -159,12 +159,21 @@ async function openAddExtensionSection() {
 	document.getElementById("add-extension-main-div").style.opacity = "1"
 	document.getElementById("black-blur-background").style.opacity = "0.4"
 	var availableExtensions = ipcRenderer.sendSync("getAvailableExtensions")
+	var alreadyInstallExtensions = ipcRenderer.sendSync("getBotExtensions", { id: currentBotOpenId })
 	document.getElementById("extension-available-placement").innerHTML = ""
 	for (var i in availableExtensions) {
 		var thisExtensionData = availableExtensions[i]
 		console.log(thisExtensionData)
 		var thisExtensionDiv = extensionAvailableBtn
-		thisExtensionDiv = thisExtensionDiv.replace("{onClickFunction}", "openConfirmInstall('" + thisExtensionData.id + "')")
+		if (!alreadyInstallExtensions.find(extension=> extension.id == thisExtensionData.id)){
+			thisExtensionDiv = thisExtensionDiv.replace("{onClickFunction}", "openConfirmInstall('" + thisExtensionData.id + "')")
+			
+			thisExtensionDiv = thisExtensionDiv.replace("{inactiveClass}","")
+		}else{
+			thisExtensionDiv = thisExtensionDiv.replace("{onClickFunction}", "")
+			
+			thisExtensionDiv = thisExtensionDiv.replace("{inactiveClass}","inactive")
+		}
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionImg}", thisExtensionData.image)
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionName}", thisExtensionData.name)
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionDescription}", thisExtensionData.smallDescription)

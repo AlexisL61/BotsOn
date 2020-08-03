@@ -1,8 +1,10 @@
 //Modules and variables
-const { app, BrowserWindow, autoUpdater } = require('electron')
+const { app, BrowserWindow, autoUpdater,protocol } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
+const unzip = require('extract-zip')
+const axios = require("axios")
 const fs = require("fs")
 const discord = require("discord.js")
 const isDev = require('electron-is-dev');
@@ -42,11 +44,43 @@ function createWindow() {
   mainWindow.loadFile('index.html')
   mainWindow.setMenu(null)
 
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
+
+  
+  mainWindow.webContents.executeJavaScript(`console.log("`+process.argv+`")`)
+}
+
+function createDownloadWindow() {
+
+  //creating window with electron
+  mainWindow = new BrowserWindow({
+    width: 500,
+    height: 500,
+    center: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  //load the index.html of the app.
+  mainWindow.loadFile('download.html')
+  mainWindow.setMenu(null)
+
+  mainWindow.webContents.openDevTools()
+
+  
 }
 
 app.on("ready", () => {
-  createWindow()
+  console.log(process.argv)
+  if (!process.argv.find(arg=>arg.startsWith("botson://"))){
+    app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
+    createWindow()
+    
+  }else{
+    createDownloadWindow()
+    
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -66,9 +100,11 @@ function getBotExtensionsData(args){
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
     var extensions = fs.readdirSync(dataFolder + "/bots/" + args.id + "/extensions")
     extensions.forEach(function (extension) {
-      var thisExtensionData = JSON.parse(fs.readFileSync(directory + "/extensions/" + extension + "/extension-data.json"))
+      if (fs.existsSync(dataFolder + "/extension-install/" + extension )){
+      var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
       thisExtensionData.active = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id + "/extensions/" + extension + "/status.json", "utf8")).active
       botExtensions.push(thisExtensionData)
+      }
     })
   }
   return botExtensions
@@ -81,6 +117,25 @@ ipc.on("firstTimeOpenApp", function (event, args) {
   } else {
     event.returnValue = true
   }
+})
+
+ipc.on("downloadExtensionFromURL",function(event,args){
+  var url = process.argv.find(arg=>arg.startsWith("botson://")).split("botson://")[1]
+    if (url.endsWith(".zip")){
+      axios({
+        method: "get",
+        url: url,
+        responseType: "stream"
+    }).then(async function (response) {
+      event.sender.send("downloadFinish")
+      response.data.pipe(fs.createWriteStream(dataFolder+"/temp.zip"));
+      if (!fs.existsSync(dataFolder + "/extension-install")){
+        fs.mkdirSync(dataFolder + "/extension-install")
+      }
+      await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) })
+      
+      event.sender.send("unzipFinish")
+    }
 })
 
 ipc.on("checkDiscordToken", async function (event, args) {
@@ -146,8 +201,8 @@ ipc.on("modifyExtensionActivation",function(event,args){
 })
 
 ipc.on("getExtensionData",function(event,args){
-  if (fs.existsSync(directory + "/extensions/" + args.id + "/extension-data.json")) {
-    event.returnValue = JSON.parse(fs.readFileSync(directory + "/extensions/" + args.id + "/extension-data.json"))
+  if (fs.existsSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json")) {
+    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json"))
   }
 })
 
@@ -169,23 +224,23 @@ ipc.on("getGuildChannels", async function (event, args) {
 })
 
 ipc.on("getAvailableExtensions", function (event, args) {
-  var directory = app.getAppPath()
   var extensionsFound = []
-  if (fs.existsSync(directory + "/extensions")) {
-    var availableExtensions = fs.readdirSync(directory + "/extensions")
+  if (fs.existsSync(dataFolder + "/extension-install")) {
+    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
     availableExtensions.forEach(function (extension) {
-      if (fs.existsSync(directory + "/extensions/" + extension + "/extension-data.json")) {
-        var extensionData = JSON.parse(fs.readFileSync(directory + "/extensions/" + extension + "/extension-data.json"))
+      if (fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
+        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
         console.log(extensionData)
         extensionsFound.push({ "name": extensionData.name, "author": extensionData.author, "description": extensionData.description, "id": extensionData.id, "smallDescription": extensionData.smallDescription, "image": extensionData.image })
       }
     })
   }
+  console.log(extensionsFound)
   event.returnValue = extensionsFound
 })
 
 ipc.on("startHosting",async function (event,args){
-  botHosting.directory = directory
+  botHosting.directory = dataFolder
   botHosting.dataExtensionFolder = dataFolder+"/bots/" + args.id + "/extensions"
   console.log(args)
   var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
