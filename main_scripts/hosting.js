@@ -4,6 +4,7 @@ module.exports = {
 
     startHosting(Discord,token,extensions){
         directory = this.directory
+        electron = this.electron
         dataExtensionFolder = this.dataExtensionFolder
         if (client != undefined){
             client.destroy()
@@ -23,6 +24,7 @@ module.exports = {
                 if (extensions[i].active){
                     var thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
                     thisExtensionHost.client = client
+                    thisExtensionHost.electron = electron
                     thisExtensionHost.dataFolder = dataExtensionFolder+"/"+extensions[i].id+"/data"
                     console.log("thisExtensionHost")
                     thisExtensionHost.start()

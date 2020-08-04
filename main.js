@@ -241,6 +241,7 @@ ipc.on("getAvailableExtensions", function (event, args) {
 
 ipc.on("startHosting",async function (event,args){
   botHosting.directory = dataFolder
+  botHosting.electron = electron
   botHosting.dataExtensionFolder = dataFolder+"/bots/" + args.id + "/extensions"
   console.log(args)
   var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
