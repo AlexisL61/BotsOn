@@ -119,6 +119,10 @@ ipc.on("firstTimeOpenApp", function (event, args) {
   }
 })
 
+ipc.on("getDataFolder",function(event,args){
+  event.returnValue = dataFolder
+})
+
 ipc.on("downloadExtensionFromURL",function(event,args){
   var url = process.argv.find(arg=>arg.startsWith("botson://")).split("botson://")[1]
     if (url.endsWith(".zip")){

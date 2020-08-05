@@ -218,7 +218,9 @@ section {
 	width:50px !important;
 	margin-top:200px !important;
 	margin-left:175px !important;
+	cursor: pointer;
 }
+
 
 iframe {
 	border-width:0px;
@@ -433,6 +435,15 @@ iframe {
 	margin-left:20%;
 	height:50px;
 	margin-top:20px;
+	cursor: pointer;
+}
+
+#main-menu-quit-button{
+	cursor:pointer;
+}
+
+#main-menu-button-activation{
+	cursor:pointer;
 }
 
 .main-menu-button img{

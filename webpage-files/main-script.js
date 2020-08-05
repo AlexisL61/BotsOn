@@ -51,12 +51,23 @@ function delay(ms) {
 
 async function createNewBot() {
 	document.getElementById("black-blur-background").style.display = "block"
+	document.getElementById("add-bot-section").setAttribute("onclick","closeCreateNewBot()")
 	document.getElementById("add-bot-section").style.display = "flex"
 	await delay(1)
 	document.getElementById("add-bot-main-div").style.marginTop = "0vh"
 	document.getElementById("add-bot-main-div").style.opacity = "1"
 
 	document.getElementById("black-blur-background").style.opacity = "0.4"
+}
+
+async function closeCreateNewBot(){
+	document.getElementById("black-blur-background").style.opacity = "0"
+
+	document.getElementById("add-bot-main-div").style.marginTop = "-40vh"
+	document.getElementById("add-bot-main-div").style.opacity = "0"
+	await delay(1000)
+	document.getElementById("add-bot-section").style.display = "none"
+	document.getElementById("black-blur-background").style.display = "none"
 }
 
 function updateBotsMenu() {
@@ -136,7 +147,8 @@ function openBotMenu(){
 }
 
 async function openConfigPage(extensionId){
-	document.getElementById("extension-config-import").src = "./extensions/"+extensionId+"/front-end/index.html"
+	var dataFolder = ipcRenderer.sendSync("getDataFolder")
+	document.getElementById("extension-config-import").src = dataFolder+"/extension-install/"+extensionId+"/front-end/index.html"
 	document.getElementById("extension-config-div").style.display = "block"
 	document.getElementById("bot-extensions-list").style.display = "none"
 }
@@ -154,6 +166,7 @@ async function changeExtensionActivation(extensionId){
 async function openAddExtensionSection() {
 	document.getElementById("black-blur-background").style.display = "block"
 	document.getElementById("add-extension-section").style.display = "flex"
+	document.getElementById("add-extension-section").setAttribute("onclick","closeAddExtensionSection()")
 	await delay(1)
 	document.getElementById("add-extension-main-div").style.marginTop = "0px"
 	document.getElementById("add-extension-main-div").style.opacity = "1"
@@ -179,6 +192,15 @@ async function openAddExtensionSection() {
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionDescription}", thisExtensionData.smallDescription)
 		document.getElementById("extension-available-placement").innerHTML += thisExtensionDiv
 	}
+}
+
+async function closeAddExtensionSection(){
+	document.getElementById("black-blur-background").style.opacity = "0"
+	document.getElementById("add-extension-main-div").style.marginTop = "80vh"
+	document.getElementById("add-extension-main-div").style.opacity = "0"
+	await delay(1000)
+	document.getElementById("black-blur-background").style.display = "none"
+	document.getElementById("add-extension-section").style.display = "none"
 }
 
 function changeHostingStatus(){
