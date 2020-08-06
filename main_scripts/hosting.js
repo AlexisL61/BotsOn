@@ -39,7 +39,9 @@ module.exports = {
         })
     },
     stopHosting(){
+        if (client){
         client.destroy()
+        }
         return {"success":true}
     }
 }

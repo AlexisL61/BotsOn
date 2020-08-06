@@ -51,7 +51,7 @@ function delay(ms) {
 
 async function createNewBot() {
 	document.getElementById("black-blur-background").style.display = "block"
-	document.getElementById("add-bot-section").setAttribute("onclick","closeCreateNewBot()")
+	document.getElementById("add-bot-section").setAttribute("onclick","")
 	document.getElementById("add-bot-section").style.display = "flex"
 	await delay(1)
 	document.getElementById("add-bot-main-div").style.marginTop = "0vh"
@@ -166,7 +166,6 @@ async function changeExtensionActivation(extensionId){
 async function openAddExtensionSection() {
 	document.getElementById("black-blur-background").style.display = "block"
 	document.getElementById("add-extension-section").style.display = "flex"
-	document.getElementById("add-extension-section").setAttribute("onclick","closeAddExtensionSection()")
 	await delay(1)
 	document.getElementById("add-extension-main-div").style.marginTop = "0px"
 	document.getElementById("add-extension-main-div").style.opacity = "1"
