@@ -91,3 +91,60 @@ ipcRenderer.on("saveConfigData", function (status) {
    }
 }
 ```
+
+#### ipcRenderer.send("getGuilds",data)
+Cette requête permet de récupérer les serveurs du bot correspondant.
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> La variable data est un tableau contenant des serveurs discord ayant comme propriété: 
+Paramètres | Types | Description
+------------ | ------------- | -------------
+id | String | L'identifiant du serveur
+name | String | Le nom du serveur
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getGuilds", {"botId":"567828934689"})
+ipcRenderer.on("getGuilds", function (status) {
+   if (status.success==true){
+      var servers = status.data 
+   }
+}
+```
+
+#### ipcRenderer.send("getGuildChannels",data)
+Cette requête permet de récupérer les salons existants correspondant à un id de serveur donné 
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+guildId | String | L'identifiant du serveur sélectionné 
+
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> La variable data est un tableau contenant des salons discord ayant comme propriété: 
+Paramètres | Types | Description
+------------ | ------------- | -------------
+id | String | L'identifiant du serveur
+name | String | Le nom du serveur
+parent | Objet | La catégorie du salon si existante
+type | String | Le type de ce salon
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getGuildChannels", {"botId":"567828934689","guildId":"627495928949"})
+ipcRenderer.on("getGuildChannels", function (status) {
+   if (status.success==true){
+      var channels = status.data 
+   }
+}
+```
