@@ -46,10 +46,48 @@ Tous les chemins d'envoi disponibles sont marqués dans la catégorie Api ainsi 
 
 #### ipcRenderer.send("getConfigData",data)
 Cette requête permet de récupérer d'anciennes données de configuration de votre extension
+
+__**Paramètres d'envoi**__
 Paramètres | Types | Description
 ------------ | ------------- | -------------
 botId | String | L'identifiant du bot sélectionné
 extensionId | String | L'identifiant de l'extension
 
-**Chemin de récupération:** getConfigData
-**Données retournées:** Donnée de configuration
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> Aucun tableau car le type de donnée n'est pas le même en fonction des données sauvegardées 
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getConfigData", {"botId":"567828934689","extensionId":"welcome-goodbye-extension"})
+ipcRenderer.on("getConfigData", function (status) {
+   if (status.success==true){
+      var data = status.data
+   }
+}
+```
+
+#### ipcRenderer.send("saveConfigData",data)
+Cette requête permet de sauvegarder une configuration d'extension au format json
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+extensionId | String | L'identifiant de l'extension
+config | Array ou dictionnary | Les données de la configuration à sauvegarder
+
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen  
+
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("saveConfigData", {"botId":"567828934689","extensionId":"welcome-goodbye-extension","config":{"status":"Connecté avec BotsOn!"}})
+ipcRenderer.on("saveConfigData", function (status) {
+   if (status.success==true){
+      //Données sauvegardées avec succès 
+   }
+}
+```
