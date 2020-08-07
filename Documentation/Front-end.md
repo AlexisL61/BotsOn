@@ -104,6 +104,7 @@ __**Données récupérées**__
 > Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des serveurs discord ayant comme propriété: 
+
 Paramètres | Types | Description
 ------------ | ------------- | -------------
 id | String | L'identifiant du serveur
@@ -132,6 +133,7 @@ __**Données récupérées**__
 > Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des salons discord ayant comme propriété: 
+
 Paramètres | Types | Description
 ------------ | ------------- | -------------
 id | String | L'identifiant du serveur
