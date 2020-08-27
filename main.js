@@ -47,7 +47,12 @@ function createWindow() {
   mainWindow.webContents.openDevTools()
 
   
-  mainWindow.webContents.executeJavaScript(`console.log("`+process.argv+`")`)
+  //mainWindow.webContents.executeJavaScript(`console.log("`+process.argv+`")`)
+
+  mainWindow.webContents.on('new-window', function(e, url) {
+    e.preventDefault();
+    require('electron').shell.openExternal(url);
+  });
 }
 
 function createDownloadWindow() {
@@ -160,7 +165,11 @@ ipc.on("checkDiscordToken", async function (event, args) {
     if (args.botId != verifierData.bot.id){
       verifierData = {success:false}
     }else{
-      fs.writeFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json", JSON.stringify(verifierData.bot))
+      var botCurrentData = fs.readFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json","utf8")
+      botCurrentData.name = verifierData.bot.name
+      botCurrentData.avatar = verifierData.bot.avatar
+      botCurrentData.token = verifierData.bot.token
+      fs.writeFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json", JSON.stringify(botCurrentData))
     }
   }
   event.sender.send("checkDiscordTokenResult", verifierData)
@@ -190,7 +199,23 @@ ipc.on("saveConfigData",function(event,args){
 
 ipc.on("getBotPrivateData",function(event,args){
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
-  event.returnValue = botData
+  event.sender.send("getBotPrivateData",botData)
+})
+
+ipc.on("getBotPrefix",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var thisBotPrefix
+  if (botData.prefix){
+    thisBotPrefix = botData.prefix
+  }
+  event.sender.send("getBotPrefix",thisBotPrefix)
+})
+
+ipc.on("modifyBotPrefix",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  botData.prefix = args.prefix
+  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  event.returnValue = {"success":true}
 })
 
 ipc.on("modifyExtensionActivation",function(event,args){

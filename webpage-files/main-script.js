@@ -135,7 +135,8 @@ async function openBot(id) {
 function openExtensionMenu(){
 	document.getElementById("extension-config-div").style.display = "none"
 	document.getElementById("bot-extensions-list").style.display = "block"
-	document.getElementById("bot-parameters-div").style.display = "none"
+	document.getElementById("bot-parameters-main-div").style.display = "none"
+	closeEveryBotParametersSubMenu()
 	closeMenu()
 }
 
@@ -320,10 +321,36 @@ async function verifyBotToken() {
 function openBotParametersMenu(){
 	openExtensionMenu()
 	document.getElementById("bot-extensions-list").style.display="none"
-	document.getElementById("bot-parameters-div").style.display = "block"
-	var botData = ipcRenderer.sendSync("getBotPrivateData",{"botId":currentBotOpenId})
-	console.log(botData)
-	document.getElementById("bot-token-parameters-input").value = botData.token
+	document.getElementById("bot-parameters-main-div").style.display = "block"
+	
+}
+
+async function openBotParametersSubMenu(parameter){
+	document.getElementById("bot-parameters-main-div").style.display = "none"
+	if (parameter=="security"){
+		document.getElementById("bot-parameters-security-div").style.display = "block"
+		ipcRenderer.send("getBotPrivateData",{"botId":currentBotOpenId})
+		console.log(botData)
+		ipcRenderer.once("getBotPrivateData",function(event,botData){
+			document.getElementById("bot-token-parameters-input").value = botData.token
+		})
+	}
+	if (parameter=="prefix"){
+		document.getElementById("bot-parameters-prefix-div").style.display = "block"
+		ipcRenderer.send("getBotPrefix",{"botId":currentBotOpenId})
+		ipcRenderer.once("getBotPrefix",function(event,prefix){
+			if (prefix){
+				document.getElementById("bot-prefix-parameters-input").value = prefix
+			}else{
+				document.getElementById("bot-prefix-parameters-input").value = ""
+			}
+		})
+	}
+}
+
+function closeEveryBotParametersSubMenu(){
+	document.getElementById("bot-parameters-security-div").style.display = "none"
+	document.getElementById("bot-parameters-prefix-div").style.display = "none"
 }
 
 function editBotData(){
@@ -335,6 +362,14 @@ function editBotData(){
 			openBot(result.bot.id)
 		}
 	})
+}
+
+function editBotPrefix(){
+	document.getElementById("bot-prefix-parameters-input").style.borderColor = ""
+	var prefixChangeResult = ipcRenderer.sendSync("modifyBotPrefix", {"botId":currentBotOpenId, "prefix": document.getElementById("bot-prefix-parameters-input").value})
+	if (prefixChangeResult.success == true){
+		document.getElementById("bot-prefix-parameters-input").style.borderColor = "green"
+	}
 }
 
 async function closeAddBot() {

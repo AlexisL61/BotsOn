@@ -30,6 +30,9 @@
 					placeholder="Token">
 				<button type="button" onclick="verifyBotToken()" id="add-bot-token-btn"
 					class="btn btn-primary button-center-reduce">Ajouter</button>
+				<a target="_blank" href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/RecevoirToken.md" class="center">
+					Je n'ai pas de token
+				</a>
 			</div>
 		</div>
 		<div id="add-bot-second-div" class="add-bot-div center">
@@ -128,19 +131,56 @@
 			<iframe id="extension-config-import">
 			</iframe>
 		</div>
-		<div id="bot-parameters-div" style="display:none;text-align:center">
+		<div id="bot-parameters-main-div" style="display:none;text-align:center">
 			<p class="title">
 				Paramètres
 			</p>
-			<div class="input-group token-modify-input">
-			<div class="input-group-prepend">
-				<span class="input-group-text" id="token-addon">Token</span>
-			  </div>
-			<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control "
-			placeholder="Token">
+			<div class="all-screen-size">
+			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('security')">
+				<img src="https://img.icons8.com/color/100/000000/lock.png">
+				<p>
+					Sécurité
+				</p>
+
 			</div>
-			<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">Mettre à jour</button>
-			
+
+			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('prefix')">
+				
+				<img src="https://img.icons8.com/color/48/000000/space-before-paragraph.png" style="transform:rotate(-90deg)">
+				<p>
+					Préfix
+				</p>
+			</div>
+		</div>
+		</div>
+		<div id="bot-parameters-security-div" style="display:none;text-align:center">
+			<h3 class='title'>
+				Token
+			</h3>
+			<div class="input-group token-modify-input">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="token-addon">Token</span>
+				  </div>
+				<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control "
+				placeholder="Token">
+				</div>
+				<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">Mettre à jour</button>
+				
+		</div>
+
+		<div id="bot-parameters-prefix-div" style="display:none;text-align:center">
+			<h3 class='title'>
+				Préfix
+			</h3>
+			<div class="input-group token-modify-input">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="prefix-addon">Préfix</span>
+				  </div>
+				<input type="text" id="bot-prefix-parameters-input" aria-describedby="prefix-addon" class="form-control "
+				placeholder="Préfix">
+				</div>
+				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">Mettre à jour</button>
+				
 		</div>
 	</section>
 	<section id="add-extension-section" style="display: none;" class="center all-screen-size">
@@ -154,6 +194,9 @@
 			<div id="extension-available-placement">
 
 			</div>
+			<a href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/Extensions.md" target="_blank" class="center">
+				Que sont les extensions?
+			</a>
 		</div>
 		<div id="add-extension-confirmation-div" class="add-extension-confirmation-div">
 			<h3>
