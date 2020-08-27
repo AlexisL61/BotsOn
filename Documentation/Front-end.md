@@ -150,3 +150,23 @@ ipcRenderer.on("getGuildChannels", function (status) {
    }
 }
 ```
+
+#### ipcRenderer.send("getBotPrefix",data)
+Cette requête permet de récupérer le prefix du bot renseigné par l'utilisateur dans les paramètres du bot 
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+
+__**Données récupérées**__
+> Electron renvoi le prefix sans variable success
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getBotPrefix", {"botId":"567828934689"})
+ipcRenderer.on("getBotPrefix", function (prefix) {
+   console.log("Le prefix du bot est "+prefix)
+}
+```
+
