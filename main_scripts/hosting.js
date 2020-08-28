@@ -1,4 +1,5 @@
-var client,directory,dataExtensionFolder
+
+var client,directory,dataExtensionFolder,ipcRenderer
 
 module.exports = {
 
@@ -6,6 +7,7 @@ module.exports = {
         directory = this.directory
         electron = this.electron
         dataExtensionFolder = this.dataExtensionFolder
+        ipcRenderer = this.ipcRenderer
         if (client != undefined){
             client.destroy()
         }
@@ -26,6 +28,7 @@ module.exports = {
                     thisExtensionHost.client = client
                     thisExtensionHost.electron = electron
                     thisExtensionHost.dataFolder = dataExtensionFolder+"/"+extensions[i].id+"/data"
+                    thisExtensionHost.ipcRenderer = ipcRenderer
                     console.log("thisExtensionHost")
                     thisExtensionHost.start()
                 }
