@@ -109,6 +109,8 @@ Paramètres | Types | Description
 ------------ | ------------- | -------------
 id | String | L'identifiant du serveur
 name | String | Le nom du serveur
+icon | String | L'icône du serveur
+ownerID | String | L'id du propriétaire du serveur
 
 __**Exemple**__
 ```javascript
@@ -147,6 +149,71 @@ ipcRenderer.send("getGuildChannels", {"botId":"567828934689","guildId":"62749592
 ipcRenderer.on("getGuildChannels", function (status) {
    if (status.success==true){
       var channels = status.data 
+   }
+}
+```
+
+#### ipcRenderer.send("getGuildRoles",data)
+Cette requête permet de récupérer les salons existants correspondant à un id de serveur donné 
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+guildId | String | L'identifiant du serveur sélectionné 
+
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> La variable data est un tableau contenant des salons discord ayant comme propriété: 
+
+Paramètres | Types | Description
+------------ | ------------- | -------------
+id | String | L'identifiant du rôle
+name | String | Le nom du rôle
+permissions | Object | Les permissions de ce rôle
+position | Number | La position du rôle dans la hiérarchie des rôles
+color | Number | Couleur du rôle
+mentionable | Boolean | Si le rôle est mentionnable ou non
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getGuildRoles", {"botId":"567828934689","guildId":"627495928949"})
+ipcRenderer.on("getGuildRoles", function (status) {
+   if (status.success==true){
+      var roles = status.data 
+   }
+}
+```
+
+#### ipcRenderer.send("getGuildEmojis",data)
+Cette requête permet de récupérer les salons existants correspondant à un id de serveur donné 
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+botId | String | L'identifiant du bot sélectionné
+guildId | String | L'identifiant du serveur sélectionné 
+
+__**Données récupérées**__
+> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> La variable data est un tableau contenant des salons discord ayant comme propriété: 
+
+Paramètres | Types | Description
+------------ | ------------- | -------------
+id | String | L'identifiant de l'émoji
+name | String | Le nom de lémoji
+available | Boolean | Si l'émoji est disponible ou non
+url | String | L'URL de l'émoji
+animated | Boolean | Si l'émoji est annimé ou non
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getGuildEmojis", {"botId":"567828934689","guildId":"627495928949"})
+ipcRenderer.on("getGuildEmojis", function (status) {
+   if (status.success==true){
+      var emojis = status.data 
    }
 }
 ```
