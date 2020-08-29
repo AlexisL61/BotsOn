@@ -253,6 +253,25 @@ ipc.on("getGuildChannels", async function (event, args) {
   event.sender.send("getGuildChannels",channels)
 })
 
+ipc.on("getGuildRoles", async function (event, args) {
+  console.log("GETROLES")
+  var thisBotToken = getToken(args.botId)
+  var roles = await api.getGuildRoles(discord,thisBotToken,args.botId,args.guildId)
+  console.log(roles)
+  event.sender.send("getGuildRoles",roles)
+  var emojis = await api.getGuildEmojis(discord,thisBotToken,args.botId,args.guildId)
+  console.log(emojis)
+  event.sender.send("getGuildEmojis",emojis)
+})
+
+ipc.on("getGuildEmojis", async function (event, args) {
+  console.log("GETEMOJIS")
+  var thisBotToken = getToken(args.botId)
+  var emojis = await api.getGuildEmojis(discord,thisBotToken,args.botId,args.guildId)
+  event.sender.send("getGuildEmojis",emojis)
+
+})
+
 ipc.on("getAvailableExtensions", function (event, args) {
   var extensionsFound = []
   if (fs.existsSync(dataFolder + "/extension-install")) {

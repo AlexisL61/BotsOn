@@ -44,7 +44,7 @@ function cleanData(botData,cleanArray){
 }
 module.exports = {
     async getBotGuilds(discord, token, id) {
-        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]}]
+        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]},{"data":"icon","childToKeep":[]},{"data":"ownerID","childToKeep":[]}]
         if (!client || !client.user || client.user.id != id) {
             var connectBotData = await connectBot(discord, token)
             if (connectBotData.success == false) {
@@ -64,6 +64,30 @@ module.exports = {
             }
         }
         var finalData = cleanData(client.guilds.cache.get(guildId).channels.cache,dataToKeep)
+        
+    return {"success":true,"data":finalData,guildId:guildId}
+    },
+    async getGuildRoles(discord,token,id,guildId){
+        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]},{"data":"permissions","childToKeep":[]},{"data":"position","childToKeep":[]},{"data":"color","childToKeep":[]},{"data":"mentionable","childToKeep":[]}]
+        if (!client || !client.user || client.user.id!=id){
+            var connectBotData = await connectBot(discord,token)
+            if (connectBotData.success == false){
+                return {"success":false,"error":"Bot can not connect"}
+            }
+        }
+        var finalData = cleanData(client.guilds.cache.get(guildId).roles.cache,dataToKeep)
+        
+    return {"success":true,"data":finalData,guildId:guildId}
+    },
+    async getGuildEmojis(discord,token,id,guildId){
+        var dataToKeep = [{"data":"id","childToKeep":[]},{"data":"name","childToKeep":[]},{"data":"animated","childToKeep":[]},{"data":"url","childToKeep":[]},{"data":"available","childToKeep":[]}]
+        if (!client || !client.user || client.user.id!=id){
+            var connectBotData = await connectBot(discord,token)
+            if (connectBotData.success == false){
+                return {"success":false,"error":"Bot can not connect"}
+            }
+        }
+        var finalData = cleanData(client.guilds.cache.get(guildId).emojis.cache,dataToKeep)
         
     return {"success":true,"data":finalData,guildId:guildId}
     }
