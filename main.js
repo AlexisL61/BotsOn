@@ -292,7 +292,12 @@ ipc.on("startHosting",async function (event,args){
   botHosting.directory = dataFolder
   botHosting.electron = electron
   botHosting.dataExtensionFolder = dataFolder+"/bots/" + args.id + "/extensions"
-  botHosting.ipcRenderer = ipc
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.id+"/botdata.json","utf-8"))
+  var thisBotPrefix
+  if (botData.prefix){
+    thisBotPrefix = botData.prefix
+  }
+  botHosting.prefix = thisBotPrefix
   console.log(args)
   var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
   console.log(botHostingResult)
