@@ -28,7 +28,7 @@ Nom | Description
 client | Objet client de discord.js, déjà authentifié
 electron | Objet de base provenant de la librairie electron.js
 dataFolder | Chemin menant vers le dossier contenant les données de configuration et données de sauvegarde
-ipcRenderer | Objet permettant d'accéder à l'api de BotsOn
+prefix | Prefix du bot en cours d'hébergement
 
 > Exemple: this.client pour récupérer le client du bot
 
