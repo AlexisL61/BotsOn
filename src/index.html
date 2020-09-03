@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html style="overflow:hidden">
+
+<head>
+	<title>Bots On</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+		crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="./webpage-files/main-style.css">
+	</style>
+
+</head>
+
+<body id="body">
+	<section id="black-blur-background" onclick="">
+
+	</section>
+	<section id="add-bot-section" class="center all-screen-size">
+		<div style="position:absolute;" class="all-screen-size" onclick="closeCreateNewBot()">
+
+		</div>
+		<div id="add-bot-main-div" class="center add-bot-div">
+			<div>
+				<h3>
+					Insérez le token de votre bot afin de l'ajouter à l'application
+				</h3>
+				<input type="text" id="add-bot-token-input" class="input-center-reduce form-control "
+					placeholder="Token">
+				<button type="button" onclick="verifyBotToken()" id="add-bot-token-btn"
+					class="btn btn-primary button-center-reduce">Ajouter</button>
+				<a target="_blank" href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/RecevoirToken.md" class="center">
+					Je n'ai pas de token
+				</a>
+			</div>
+		</div>
+		<div id="add-bot-second-div" class="add-bot-div center">
+			<div>
+				<img class="add-bot-img" id="add-bot-second-div-img" src="">
+				<h3 id="add-bot-second-div-bot-name">
+
+				</h3>
+				<h4>
+					Ce bot a bien été ajouté
+				</h4>
+				<button type="button" onclick="closeAddBot()" id="add-bot-token-btn"
+					class="btn btn-success button-center-reduce">Parfait!</button>
+			</div>
+		</div>
+	</section>
+	<section id="main-menu-section">
+		<img id="main-menu-button-activation" onclick="openMenu()"
+			src="https://img.icons8.com/ios-filled/50/000000/menu.png">
+		<div id="main-menu-div" class="menu-div-close">
+			<img id="main-menu-quit-button" onclick="closeMenu()"
+				src="https://img.icons8.com/emoji/50/000000/cross-mark-emoji.png">
+				<div id="alwaysActiveMenuSection">
+				<div class="main-menu-button" onclick="openBotMenu()">
+					<img src="https://img.icons8.com/material/50/000000/bot.png">
+					<h4>
+						Bots
+					</h4>
+				</div>
+				</div>
+				<hr/>
+				<div id="botActiveMenuSection" style="display:none">
+					<img id="menuBotImage">
+					<h3 id="menuBotName">
+
+					</h3>
+				<div class="main-menu-button" onclick="openExtensionMenu()">
+					<img src="https://img.icons8.com/metro/50/000000/puzzle.png">
+					<h4>
+						Extension
+					</h4>
+				</div>
+				<div class="main-menu-button" onclick="openBotParametersMenu()">
+					<img src="https://img.icons8.com/ios-filled/50/000000/settings.png">
+					<h4>
+						Paramètres
+					</h4>
+					
+				</div>
+				</div>
+				</div>
+		</div>
+		
+			
+		</div>
+	</section>
+	<section id="loading-section">
+		<div class="center all-screen-size">
+			<p class="title white" id="loading-section-title">
+				Chargement
+			</p>
+		</div>
+	</section>
+	<section id="my-bots-section" class="all-screen-size" style="display:none">
+		<p class="title">
+			Vos bots
+		</p>
+		<div id="my-bots-placement">
+			<div onclick="createNewBot()" class="bot-menu-btn bot-menu-btn-no-color center">
+				<div>
+					<img src="https://img.icons8.com/ios/50/000000/plus.png">
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="bot-select-section" style="display:none">
+		<div id="bot-heberg-div">
+			<img id="bot-heberg-menu-img" class="avatar">
+			<h3 id="bot-heberg-menu-name">
+			</h3>
+			<div>
+				<button class="btn-primary btn" id="heberg-bot-btn" onclick="changeHostingStatus()">
+					Héberger
+				</button>
+			</div>
+		</div>
+		<div id="bot-extensions-list">
+			<div onclick="openAddExtensionSection()" class="extension-bot-menu-btn extension-bot-menu-btn-no-color">
+				<img src="https://img.icons8.com/ios/100/000000/plus.png" class="">
+				<h3>
+					Ajouter une extension
+				</h3>
+			</div>
+		</div>
+		<div id="extension-config-div" style="display:none">
+			<iframe id="extension-config-import">
+			</iframe>
+		</div>
+		<div id="bot-parameters-main-div" style="display:none;text-align:center">
+			<p class="title">
+				Paramètres
+			</p>
+			<div class="all-screen-size">
+			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('security')">
+				<img src="https://img.icons8.com/color/100/000000/lock.png">
+				<p>
+					Sécurité
+				</p>
+
+			</div>
+
+			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('prefix')">
+				
+				<img src="https://img.icons8.com/color/48/000000/space-before-paragraph.png" style="transform:rotate(-90deg)">
+				<p>
+					Préfix
+				</p>
+			</div>
+		</div>
+		</div>
+		<div id="bot-parameters-security-div" style="display:none;text-align:center">
+			<h3 class='title'>
+				Token
+			</h3>
+			<div class="input-group token-modify-input">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="token-addon">Token</span>
+				  </div>
+				<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control "
+				placeholder="Token">
+				</div>
+				<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">Mettre à jour</button>
+				
+		</div>
+
+		<div id="bot-parameters-prefix-div" style="display:none;text-align:center">
+			<h3 class='title'>
+				Préfix
+			</h3>
+			<div class="input-group token-modify-input">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="prefix-addon">Préfix</span>
+				  </div>
+				<input type="text" id="bot-prefix-parameters-input" aria-describedby="prefix-addon" class="form-control "
+				placeholder="Préfix">
+				</div>
+				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">Mettre à jour</button>
+				
+		</div>
+	</section>
+	<section id="add-extension-section" style="display: none;" class="center all-screen-size">
+		<div style="position:absolute;" class="all-screen-size" onclick="closeAddExtensionSection()">
+
+		</div>
+		<div id="add-extension-main-div" class="add-extension-div">
+			<h3>
+				Ajouter une extension
+			</h3>
+			<div id="extension-available-placement">
+
+			</div>
+			<a href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/Extensions.md" target="_blank" class="center">
+				Que sont les extensions?
+			</a>
+		</div>
+		<div id="add-extension-confirmation-div" class="add-extension-confirmation-div">
+			<h3>
+				Confirmation
+			</h3>
+			<p id="add-extension-confirmation-description">
+				
+			</p>
+			<button type="button" id="add-extension-confirmation-btn" class="btn btn-success button-center-reduce">Ajouter</button>
+			<button type="button" id="add-extension-cancel-btn" onclick="cancelAddExtension()" class="btn btn-danger button-center-reduce">Annuler</button>
+		
+		</div>
+	</section>
+	
+	<script src="./webpage-files/main-script.js"> </script>
+</body>
+
+</html>
