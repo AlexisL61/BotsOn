@@ -33,6 +33,13 @@ var extensionActivateBtn = `<div class="extension-bot-menu-btn {inactiveClass}" 
   </label>
 </div>`
 
+var addExtensionBtn = `<div onclick="openAddExtensionSection()" class="extension-bot-menu-btn extension-bot-menu-btn-no-color">
+<img src="https://img.icons8.com/ios/100/000000/plus.png" class="">
+<h3>
+	Ajouter une extension
+</h3>
+</div>`
+
 var extensionAvailableBtn = `<div onclick="{onClickFunction}" class="extension-available-menu-btn {inactiveClass}">
 		<img src="{extensionImg}" class="">
 		<div>
@@ -93,11 +100,8 @@ async function openBot(id) {
 	console.log("openBot")
 	var botExtensions = ipcRenderer.sendSync("getBotExtensions", { id: id })
 	var extensionList = document.getElementById("bot-extensions-list")
-	for (var i in extensionList.childNodes) {
-		if (extensionList.childNodes[i].classList && !extensionList.childNodes[i].classList.contains("extension-bot-menu-btn-no-color")) {
-			extensionList.removeChild(extensionList.childNodes[i])
-		}
-	}
+
+	extensionList.innerHTML = addExtensionBtn
 
 	for (var i in botExtensions) {
 		var thisExtensionData = botExtensions[i]
@@ -330,7 +334,6 @@ async function openBotParametersSubMenu(parameter){
 	if (parameter=="security"){
 		document.getElementById("bot-parameters-security-div").style.display = "block"
 		ipcRenderer.send("getBotPrivateData",{"botId":currentBotOpenId})
-		console.log(botData)
 		ipcRenderer.once("getBotPrivateData",function(event,botData){
 			document.getElementById("bot-token-parameters-input").value = botData.token
 		})
@@ -346,11 +349,23 @@ async function openBotParametersSubMenu(parameter){
 			}
 		})
 	}
+	if (parameter=="user"){
+		document.getElementById("bot-parameters-user-div").style.display = "block"
+		ipcRenderer.send("getBotUser",{"botId":currentBotOpenId})
+		ipcRenderer.once("getBotUser",function(event,user){
+			if (user){
+				document.getElementById("bot-user-parameters-input").value = user
+			}else{
+				document.getElementById("bot-user-parameters-input").value = ""
+			}
+		})
+	}
 }
 
 function closeEveryBotParametersSubMenu(){
 	document.getElementById("bot-parameters-security-div").style.display = "none"
 	document.getElementById("bot-parameters-prefix-div").style.display = "none"
+	document.getElementById("bot-parameters-user-div").style.display = "none"
 }
 
 function editBotData(){
@@ -369,6 +384,14 @@ function editBotPrefix(){
 	var prefixChangeResult = ipcRenderer.sendSync("modifyBotPrefix", {"botId":currentBotOpenId, "prefix": document.getElementById("bot-prefix-parameters-input").value})
 	if (prefixChangeResult.success == true){
 		document.getElementById("bot-prefix-parameters-input").style.borderColor = "green"
+	}
+}
+
+function editBotUser(){
+	document.getElementById("bot-user-parameters-input").style.borderColor = ""
+	var userChangeResult = ipcRenderer.sendSync("modifyBotUser", {"botId":currentBotOpenId, "user": document.getElementById("bot-user-parameters-input").value})
+	if (userChangeResult.success == true){
+		document.getElementById("bot-user-parameters-input").style.borderColor = "green"
 	}
 }
 

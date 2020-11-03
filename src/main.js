@@ -204,16 +204,32 @@ ipc.on("getBotPrivateData",function(event,args){
 
 ipc.on("getBotPrefix",function(event,args){
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
-  var thisBotPrefix
+  var thisBotPrefix = "!"
   if (botData.prefix){
     thisBotPrefix = botData.prefix
   }
   event.sender.send("getBotPrefix",thisBotPrefix)
 })
 
+ipc.on("getBotUser",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var thisBotUser
+  if (botData.user){
+    thisBotUser = botData.user
+  }
+  event.sender.send("getBotUser",thisBotUser)
+})
+
 ipc.on("modifyBotPrefix",function(event,args){
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
   botData.prefix = args.prefix
+  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  event.returnValue = {"success":true}
+})
+
+ipc.on("modifyBotUser",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  botData.user = args.user
   fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
   event.returnValue = {"success":true}
 })
@@ -293,11 +309,16 @@ ipc.on("startHosting",async function (event,args){
   botHosting.electron = electron
   botHosting.dataExtensionFolder = dataFolder+"/bots/" + args.id + "/extensions"
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.id+"/botdata.json","utf-8"))
-  var thisBotPrefix
+  var thisBotPrefix = "!"
   if (botData.prefix){
     thisBotPrefix = botData.prefix
   }
   botHosting.prefix = thisBotPrefix
+  var thisBotUser = ""
+  if (botData.user){
+    thisBotUser = botData.user
+  }
+  botHosting.user = thisbotUser
   console.log(args)
   var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
   console.log(botHostingResult)

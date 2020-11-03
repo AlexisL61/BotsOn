@@ -120,12 +120,7 @@
 			</div>
 		</div>
 		<div id="bot-extensions-list">
-			<div onclick="openAddExtensionSection()" class="extension-bot-menu-btn extension-bot-menu-btn-no-color">
-				<img src="https://img.icons8.com/ios/100/000000/plus.png" class="">
-				<h3>
-					Ajouter une extension
-				</h3>
-			</div>
+			
 		</div>
 		<div id="extension-config-div" style="display:none">
 			<iframe id="extension-config-import">
@@ -146,9 +141,17 @@
 
 			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('prefix')">
 				
-				<img src="https://img.icons8.com/color/48/000000/space-before-paragraph.png" style="transform:rotate(-90deg)">
+				<img src="https://img.icons8.com/color/100/000000/space-before-paragraph.png" style="transform:rotate(-90deg)">
 				<p>
 					Préfix
+				</p>
+			</div>
+
+			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('user')">
+				
+				<img src="https://img.icons8.com/fluent/100/000000/user-male-circle.png">
+				<p>
+					Utilisateur
 				</p>
 			</div>
 		</div>
@@ -180,6 +183,21 @@
 				placeholder="Préfix">
 				</div>
 				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">Mettre à jour</button>
+				
+		</div>
+
+		<div id="bot-parameters-user-div" style="display:none;text-align:center">
+			<h3 class='title'>
+				Utilisateur
+			</h3>
+			<div class="input-group token-modify-input">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="user-addon">Utilisateur</span>
+				  </div>
+				<input type="text" id="bot-user-parameters-input" aria-describedby="user-addon" class="form-control "
+				placeholder="Votre identifiant ou tag discord">
+				</div>
+				<button type="button" onclick="editBotUser()" id="edit-bot-user-btn" class="btn btn-success">Mettre à jour</button>
 				
 		</div>
 	</section>
