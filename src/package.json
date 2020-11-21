@@ -44,12 +44,13 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "decompress": "^4.2.1",
+    "discord-rpc": "^3.1.4",
     "discord.js": "^12.2.0",
     "electron-forge": "^5.2.4",
     "electron-is-dev": "^1.2.0",
     "electron-squirrel-startup": "^1.0.0",
     "extract-zip": "^2.0.1",
-    "isolated-vm": "^3.3.5",
     "nan": "^2.14.0",
     "unzipper": "^0.10.11"
   },

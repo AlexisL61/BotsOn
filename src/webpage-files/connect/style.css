@@ -1,0 +1,64 @@
+#background-section{
+    position:absolute;
+}
+
+.center{
+	display:flex;
+	align-items:center;
+}
+
+#left-background-img{
+    width:80vw;
+    position:absolute;
+}
+#right-background-img{
+    background-image: url("../../files/images/background.jpg");
+	background-repeat:repeat;
+	background-size: auto;
+	width:100vw;
+	height:100vh;
+    z-index:3;
+}
+body{
+    background-color: #23272a;
+}
+
+h2{
+    font-weight:600;
+    font-size:24px;
+    line-height:30px;
+}
+
+h3{
+    color:#b9bbbe;
+    font-size:16px;
+    line-height:20px;
+    margin-bottom:16px;
+}
+
+.btn-blinking{
+    animation-iteration-count: infinite;
+  	animation-direction: alternate;
+	animation-duration: 1s;
+	animation-name: textBlinkingAnimation;
+}
+  @keyframes textBlinkingAnimation {
+    from {
+      color: white;
+    }
+    50%{
+        color: rgb(128, 128, 128);
+    }
+    to {
+        color: white;
+    }
+  }
+
+#connect-div{
+    padding:32px;
+    border-radius:5px;
+    font-size:18px;
+    width:300px;
+    background-color: #36393f;
+    box-shadow:0 2px 10px 0 rgba(0,0,0,.2);
+}

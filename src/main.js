@@ -1,5 +1,5 @@
 //Modules and variables
-const { app, BrowserWindow, autoUpdater,protocol } = require('electron')
+const { app, BrowserWindow, autoUpdater,protocol,Menu } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -10,12 +10,20 @@ const discord = require("discord.js")
 const isDev = require('electron-is-dev');
 const dataFolder = app.getPath('userData')
 const directory = app.getAppPath()
+const RPC = require("discord-rpc")
+const RPCclient = new RPC.Client({ transport: 'ipc' })
+
+const clientId = '774665586001051648';
+const scopes = [ 'identify'];
+
+var mainWindow
 
 console.log(dataFolder)
 
 const discordTokenVerify = require("./main_scripts/verify-token.js")
 const api = require("./main_scripts/api.js")
 const botHosting = require("./main_scripts/hosting.js")
+const richPresence = require("./main_scripts/rich-presence.js")
 
 console.log(process.arch)
 //const server = 'https://update.electronjs.org'
@@ -41,10 +49,21 @@ function createWindow() {
   })
 
   //load the index.html of the app.
-  mainWindow.loadFile('index.html')
-  mainWindow.setMenu(null)
+  mainWindow.loadFile('./webpage-files/connect/connect.html')
+  mainWindow.setMenu(Menu.buildFromTemplate([{
+    label: "Debug",
+    submenu: [
+      {
+        label: "Ouvrir les Dev Tools",
+        accelerator: "F12",
+        click: () => {
+          mainWindow.webContents.toggleDevTools();
+        }
+      }
+    ]
+  }]))
 
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools();
 
   
   //mainWindow.webContents.executeJavaScript(`console.log("`+process.argv+`")`)
@@ -71,7 +90,7 @@ function createDownloadWindow() {
   mainWindow.loadFile('download.html')
   mainWindow.setMenu(null)
 
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   
 }
@@ -81,6 +100,7 @@ app.on("ready", () => {
   if (!process.argv.find(arg=>arg.startsWith("botson://"))){
     app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
     createWindow()
+    //createDownloadWindow()
     
   }else{
     createDownloadWindow()
@@ -104,6 +124,8 @@ function getBotExtensionsData(args){
   var botExtensions = []
   var directory = app.getAppPath()
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
+    var botName = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id+"/botdata.json")).name
+    richPresence.changeRPC({"state":"Configure "+botName})
     var extensions = fs.readdirSync(dataFolder + "/bots/" + args.id + "/extensions")
     extensions.forEach(function (extension) {
       if (fs.existsSync(dataFolder + "/extension-install/" + extension )){
@@ -115,6 +137,25 @@ function getBotExtensionsData(args){
   }
   return botExtensions
 }
+
+ipc.on("connect-discord",function(event,args){
+  try{
+    RPCclient.login({ clientId});
+  }catch(e){
+    
+    console.log("ERROR")
+  }
+  RPCclient.once("connected", () => {
+    richPresence.init(RPCclient)
+    richPresence.changeRPC({"state":"Sélectionne son bot"})
+    console.log(RPCclient.user.username)
+    mainWindow.loadFile('./index.html')
+    event.sender.send("connect-discord",{"status":"connect"})
+  })
+  RPCclient.on("error",()=>{
+  })
+})
+
 
 //communicate with webpage
 ipc.on("firstTimeOpenApp", function (event, args) {
@@ -131,21 +172,27 @@ ipc.on("getDataFolder",function(event,args){
 
 ipc.on("downloadExtensionFromURL",function(event,args){
   var url = process.argv.find(arg=>arg.startsWith("botson://")).split("botson://")[1]
-    if (url.endsWith(".zip")){
       axios({
         method: "get",
         url: url,
         responseType: "stream"
     }).then(async function (response) {
       event.sender.send("downloadFinish")
-      response.data.pipe(fs.createWriteStream(dataFolder+"/temp.zip"));
+      var stream = fs.createWriteStream(dataFolder+"/temp.zip")
+      response.data.pipe(stream);
+      stream.on("finish",async function(){
+        try{
       if (!fs.existsSync(dataFolder + "/extension-install")){
         fs.mkdirSync(dataFolder + "/extension-install")
       }
-      await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) })
-      
-      event.sender.send("unzipFinish")
+        await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) 
+        event.sender.send("unzipFinish")
+    }catch(e){
+      event.sender.send("error",{error:e})
     }
+      
+    })
+    })
 })
 
 ipc.on("checkDiscordToken", async function (event, args) {
@@ -202,6 +249,24 @@ ipc.on("getBotPrivateData",function(event,args){
   event.sender.send("getBotPrivateData",botData)
 })
 
+ipc.on("getBotIntents",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var thisBotIntents = {"presence_intent":false, "server_members_intent":false}
+  if (botData.intents){
+    thisBotIntents = botData.intents
+  }
+  event.sender.send("getBotIntents",thisBotIntents)
+})
+
+ipc.on("getBotGeneralCommands",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var thisBotGeneralCommands = {"help":false}
+  if (botData.generalCommands){
+    thisBotGeneralCommands = botData.generalCommands
+  }
+  event.sender.send("getBotGeneralCommands",thisBotGeneralCommands)
+})
+
 ipc.on("getBotPrefix",function(event,args){
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
   var thisBotPrefix = "!"
@@ -230,6 +295,34 @@ ipc.on("modifyBotPrefix",function(event,args){
 ipc.on("modifyBotUser",function(event,args){
   var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
   botData.user = args.user
+  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  event.returnValue = {"success":true}
+})
+
+ipc.on("modifyBotIntent",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  if (!botData.intents){
+    botData.intents = {}
+  }
+  if (!botData.intents[args.intent]){
+    botData.intents[args.intent] = false
+  }
+  botData.intents[args.intent] = !botData.intents[args.intent]
+  console.log("intents: "+botData.intents)
+  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  event.returnValue = {"success":true}
+})
+
+ipc.on("modifyBotGeneralCommand",function(event,args){
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  if (!botData.generalCommands){
+    botData.generalCommands = {}
+  }
+  if (!botData.generalCommands[args.command]){
+    botData.generalCommands[args.command] = false
+  }
+  botData.generalCommands[args.command] = !botData.generalCommands[args.command]
+  console.log("intents: "+botData.generalCommands)
   fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
   event.returnValue = {"success":true}
 })
@@ -318,8 +411,21 @@ ipc.on("startHosting",async function (event,args){
   if (botData.user){
     thisBotUser = botData.user
   }
-  botHosting.user = thisbotUser
-  console.log(args)
+  if (RPCclient.user.id){
+    botHosting.user = RPCclient.user.id
+  }else{
+    botHosting.user = thisBotUser
+  }
+  var thisBotIntents = {"presence":false,"guild_members":false}
+  if (botData.intents){
+    thisBotIntents = botData.intents
+  }
+  botHosting.intents = thisBotIntents
+  var thisBotGeneralCommands = {"help":false}
+  if (botData.generalCommands){
+    thisBotGeneralCommands = botData.generalCommands
+  }
+  botHosting.generalCommands = thisBotGeneralCommands
   var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
   console.log(botHostingResult)
   event.sender.send("startHosting",botHostingResult)
@@ -337,6 +443,10 @@ ipc.on("getBotExtensions",function (event, args) {
 
 ipc.on("getBotData", function (event, args) {
   event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botData.json", "utf8"))
+})
+
+ipc.on("getUser",function(event,args){
+  event.returnValue = RPCclient.user
 })
 
 ipc.on("getUserBots", function (event, args) {

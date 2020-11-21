@@ -28,6 +28,9 @@
 			finish = true
 			document.getElementById("downloading-section-title").innerHTML = "Installation de l'extension terminée.<br/>Vous pouvez fermer cette fenêtre"
 		})
+		ipcRenderer.on("error",function(e){
+			document.getElementById("downloading-section-title").innerHTML = e.error
+		})
 	</script>
 </body>
 
