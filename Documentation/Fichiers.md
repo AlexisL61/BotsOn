@@ -25,7 +25,7 @@ Ce fichier peut accueillir les informations suivantes:
     "smallDescription":"<Description courte>",
     "description":"<Description de l'extension>",
     "help":{
-      "active":<boolean Si l'extension s'affiche dans le help ou non>,
+      "active":"<Si l'extension s'affiche dans le help ou non (true ou false)>",
     	 "field":{
     		 "name":"<Nom du field s'ajoutant dans le help>",
     		 "value":"<Valeur du field s'ajoutant dans le help>"
@@ -34,6 +34,7 @@ Ce fichier peut accueillir les informations suivantes:
   }
 ```
 > L'information *description* sera intégrée plus tard dans l'application, il est donc conseillé de la remplir
+
 > L'information help est optionnel, mais il est conseillé de la remplir pour une meilleure intégration de votre extension dans l'app
 
 ## Front-end
