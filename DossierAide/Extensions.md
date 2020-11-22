@@ -3,6 +3,8 @@
 Les extensions sont des fichiers optionnelles, créés par d'autres utilisateurs, qui permettent de modifier le comportement de votre bot.
 Sans les extensions, l'application permettrait seulement d'allumer votre bot.
 
+Une grande majorité d'extension est disponible sur notre serveur discord: https://discord.gg/xDZNDqKgYe
+
 ## Installation
 
 Les extensions peuvent être téléchargées en cliquant sur un lien BotsOn.
