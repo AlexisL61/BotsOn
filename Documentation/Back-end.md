@@ -29,6 +29,9 @@ client | Objet client de discord.js, déjà authentifié
 electron | Objet de base provenant de la librairie electron.js
 dataFolder | Chemin menant vers le dossier contenant les données de configuration et données de sauvegarde
 prefix | Prefix du bot en cours d'hébergement
+location | Chemin menant vers le dossier de l'installation de votre extension
+intents | Les intents activés pour le bot utilisé
+user | L'id d'utilisateur utilisant actuellement l'application
 
 > Exemple: this.client pour récupérer le client du bot
 
