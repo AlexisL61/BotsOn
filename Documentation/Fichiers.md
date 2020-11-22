@@ -17,16 +17,24 @@ D'autres fichiers peuvent aussi être ajoutés mais ils ne sont pas obligatoires
 Le fichier extension-data.json est le fichier principal de votre extension, il contient toutes les informations de votre extension.
 Ce fichier peut accueillir les informations suivantes:
 ```json
-  {
+  {   
     "name":"<nom de l'extension>",
     "id":"<id-extension>",
     "author":"<Auteur de l'extension>",
     "image":"<Image de l'extension>",
     "smallDescription":"<Description courte>",
-    "description":"<Description de l'extension>"
+    "description":"<Description de l'extension>",
+    "help":{
+      "active":<boolean Si l'extension s'affiche dans le help ou non>,
+    	 "field":{
+    		 "name":"<Nom du field s'ajoutant dans le help>",
+    		 "value":"<Valeur du field s'ajoutant dans le help>"
+    	 }
+    }
   }
 ```
 > L'information *description* sera intégrée plus tard dans l'application, il est donc conseillé de la remplir
+> L'information help est optionnel, mais il est conseillé de la remplir pour une meilleure intégration de votre extension dans l'app
 
 ## Front-end
 
