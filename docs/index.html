@@ -3,6 +3,12 @@
 
     </head>
     <body>
-        
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            const myParam = urlParams.get('r');
+            if (myParam){
+              window.location.href = myParam
+            }
+        </script>
     </body>
 </html>
