@@ -26,12 +26,15 @@ Il est possible de récupérer certains objets provenant du programme principal 
 Nom | Description
 ------------ | -------------
 client | Objet client de discord.js, déjà authentifié
+discord | Objet Discord de discord.js
 electron | Objet de base provenant de la librairie electron.js
 dataFolder | Chemin menant vers le dossier contenant les données de configuration et données de sauvegarde
 prefix | Prefix du bot en cours d'hébergement
 location | Chemin menant vers le dossier de l'installation de votre extension
 intents | Les intents activés pour le bot utilisé
 user | L'id d'utilisateur utilisant actuellement l'application
+canvas | Permet d'utiliser le module BotsOn: Canvas (requiert la permission canvas)
+onApp | Boolean permettant de savoir si le bot démarré sur l'application BotsOn (true) ou sur un bot exporté
 
 > Exemple: this.client pour récupérer le client du bot
 
@@ -46,7 +49,7 @@ Pour en ajouter, créez un fichier package.json avec la commande npm init dans l
 
 ##### Exception
 
-Lors du démarrage de l'hébergement, l'application peut envoyer une erreur par rapport à la version d'electron et de vos modules qui ne sont pas les mêmes
+Lors du démarrage de l'hébergement, l'application peut, pour certains modules, envoyer une erreur par rapport à la version d'electron et de vos modules qui ne sont pas les mêmes. 
 Pour corriger ce problème, vous devez installer le module electron-rebuild et le module electron.
 Le module electron téléchargé doit avoir la même version que la version d'electron de l'application: 9.0.5
 
