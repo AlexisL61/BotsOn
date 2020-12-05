@@ -30,12 +30,15 @@ Ce fichier peut accueillir les informations suivantes:
     		 "name":"<Nom du field s'ajoutant dans le help>",
     		 "value":"<Valeur du field s'ajoutant dans le help>"
     	 }
-    }
+    },
+    "require":["canvas"]
   }
 ```
 > L'information *description* sera intégrée plus tard dans l'application, il est donc conseillé de la remplir
 
 > L'information help est optionnel, mais il est conseillé de la remplir pour une meilleure intégration de votre extension dans l'app
+
+> L'information require permet d'avoir accès à certaines options en plus, comme ici, le module BotsOn canvas
 
 ## Front-end
 
