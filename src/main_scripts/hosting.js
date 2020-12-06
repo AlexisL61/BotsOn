@@ -1,8 +1,9 @@
 
-var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user
+var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path
 var fs = require("fs")
-
-
+var currentOpenWebPage
+var canvas  = require("./canvas.js")
+console.log(canvas)
 module.exports = {
 
     startHosting(Discord,token,extensions){
@@ -16,10 +17,11 @@ module.exports = {
         directory = this.directory
         electron = this.electron
         dataExtensionFolder = this.dataExtensionFolder
-        ipcRenderer = this.ipcRenderer
+        ipcRenderer = this.ipc
         prefix = this.prefix
         intents = this.intents
         user = this.user
+        path = this.path
         generalCommands = this.generalCommands
         if (client != undefined){
             client.destroy()
@@ -42,10 +44,34 @@ module.exports = {
             client.emit("botLogin",{"success":false,"error":"onLogin"})
         })
         
-        client.once("ready",function(){
+        client.once("ready",async function(){
             console.log(extensions)
+            var needCanvas = false
             for (var i in extensions){
                 if (extensions[i].active){
+                    var thisExtensionHost = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
+                    if (thisExtensionHost.require && thisExtensionHost.require.find(data=>data=="canvas")){
+                        needCanvas = true
+                    }
+                }
+            }
+            if (needCanvas == true){
+                currentOpenWebPage = new electron.BrowserWindow({
+                    width:1000,
+                    height:1000,
+                    center: true,
+                    show:false,
+                    webPreferences: {
+                        preload: path.join(__dirname, '../preload.js')
+                    }
+                })
+                await currentOpenWebPage.loadFile('./webpage-files/canvas/canvas.html')
+                currentOpenWebPage.webContents.openDevTools()
+                canvas.init(currentOpenWebPage.webContents,ipcRenderer)
+            }
+            for (var i in extensions){
+                if (extensions[i].active){
+                    var thisExtensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
                     var thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
                     thisExtensionHost.client = client
                     thisExtensionHost.electron = electron
@@ -54,6 +80,12 @@ module.exports = {
                     thisExtensionHost.prefix = prefix
                     thisExtensionHost.intents = intents
                     thisExtensionHost.user = user
+                    thisExtensionHost.discord = Discord
+                    thisExtensionHost.onApp = true
+                    if (thisExtensionData.require && thisExtensionData.require.find(data=>data=="canvas")){
+                        thisExtensionHost.canvas = canvas
+                        console.log(canvas)
+                    }
                     console.log("thisExtensionHost")
                     thisExtensionHost.start()
                 }
@@ -98,6 +130,9 @@ module.exports = {
         if (client){
             client.emit("stopHosting")
             client.destroy()
+        }
+        if (currentOpenWebPage){
+            currentOpenWebPage.close()
         }
         return {"success":true}
     }

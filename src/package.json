@@ -7,6 +7,7 @@
   "scripts": {
     "start": "electron .",
     "package": "electron-forge package",
+    "packagemac": "electron-forge package --platform darwin",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
@@ -44,23 +45,20 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "decompress": "^4.2.1",
+    "canvas-to-buffer": "^1.1.1",
     "discord-rpc": "^3.1.4",
     "discord.js": "^12.2.0",
-    "electron-forge": "^5.2.4",
-    "electron-is-dev": "^1.2.0",
     "electron-squirrel-startup": "^1.0.0",
     "extract-zip": "^2.0.1",
-    "nan": "^2.14.0",
-    "unzipper": "^0.10.11"
+    "fs-extra": "^9.0.1"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.52",
+    "@electron-forge/cli": "^6.0.0-beta.54",
     "@electron-forge/maker-deb": "^6.0.0-beta.51",
     "@electron-forge/maker-rpm": "^6.0.0-beta.51",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.51",
     "@electron-forge/maker-zip": "^6.0.0-beta.51",
-    "electron": "^9.0.5"
+    "electron": "^9.3.5"
   },
   "build": {
     "appId": "botson",

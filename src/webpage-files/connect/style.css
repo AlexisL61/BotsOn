@@ -62,3 +62,19 @@ h3{
     background-color: #36393f;
     box-shadow:0 2px 10px 0 rgba(0,0,0,.2);
 }
+
+#discord-logo{
+    position:absolute;
+    width:50px;
+    margin-top:100vh;
+    transform:translateY(-75px);
+    margin-left: 25px;
+}
+
+#credits-logo{
+    position:absolute;
+    width:50px;
+    margin-top:100vh;
+    margin-left:100vw;
+    transform:translateY(-75px) translateX(-100px);
+}
