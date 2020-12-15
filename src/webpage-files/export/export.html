@@ -29,8 +29,9 @@
 	<script>
 		var finish = false
 		var botId;
-		ipcRenderer.send("confirmWebPageExport","")
+		ipcRenderer.send("confirmWebPageExport",{language:"fr_FR"})
 		ipcRenderer.on("webPageExport",function(event,args){
+			
 			if (args.subtitle){
                 document.getElementById("exporting-section-subtitle").innerHTML = args.subtitle
             }

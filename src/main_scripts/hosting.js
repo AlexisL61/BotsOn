@@ -1,8 +1,9 @@
 
-var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path
+var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path,discord,Notification
 var fs = require("fs")
 var currentOpenWebPage
 var canvas  = require("./canvas.js")
+const child_process = require("child_process")
 console.log(canvas)
 module.exports = {
 
@@ -13,7 +14,7 @@ module.exports = {
         
             ]
         }
-
+        Notification = this.notification
         directory = this.directory
         electron = this.electron
         dataExtensionFolder = this.dataExtensionFolder
@@ -23,6 +24,7 @@ module.exports = {
         user = this.user
         path = this.path
         generalCommands = this.generalCommands
+        discord = Discord
         if (client != undefined){
             client.destroy()
         }
@@ -71,7 +73,11 @@ module.exports = {
             }
             for (var i in extensions){
                 if (extensions[i].active){
+                    try{
                     var thisExtensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
+                    if (require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]){
+                        delete require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]
+                    }
                     var thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
                     thisExtensionHost.client = client
                     thisExtensionHost.electron = electron
@@ -80,14 +86,30 @@ module.exports = {
                     thisExtensionHost.prefix = prefix
                     thisExtensionHost.intents = intents
                     thisExtensionHost.user = user
-                    thisExtensionHost.discord = Discord
+                    thisExtensionHost.discord = discord
                     thisExtensionHost.onApp = true
                     if (thisExtensionData.require && thisExtensionData.require.find(data=>data=="canvas")){
                         thisExtensionHost.canvas = canvas
                         console.log(canvas)
                     }
                     console.log("thisExtensionHost")
-                    thisExtensionHost.start()
+                        thisExtensionHost.start()
+                    }catch(e){
+                        console.log(e)
+                        if (!fs.existsSync(directory+"/logs")){
+                            fs.mkdirSync(directory+"/logs")
+                        }
+                        fs.writeFileSync(directory+"/logs/"+extensions[i].id+".txt",e)
+                        var thisIndex = i
+                        var customNotification = new Notification({"title":"Erreur démarrage d'extension","body":"L'extension "+extensions[i].id+" n'a pas pu démarrer. Cliquez pour voir l'erreur"})
+                        customNotification.show()
+                        customNotification.addListener('click', () => { 
+                            console.log("click")
+                            console.log(directory)
+                            child_process.exec('start "" '+directory+"\\logs\\"+extensions[thisIndex].id+".txt", function(stdout) {
+                            });
+                        });
+                    }
                 }
             }
             client.emit("botLogin",{"success":true})
@@ -132,7 +154,11 @@ module.exports = {
             client.destroy()
         }
         if (currentOpenWebPage){
+            try{
             currentOpenWebPage.close()
+            }catch(e){
+
+            }
         }
         return {"success":true}
     }

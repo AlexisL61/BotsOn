@@ -3,6 +3,7 @@
 
 <head>
 	<title>Bots On</title>
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
 		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
@@ -24,15 +25,15 @@
 		<div id="add-bot-main-div" class="center add-bot-div ">
 			<div style="margin-top:10px">
 				<h3 class="text-white">
-					Insérez le token de votre bot afin de l'ajouter à l'application
+					{addToken}
 				</h3>
 				<input type="text" id="add-bot-token-input" class="input-center-reduce form-control form-control-dark"
-					placeholder="Token">
+					placeholder="{token}">
 					<div class="footer">
 						<button type="button" onclick="verifyBotToken()" id="add-bot-token-btn"
-							class="btn btn-primary button-right-reduce">Ajouter</button>
+							class="btn btn-primary button-right-reduce">{add}</button>
 						<a target="_blank" href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/RecevoirToken.md" class="center text-white">
-							Je n'ai pas de token
+							{noToken}
 						</a>
 				</div>
 			</div>
@@ -44,10 +45,10 @@
 
 				</h3>
 				<h4 class="text-white">
-					Ce bot a bien été ajouté
+					{botAddSuccess}
 				</h4>
 				<button type="button" onclick="closeAddBot()" id="add-bot-token-btn"
-					class="btn btn-success button-center-reduce">Parfait!</button>
+					class="btn btn-success button-center-reduce">{perfectExclamative}</button>
 			</div>
 		</div>
 	</section>
@@ -61,7 +62,7 @@
 				<div class="main-menu-button" onclick="openBotMenu()">
 					<img src="https://img.icons8.com/material/50/000000/bot.png">
 					<h4>
-						Bots
+						{bots}
 					</h4>
 				</div>
 				</div>
@@ -74,20 +75,20 @@
 				<div class="main-menu-button" onclick="openExtensionMenu()">
 					<img src="https://img.icons8.com/metro/50/000000/puzzle.png">
 					<h4>
-						Extension
+						{extensions}
 					</h4>
 				</div>
 				<div class="main-menu-button" onclick="openBotParametersMenu()">
 					<img src="https://img.icons8.com/ios-filled/50/000000/settings.png">
 					<h4>
-						Paramètres
+						{parameters}
 					</h4>
 					
 				</div>
 				<div class="main-menu-button" onclick="startBotExport()">
 					<img src="https://img.icons8.com/fluent-systems-filled/48/000000/share-rounded.png">
 					<h4>
-						Exporter
+						{export}
 					</h4>
 					
 				</div>
@@ -101,13 +102,13 @@
 	<section id="loading-section">
 		<div class="center all-screen-size">
 			<p class="title white" id="loading-section-title">
-				Chargement
+				{loading}
 			</p>
 		</div>
 	</section>
 	<section id="my-bots-section" class="all-screen-size div-dark" style="display:none">
 		<p class="title">
-			Vos bots
+			{yourBots}
 		</p>
 		<div id="my-bots-placement">
 			<div onclick="createNewBot()" class="bot-menu-btn bot-menu-btn-no-color center">
@@ -124,7 +125,7 @@
 			</h3>
 			<div>
 				<button class="btn-primary btn" id="heberg-bot-btn" onclick="changeHostingStatus()">
-					Héberger
+					{host}
 				</button>
 			</div>
 		</div>
@@ -137,13 +138,13 @@
 		</div>
 		<div id="bot-parameters-main-div" class="dark-background" style="display:none;text-align:center">
 			<p class="title">
-				Paramètres
+				{parameters}
 			</p>
 			<div class="all-screen-size">
 			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('security')">
 				<img src="https://img.icons8.com/color/100/000000/lock.png">
 				<p>
-					Sécurité
+					{security}
 				</p>
 
 			</div>
@@ -152,7 +153,7 @@
 				
 				<img src="https://img.icons8.com/color/100/000000/space-before-paragraph.png" style="transform:rotate(-90deg)">
 				<p>
-					Préfix
+					{prefix}
 				</p>
 			</div>
 
@@ -160,7 +161,7 @@
 				
 				<img src="https://img.icons8.com/fluent/100/000000/user-male-circle.png">
 				<p>
-					Utilisateur
+					{user}
 				</p>
 			</div>
 
@@ -168,80 +169,80 @@
 				
 				<img src="https://img.icons8.com/office/100/000000/tasks.png">
 				<p>
-					Intents
+					{intents}
 				</p>
 			</div>
 			<div class="parameters-button-opener" onclick="openBotParametersSubMenu('generalcommands')">
 				
 				<img src="https://img.icons8.com/office/100/000000/tasks.png">
 				<p>
-					Commandes générales
+					{generalCommands}
 				</p>
 			</div>
 		</div>
 		</div>
 		<div id="bot-parameters-security-div" class="dark-background" style="display:none;text-align:center">
 			<h3 class='title'>
-				Token
+				{token}
 			</h3>
 			<p class="subtitle">
-				Le token est la clé vers votre bot<br/>C'est le seul moyen pour l'application de se connecter à votre bot Discord.<br/><b>Ce token doit être gardé secret</b>
+				{tokenExplanation}
 			</p>
 			<div class="input-group token-modify-input">
 				<div class="input-group-prepend">
-					<span class="input-group-text" id="token-addon">Token</span>
+					<span class="input-group-text" id="token-addon">{token}</span>
 				  </div>
 				<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control form-control-dark"
-				placeholder="Token">
+				placeholder="{token}">
 				</div>
-				<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">Mettre à jour</button>
+				<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">{update}</button>
 				
 		</div>
 
 		<div id="bot-parameters-prefix-div" class="dark-background" style="display:none;text-align:center">
 			<h3 class='title'>
-				Préfix
+				{prefix}
 			</h3>
 			<p class="subtitle">
-				Le prefix est utilisé par certaines extensions pour l'utilisation des commandes<br/>Changer ce prefix changera la majorité des prefix de vos extensions
+				{prefixExplanation}
 			</p>
 			<div class="input-group token-modify-input">
 				<div class="input-group-prepend">
-					<span class="input-group-text" id="prefix-addon">Préfix</span>
+					<span class="input-group-text" id="prefix-addon">{prefix}</span>
 				  </div>
 				<input type="text" id="bot-prefix-parameters-input" aria-describedby="prefix-addon" class="form-control form-control-dark"
-				placeholder="Préfix">
+				placeholder="{prefix}">
 				</div>
-				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">Mettre à jour</button>
+				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">{update}</button>
 				
 		</div>
 
 		<div id="bot-parameters-user-div" class="dark-background" style="display:none;text-align:center">
 			<h3 class='title'>
-				Utilisateur
+				{user}
 			</h3>
 			<p class="subtitle">
-				L'utilisateur est la personne utilisant l'app, c'est vous<br/>Ce paramêtre sera enlevé dans une prochaine mise à jour.
+				{userExplanation}
 			</p>
 			<div class="input-group token-modify-input">
 				<div class="input-group-prepend">
-					<span class="input-group-text" id="user-addon">Utilisateur</span>
+					<span class="input-group-text" id="user-addon">{user}</span>
 				  </div>
 				<input type="text" id="bot-user-parameters-input" aria-describedby="user-addon" class="form-control form-control-dark"
-				placeholder="Votre identifiant ou tag discord">
+				placeholder="{yourId}">
 				</div>
-				<button type="button" onclick="editBotUser()" id="edit-bot-user-btn" class="btn btn-success">Mettre à jour</button>
+				<button type="button" onclick="editBotUser()" id="edit-bot-user-btn" class="btn btn-success">{update}</button>
 				
 		</div>
 	<div id="bot-parameters-intents-div" class="dark-background" style="display:none;text-align:center">
 		<h3 class='title'>
-			Intents
+			{intents}
 		</h3>
 		<p class="subtitle">
-			Les intents sont des options permettant à un bot de recevoir des données supplémentaires.<br/>Pour que les intents marchent, vous devez auparavant les activer dans les paramètres de votre application Discord
+			{intentsExplanation}
 		</p>
 		<div>
-			<p class="text-white" style="font-size: 24px; display:contents">Presence intent</p>
+			<p class="text-white" style="font-size: 24px; display:contents">{presenceIntent}</p>
 			
 			<label class="switch" style="margin-left:15px"  >
 				<input type="checkbox" id="bot-intents-parameters-input-presence" >
@@ -249,7 +250,7 @@
 		</div>
 
 		<div>
-			<p class="text-white" style="font-size: 24px; display:contents">Guild members intent</p>
+			<p class="text-white" style="font-size: 24px; display:contents">{guildMembersIntent}</p>
 			
 			<label class="switch" style="margin-left:15px"  >
 				<input type="checkbox" id="bot-intents-parameters-input-guild-members">
@@ -260,10 +261,10 @@
 		</div>
 		<div id="bot-parameters-general-commands-div" class="dark-background" style="display: none; text-align: center;">
 			<h3 class="title">
-				Commandes générales
+				{generalCommands}
 			</h3>
 			<p class="subtitle">
-				Les commandes générales sont des commandes optionnelles intégrées à votre bot. <br>Ces commandes changent en fonction des extensions que vous utilisez pour votre bot
+				{generalCommandsExplanation}
 			</p>
 			<hr/>
 			<div style="margin-left: 25vw;text-align:center;">
@@ -275,7 +276,7 @@
 						<span class="slider round" onclick="editBotGeneralCommands('help')"></span>
 					</div>
 					<p class="subtitle" style="font-size: 16px;text-align: left;">
-						La commande help permet de montrer un message d'aide. Les fonctionnalités incluts dans le help sont modifiés par les extensions que vous avez installées.
+						{generalCommandsHelpExplanation}
 					</p>
 				</div>
 			</div>
@@ -287,31 +288,31 @@
 		</div>
 		<div id="add-extension-main-div" class="add-extension-div">
 			<h3 class="text-white">
-				Ajouter une extension
+				{addExtension}
 			</h3>
 			<div id="extension-available-placement">
 
 			</div>
 			<a href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/Extensions.md" target="_blank" class="center">
-				Que sont les extensions?
+				{whatIsExtension}
 			</a>
 		</div>
 		<div id="add-extension-confirmation-div" class="add-extension-confirmation-div">
 			<h3>
-				Confirmation
+				{confirmation}
 			</h3>
 			<p id="add-extension-confirmation-description">
 				
 			</p>
-			<button type="button" id="add-extension-confirmation-btn" class="btn btn-success button-center-reduce">Ajouter</button>
-			<button type="button" id="add-extension-cancel-btn" onclick="cancelAddExtension()" class="btn btn-danger button-center-reduce">Annuler</button>
+			<button type="button" id="add-extension-confirmation-btn" class="btn btn-success button-center-reduce">{add}</button>
+			<button type="button" id="add-extension-cancel-btn" onclick="cancelAddExtension()" class="btn btn-danger button-center-reduce">{annulation}</button>
 		
 		</div>
 	</section>
 	
 	<section id="fixed-section" class="center">
 		<div id="indicator-active-mode" class="text-white">
-			Clique gauche: activer / désactiver une extension <br/>Clique droit: Quitter le mode désactivation
+			{indicatorActiveMode}
 		</div>
 	</section>
 	<script src="./webpage-files/main-script.js"> </script>

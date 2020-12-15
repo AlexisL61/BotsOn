@@ -16,6 +16,7 @@ const directory = app.getAppPath()
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
 
+var currentlyBotHosting 
 const clientId = '774665586001051648';
 const scopes = [ 'identify'];
 
@@ -25,12 +26,11 @@ console.log(dataFolder)
 
 const discordTokenVerify = require("./main_scripts/verify-token.js")
 const api = require("./main_scripts/api.js")
-const botHosting = require("./main_scripts/hosting.js")
 const richPresence = require("./main_scripts/rich-presence.js")
 
 var mainWebContent
 
-const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname,"jsonFolder/notifications/notifications.json"),"utf-8"))
+const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname,"jsonFolder/notifications/notifications.json"),"utf8"))
 console.log(process.arch)
 //const server = 'https://update.electronjs.org'
 //const feed = `${server}/AlexisL61/BotsOn/${process.platform}-${process.arch}/${app.getVersion()}`
@@ -141,7 +141,10 @@ app.on("ready", () => {
 
 // Quit when all windows are closed
 app.on('window-all-closed', function () {
-  botHosting.stopHosting()
+  if (currentlyBotHosting){
+    currentlyBotHosting.stopHosting()
+  }
+  
   if (process.platform !== 'darwin') app.quit()
 })
 
@@ -149,12 +152,12 @@ function getBotExtensionsData(args){
   var botExtensions = []
   var directory = app.getAppPath()
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
-    var botName = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id+"/botdata.json")).name
+    var botName = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id+"/botdata.json","utf8")).name
     richPresence.changeRPC({"state":"Configure "+botName})
     var extensions = fs.readdirSync(dataFolder + "/bots/" + args.id + "/extensions")
     extensions.forEach(function (extension) {
-      if (fs.existsSync(dataFolder + "/extension-install/" + extension )){
-      var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
+      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
+      var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json","utf8"))
       thisExtensionData.active = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id + "/extensions/" + extension + "/status.json", "utf8")).active
       botExtensions.push(thisExtensionData)
       }
@@ -181,6 +184,10 @@ ipc.on("connect-discord",function(event,args){
   })
 })
 
+ipc.on("getLanguageFile",function(event,language){
+  var languageFile = fs.readFileSync(path.join(__dirname,"languages/"+language+".json"),"utf8")
+  event.returnValue = JSON.parse(languageFile)
+})
 
 //communicate with webpage
 ipc.on("firstTimeOpenApp", function (event, args) {
@@ -191,6 +198,11 @@ ipc.on("firstTimeOpenApp", function (event, args) {
   }
 })
 
+function getTranslate(lang,tr){
+  var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+lang+".json"),"utf8"))
+  return languageFile.find(l=>l.dest == "{"+tr+"}").translation
+}
+
 ipc.on("exportBot",async function(event,args){
   const copyAsync = promisify(fse.copy)
   const existsAsync = promisify(fs.exists)
@@ -198,29 +210,29 @@ ipc.on("exportBot",async function(event,args){
   const rmdirAsync = promisify(fs.rmdir)
   ipc.once("confirmWebPageExport",async function(event){
     if (! (await existsAsync(dataFolder+"/export"))){
-      event.sender.send("webPageExport",{"subtitle":"Création du dossier d'exportation"})
+      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingExportationFile")})
       await mkdirAsync(dataFolder+"/export");
     }
     if (existsAsync(dataFolder+"/export/"+args.bot)){
-      event.sender.send("webPageExport",{"subtitle":"Suppression de l'ancienne exportation"})
+      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","deletingExportationFile")})
       await rmdirAsync(dataFolder+"/export/"+args.bot,{recursive:true})
     }
-    event.sender.send("webPageExport",{"subtitle":"Création du dossier de cette exportation"})
+    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingThisExportationFolder")})
     await mkdirAsync(dataFolder+"/export/"+args.bot)
-    event.sender.send("webPageExport",{"subtitle":"Copie du système d'exportation"})
+    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationSystemCopy")})
     await copyAsync(path.join(__dirname,"export"), dataFolder+"/export/"+args.bot)
     var extensions = getBotExtensionsData({"id":args.bot})
     for (var i in extensions){
-      event.sender.send("webPageExport",{"subtitle":"Copie de l'extension: "+extensions[i].name + " (1/2)","percentage":Math.floor((i*2)*99/(extensions.length*2))})
+      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","extensionCopy")+": "+extensions[i].name + " (1/2)","percentage":Math.floor((i*2)*99/(extensions.length*2))})
       console.log(extensions[i].id + "1/2")
       await copyAsync(dataFolder+"/extension-install/"+extensions[i].id,dataFolder+"/export/"+args.bot+"/extensions/"+extensions[i].id)
       console.log(extensions[i].id + "2/2")
       event.sender.send("webPageExport",{"subtitle":"Copie de l'extension: "+extensions[i].name + " (2/2)","percentage":Math.floor((i*2+1)*99/extensions.length)})
       await copyAsync(dataFolder+"/bots/"+args.bot+"/extensions/"+extensions[i].id,dataFolder+"/export/"+args.bot+"/extensions-data/"+extensions[i].id)
     }
-    event.sender.send("webPageExport",{"subtitle":"Finalisation","percentage":99})
+    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","finishing"),"percentage":99})
     var finalData = {}
-    var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.bot+"/botdata.json","utf-8"))
+    var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.bot+"/botdata.json","utf8"))
     fs.writeFileSync(dataFolder+"/export/"+args.bot+"/.env","botToken="+botData.token)
     var thisBotPrefix = "!"
     if (botData.prefix){
@@ -247,11 +259,11 @@ ipc.on("exportBot",async function(event,args){
     }
     finalData.generalCommands = thisBotGeneralCommands
     fs.writeFileSync(dataFolder+"/export/"+args.bot+"/config.json",JSON.stringify(finalData))
-    event.sender.send("webPageExport",{"subtitle":"Exportation terminée","percentage":100,"bot":args.bot})
+    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationEnd"),"percentage":100,"bot":args.bot})
     
   })
 
-  
+
 
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -266,10 +278,9 @@ ipc.on("exportBot",async function(event,args){
   await mainWindow.loadFile('./webpage-files/export/export.html')
 })
 
-
 ipc.on("openExportFolder",function(event,args){
   console.log("receive")
-  child_process.exec("explorer.exe /select,"+dataFolder+"\\export\\"+args.bot+"\\startBot.bat", function(stdout) {
+  child_process.exec("explorer.exe /select,"+dataFolder+"/export/"+args.bot+"/startBot.bat", function(stdout) {
     console.log(dataFolder)
 });
 })
@@ -310,21 +321,21 @@ ipc.on("checkDiscordToken", async function (event, args) {
   if (args.addBot == true && verifierData.success) {
     var botData = verifierData.bot
     botData.token = args.token
-    if (!fs.existsSync(dataFolder + "\\bots")) {
-      fs.mkdirSync(dataFolder + "\\bots")
+    if (!fs.existsSync(dataFolder + "/bots")) {
+      fs.mkdirSync(dataFolder + "/bots")
     }
-    fs.mkdirSync(dataFolder + "\\bots\\" + botData.id)
-    fs.writeFileSync(dataFolder + "\\bots\\" + botData.id + "\\botdata.json", JSON.stringify(botData))
+    fs.mkdirSync(dataFolder + "/bots/" + botData.id)
+    fs.writeFileSync(dataFolder + "/bots/" + botData.id + "/botdata.json", JSON.stringify(botData))
   }
   if (args.modifyBot == true && verifierData.success == true){
     if (args.botId != verifierData.bot.id){
       verifierData = {success:false}
     }else{
-      var botCurrentData = JSON.parse(fs.readFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json","utf8"))
+      var botCurrentData = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + verifierData.bot.id + "/botdata.json","utf8"))
       botCurrentData.name = verifierData.bot.name
       botCurrentData.avatar = verifierData.bot.avatar
       botCurrentData.token = verifierData.bot.token
-      fs.writeFileSync(dataFolder + "\\bots\\" + verifierData.bot.id + "\\botdata.json", JSON.stringify(botCurrentData))
+      fs.writeFileSync(dataFolder + "/bots/" + verifierData.bot.id + "/botdata.json", JSON.stringify(botCurrentData))
     }
   }
   event.sender.send("checkDiscordTokenResult", verifierData)
@@ -345,7 +356,7 @@ ipc.on("installExtension",function(event,args){
 
 ipc.on("getConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    event.sender.send("getConfigData",JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json","utf-8")))
+    event.sender.send("getConfigData",JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json","utf8")))
   }else{
     new Notification(createErrorCode("config-2")).show()
   }
@@ -361,12 +372,12 @@ ipc.on("saveConfigData",function(event,args){
 })
 
 ipc.on("getBotPrivateData",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   event.sender.send("getBotPrivateData",botData)
 })
 
 ipc.on("getBotIntents",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   var thisBotIntents = {"presence_intent":false, "server_members_intent":false}
   if (botData.intents){
     thisBotIntents = botData.intents
@@ -375,7 +386,7 @@ ipc.on("getBotIntents",function(event,args){
 })
 
 ipc.on("getBotGeneralCommands",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   var thisBotGeneralCommands = {"help":false}
   if (botData.generalCommands){
     thisBotGeneralCommands = botData.generalCommands
@@ -384,7 +395,7 @@ ipc.on("getBotGeneralCommands",function(event,args){
 })
 
 ipc.on("getBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   var thisBotPrefix = "!"
   if (botData.prefix){
     thisBotPrefix = botData.prefix
@@ -393,7 +404,7 @@ ipc.on("getBotPrefix",function(event,args){
 })
 
 ipc.on("getBotUser",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   var thisBotUser
   if (botData.user){
     thisBotUser = botData.user
@@ -402,21 +413,21 @@ ipc.on("getBotUser",function(event,args){
 })
 
 ipc.on("modifyBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   botData.prefix = args.prefix
   fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
   event.returnValue = {"success":true}
 })
 
 ipc.on("modifyBotUser",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   botData.user = args.user
   fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
   event.returnValue = {"success":true}
 })
 
 ipc.on("modifyBotIntent",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   if (!botData.intents){
     botData.intents = {}
   }
@@ -430,7 +441,7 @@ ipc.on("modifyBotIntent",function(event,args){
 })
 
 ipc.on("modifyBotGeneralCommand",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf-8"))
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
   if (!botData.generalCommands){
     botData.generalCommands = {}
   }
@@ -458,7 +469,7 @@ ipc.on("modifyExtensionActivation",function(event,args){
 ipc.on("getExtensionData",function(event,args){
   if (args.id){
     if (fs.existsSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json")) {
-      event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json"))
+      event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json","utf8"))
     }else{
       new Notification(createErrorCode("eData-2")).show()
     }
@@ -469,7 +480,7 @@ ipc.on("getExtensionData",function(event,args){
 })
 
 function getToken(id){
-  return JSON.parse(fs.readFileSync(dataFolder + "\\bots\\" + id + "\\botdata.json")).token
+  return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json","utf8")).token
 }
 
 ipc.on("getGuilds", async function (event, args) {
@@ -524,7 +535,7 @@ ipc.on("getAvailableExtensions", function (event, args) {
   if (fs.existsSync(dataFolder + "/extension-install")) {
     var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
     availableExtensions.forEach(function (extension) {
-      if (fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
+      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
         var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
         console.log(extensionData)
         extensionsFound.push({ "name": extensionData.name, "author": extensionData.author, "description": extensionData.description, "id": extensionData.id, "smallDescription": extensionData.smallDescription, "image": extensionData.image })
@@ -536,12 +547,17 @@ ipc.on("getAvailableExtensions", function (event, args) {
 })
 
 ipc.on("startHosting",async function (event,args){
+  if (currentlyBotHosting){
+    currentlyBotHosting.stopHosting()
+  }
+  var botHosting = require("./main_scripts/hosting.js")
   botHosting.directory = dataFolder
   botHosting.electron = electron
   botHosting.dataExtensionFolder = dataFolder+"/bots/" + args.id + "/extensions"
   botHosting.ipc = ipc
   botHosting.path = path
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.id+"/botdata.json","utf-8"))
+  botHosting.notification = Notification
+  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.id+"/botdata.json","utf8"))
   var thisBotPrefix = "!"
   if (botData.prefix){
     thisBotPrefix = botData.prefix
@@ -571,12 +587,15 @@ ipc.on("startHosting",async function (event,args){
   if (botHostingResult.success == false){
     new Notification({"title":"Erreur d'hébergement", "body":"Vérifiez que les intents de votre bot soient bien activés sur Discord.com et vérifiez votre Token"}).show()
   }
+  currentlyBotHosting = botHosting
   event.sender.send("startHosting",botHostingResult)
 })
 
 ipc.on("endHosting",async function (event,args){
-  var botHostingResult = await botHosting.stopHosting()
-  event.sender.send("endHosting",botHostingResult)
+  if (currentlyBotHosting){
+    var botHostingResult = await currentlyBotHosting.stopHosting()
+    event.sender.send("endHosting",botHostingResult)
+  }
 })
 
 ipc.on("canvas",async function(event,args){
@@ -601,13 +620,15 @@ ipc.on("getUser",function(event,args){
 ipc.on("getUserBots", function (event, args) {
   var currentBots = []
   //check if folder with bot exist
-  if (fs.existsSync(dataFolder + "\\bots")) {
+  if (fs.existsSync(dataFolder + "/bots")) {
     //get all bots save
     var bots = fs.readdirSync(dataFolder + "/bots")
     bots.forEach(function (bot) {
-      var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
-      console.log(thisBotData)
-      currentBots.push(thisBotData)
+      if (!bot.startsWith(".")){
+        var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+        console.log(thisBotData)
+        currentBots.push(thisBotData)
+      }
     })
   }
   event.returnValue = currentBots
@@ -615,26 +636,30 @@ ipc.on("getUserBots", function (event, args) {
 
 function copyDebugFile(){
   var currentBots = []
-  if (fs.existsSync(dataFolder + "\\bots")) {
+  if (fs.existsSync(dataFolder + "/bots")) {
     //get all bots save
     var bots = fs.readdirSync(dataFolder + "/bots")
     bots.forEach(function (bot) {
-      var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
-      console.log(thisBotData)
-      thisBotData.token = "***" 
-      var extensionsData = []
-      var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot +"/extensions")
-      extensions.forEach(function (extension) {
-        extensionsData.push(extension)
-      })
-      currentBots.push({"data":thisBotData,"extensions":extensionsData})
+      if (!bot.startsWith(".")){
+        var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+        console.log(thisBotData)
+        thisBotData.token = "***" 
+        var extensionsData = []
+        var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot +"/extensions")
+        extensions.forEach(function (extension) {
+          if (!extension.startsWith(".")){
+            extensionsData.push(extension)
+          }
+        })
+        currentBots.push({"data":thisBotData,"extensions":extensionsData})
+      }
     })
   }
   var currentExtensions = []
-  if (fs.existsSync(dataFolder + "\\extension-install")) {
+  if (fs.existsSync(dataFolder + "/extension-install")) {
     var extensions = fs.readdirSync(dataFolder + "/extension-install")
     extensions.forEach(function (extension) {
-      if (fs.existsSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json")){
+      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json")){
         var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json", "utf8"))
         currentExtensions.push(thisExtensionData)
       }

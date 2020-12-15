@@ -1,11 +1,21 @@
+
+var languageFile
+function getTranslation(tr){
+	return languageFile.find(l=>l.dest == "{"+tr+"}").translation
+}
+
 function connectToDiscord(){
     ipcRenderer.send("connect-discord")
-    document.getElementById("connect-btn").innerHTML = "Connexion à Discord en cours..."
+    document.getElementById("connect-btn").innerHTML = getTranslation("currentlyConnectingToDiscord")
     document.getElementById("connect-btn").classList.add("btn-blinking")
 }
-ipcRenderer.on("connect-discord",function(event,args){
 
-})
+languageFile = ipcRenderer.sendSync("getLanguageFile","fr_FR")
+	while (document.body.innerHTML.includes("{")){
+		for (var i in languageFile){
+			document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest,languageFile[i].translation)
+		}
+	  }
 
 /*for (var i=0;i<5;i++){
     document.getElementById("triangular1").innerHTML += `<div class="triangle" style="margin-left:`+(Math.random()*1000-50)+`px;margin-top:`+Math.random()*1000+`px;
