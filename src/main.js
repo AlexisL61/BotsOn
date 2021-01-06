@@ -1,6 +1,6 @@
 //Modules and variables
-process.noAsar = true
-const { app, BrowserWindow, autoUpdater,protocol,Menu,clipboard,Notification,shell } = require('electron')
+const { app, BrowserWindow, autoUpdater,protocol,Menu,clipboard,Notification,shell,screen, ipcRenderer } = require('electron')
+const appPath = app.getAppPath()
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -15,6 +15,7 @@ const child_process = require("child_process")
 const directory = app.getAppPath()
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
+var premiumData
 
 var currentlyBotHosting 
 const clientId = '774665586001051648';
@@ -100,12 +101,17 @@ function createWindow() {
 }
 
 function createDownloadWindow() {
-
+  
+  var mainScreen = screen.getPrimaryDisplay();
+  var dimensions = mainScreen.workAreaSize;
+  console.log(dimensions)
   //creating window with electron
   mainWindow = new BrowserWindow({
-    width: 500,
-    height: 500,
-    center: true,
+    width: 400,
+    height: 100,
+      x:dimensions.width-410,
+      y:dimensions.height-110,
+      frame:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -114,6 +120,10 @@ function createDownloadWindow() {
   //load the index.html of the app.
   mainWindow.loadFile('download.html')
   mainWindow.setMenu(null)
+
+  ipc.once("closeDownload",function(event){
+    mainWindow.close()
+  })
 
   //mainWindow.webContents.openDevTools()
 
@@ -166,6 +176,21 @@ function getBotExtensionsData(args){
   return botExtensions
 }
 
+ipc.on("deleteExtensionFromBot",function(event,args){
+  fs.rmdirSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId, { recursive: true });
+  event.returnValue = true
+})
+
+ipc.on("deleteBot",function(event,args){
+  fs.rmdirSync(dataFolder + "/bots/" + args.botId, { recursive: true });
+  new Notification({"title":"Suppression terminée","body":"Ce bot a bien été supprimé"}).show()
+})
+
+ipc.on("uninstallExtension",function(event,args){
+  fs.rmdirSync(dataFolder + "/extension-install/" + args.extensionId, { recursive: true });
+  new Notification({"title":"Désinstallation terminée","body":"L'extension "+args.extensionId+" a bien été désinstallée."}).show()
+})
+
 ipc.on("connect-discord",function(event,args){
   try{
     RPCclient.login({ clientId});
@@ -173,12 +198,22 @@ ipc.on("connect-discord",function(event,args){
     
     console.log("ERROR")
   }
-  RPCclient.once("connected", () => {
+  RPCclient.once("connected", async () => {
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
     mainWindow.loadFile('./index.html')
-    event.sender.send("connect-discord",{"status":"connect"})
+    axios.get("https://botsonapp.me/api/isPremium/"+RPCclient.user.id)
+    .then(function(result){
+      console.log("result")
+      premiumData = result.data
+      event.sender.send("connect-discord",{"status":"connect"})
+    })
+    .catch(function(e){
+      console.log(e)
+      premiumData = {premium:false}
+      event.sender.send("connect-discord",{"status":"connect"})
+    })
   })
   RPCclient.on("error",()=>{
   })
@@ -213,27 +248,29 @@ ipc.on("exportBot",async function(event,args){
       event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingExportationFile")})
       await mkdirAsync(dataFolder+"/export");
     }
-    if (existsAsync(dataFolder+"/export/"+args.bot)){
+    var currentId = Date.now()
+    if (existsAsync(dataFolder+"/export/"+args.bot+" - "+currentId)){
       event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","deletingExportationFile")})
-      await rmdirAsync(dataFolder+"/export/"+args.bot,{recursive:true})
+      await rmdirAsync(dataFolder+"/export/"+args.bot+" - "+currentId,{recursive:true})
     }
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingThisExportationFolder")})
-    await mkdirAsync(dataFolder+"/export/"+args.bot)
+    await mkdirAsync(dataFolder+"/export/"+args.bot+" - "+currentId)
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationSystemCopy")})
-    await copyAsync(path.join(__dirname,"export"), dataFolder+"/export/"+args.bot)
+    await copyAsync(path.join(__dirname,"export"), dataFolder+"/export/"+args.bot+" - "+currentId)
     var extensions = getBotExtensionsData({"id":args.bot})
     for (var i in extensions){
       event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","extensionCopy")+": "+extensions[i].name + " (1/2)","percentage":Math.floor((i*2)*99/(extensions.length*2))})
       console.log(extensions[i].id + "1/2")
-      await copyAsync(dataFolder+"/extension-install/"+extensions[i].id,dataFolder+"/export/"+args.bot+"/extensions/"+extensions[i].id)
+      await copyAsync(dataFolder+"/extension-install/"+extensions[i].id,dataFolder+"/export/"+args.bot+" - "+currentId+"/extensions/"+extensions[i].id)
       console.log(extensions[i].id + "2/2")
       event.sender.send("webPageExport",{"subtitle":"Copie de l'extension: "+extensions[i].name + " (2/2)","percentage":Math.floor((i*2+1)*99/extensions.length)})
-      await copyAsync(dataFolder+"/bots/"+args.bot+"/extensions/"+extensions[i].id,dataFolder+"/export/"+args.bot+"/extensions-data/"+extensions[i].id)
+      await copyAsync(dataFolder+"/bots/"+args.bot+"/extensions/"+extensions[i].id,dataFolder+"/export/"+args.bot+" - "+currentId+"/extensions-data/"+extensions[i].id)
     }
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","finishing"),"percentage":99})
     var finalData = {}
     var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.bot+"/botdata.json","utf8"))
-    fs.writeFileSync(dataFolder+"/export/"+args.bot+"/.env","botToken="+botData.token)
+    console.log(botData)
+    fs.writeFileSync(dataFolder+"/export/"+args.bot+" - "+currentId+"/.env","botToken="+botData.token)
     var thisBotPrefix = "!"
     if (botData.prefix){
       thisBotPrefix = botData.prefix
@@ -258,7 +295,7 @@ ipc.on("exportBot",async function(event,args){
       thisBotGeneralCommands = botData.generalCommands
     }
     finalData.generalCommands = thisBotGeneralCommands
-    fs.writeFileSync(dataFolder+"/export/"+args.bot+"/config.json",JSON.stringify(finalData))
+    fs.writeFileSync(dataFolder+"/export/"+args.bot+" - "+currentId+"/config.json",JSON.stringify(finalData))
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationEnd"),"percentage":100,"bot":args.bot})
     
   })
@@ -280,7 +317,7 @@ ipc.on("exportBot",async function(event,args){
 
 ipc.on("openExportFolder",function(event,args){
   console.log("receive")
-  child_process.exec("explorer.exe /select,"+dataFolder+"/export/"+args.bot+"/startBot.bat", function(stdout) {
+  child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function(stdout) {
     console.log(dataFolder)
 });
 })
@@ -291,11 +328,31 @@ ipc.on("getDataFolder",function(event,args){
 
 ipc.on("downloadExtensionFromURL",function(event,args){
   var url = process.argv.find(arg=>arg.startsWith("botson://")).split("botson://")[1]
+  var urlData = url.split("?")
+  url = urlData[0]
+  var params = urlData[1]
+  var paramsDico = {}
+  if (params){
+    console.log(1)
+    var splitParams = params.split("&")
+    console.log(2)
+    for (var i in splitParams){
+      var data = splitParams[i].split("=")[0]
+      var value = splitParams[i].split("=")[1]
+      paramsDico[data] = value
+    }
+  }
+  console.log(paramsDico)
+  console.log("start")
       axios({
         method: "get",
         url: url,
         responseType: "stream"
     }).then(async function (response) {
+      var fileName
+      if (paramsDico["id"]){
+        fileName = paramsDico["id"]
+      }
       event.sender.send("downloadFinish")
       var stream = fs.createWriteStream(dataFolder+"/temp.zip")
       response.data.pipe(stream);
@@ -305,7 +362,16 @@ ipc.on("downloadExtensionFromURL",function(event,args){
         fs.mkdirSync(dataFolder + "/extension-install")
       }
         await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) 
+        console.log("unzip")
         event.sender.send("unzipFinish")
+        if (fileName){
+          var data = JSON.parse(fs.readFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json","utf-8"))
+          if (paramsDico["version"]){
+            data.version = paramsDico["version"]
+          }
+          fs.writeFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json",JSON.stringify(data))
+        }
+        event.sender.send("finalisationFinish")
     }catch(e){
       event.sender.send("error",{error:e})
     }
@@ -479,6 +545,35 @@ ipc.on("getExtensionData",function(event,args){
   
 })
 
+ipc.on("checkUpdateExtensions",async function(event){
+  var extensionsFound = []
+  if (fs.existsSync(dataFolder + "/extension-install")) {
+    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
+    availableExtensions.forEach(function (extension) {
+      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
+        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
+        console.log(extensionData)
+        var toPush = {}
+        toPush.id = extensionData.id
+        toPush.version = "1"
+        if (extensionData.version){
+          toPush.version = extensionData.version
+        }
+        extensionsFound.push(toPush)
+      }
+    })
+  }
+  var result = await axios.get("https://botsonapp.me/api/verify-update?extensions="+JSON.stringify(extensionsFound))
+  result = result.data
+  var toSend = []
+  console.log(result)
+  for (var i in extensionsFound){
+    var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extensionsFound[i].id + "/extension-data.json"))
+    toSend.push({"name":extensionData.name,"id":extensionData.id,"image":extensionData.image,"status":result[extensionsFound[i].id].status,"download":result[extensionsFound[i].id].downloadLink,"extension":result[extensionsFound[i].id].extensionLink})
+  }
+  event.sender.send("checkUpdateExtensions",toSend)
+})
+
 function getToken(id){
   return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json","utf8")).token
 }
@@ -582,7 +677,11 @@ ipc.on("startHosting",async function (event,args){
     thisBotGeneralCommands = botData.generalCommands
   }
   botHosting.generalCommands = thisBotGeneralCommands
-  var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),event.sender)
+  if (!premiumData){
+    premiumData = {}
+    premiumData.premium = false
+  }
+  var botHostingResult = await botHosting.startHosting(discord,getToken(args.id),getBotExtensionsData(args),premiumData.premium,event.sender)
   console.log(botHostingResult)
   if (botHostingResult.success == false){
     new Notification({"title":"Erreur d'hébergement", "body":"Vérifiez que les intents de votre bot soient bien activés sur Discord.com et vérifiez votre Token"}).show()
@@ -604,8 +703,6 @@ ipc.on("canvas",async function(event,args){
 
 ipc.on("getBotExtensions",async function (event, args) {
   var botExtensions =  getBotExtensionsData(args)
-  var canvas = mainWebContent.executeJavaScript(`console.log(document.getElementById("canvas"))`)
-  console.log(canvas)
   event.returnValue = botExtensions
 })
 

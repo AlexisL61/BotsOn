@@ -7,7 +7,7 @@ const child_process = require("child_process")
 console.log(canvas)
 module.exports = {
 
-    startHosting(Discord,token,extensions){
+    startHosting(Discord,token,extensions,isPremium){
         var helpEmbed = {
             "title":"Help",
             "fields":[
@@ -129,6 +129,13 @@ module.exports = {
                         helpEmbed.fields.push(extensionData.help.field)
                     }
                 }
+            }
+            console.log(isPremium)
+            if (isPremium == false){
+                helpEmbed.fields.push({
+                    "name": "Crédits",
+                    "value": "Créé avec [BotsOn](https://botsonapp.me/)"
+                })
             }
             client.on("message",function(message){
                 console.log("MESSAGE")

@@ -27,7 +27,7 @@
 				<h3 class="text-white">
 					{addToken}
 				</h3>
-				<input type="text" id="add-bot-token-input" class="input-center-reduce form-control form-control-dark"
+				<input type="text" id="add-bot-token-input" class="input-center-reduce form-control "
 					placeholder="{token}">
 					<div class="footer">
 						<button type="button" onclick="verifyBotToken()" id="add-bot-token-btn"
@@ -106,7 +106,7 @@
 			</p>
 		</div>
 	</section>
-	<section id="my-bots-section" class="all-screen-size div-dark" style="display:none">
+	<section id="my-bots-section" class="all-screen-size list-background" style="display:none">
 		<p class="title">
 			{yourBots}
 		</p>
@@ -124,6 +124,9 @@
 			<h3 id="bot-heberg-menu-name">
 			</h3>
 			<div>
+				<button class="btn-primary btn" id="update-extension-btn" onclick="openUpdateExtensionSection()">
+					<img style="width:30px;height:30px;margin-left:-15px;margin-top:-15px;" src="https://img.icons8.com/flat_round/50/000000/downloading-updates--v1.png">
+				</button>
 				<button class="btn-primary btn" id="heberg-bot-btn" onclick="changeHostingStatus()">
 					{host}
 				</button>
@@ -192,7 +195,7 @@
 				<div class="input-group-prepend">
 					<span class="input-group-text" id="token-addon">{token}</span>
 				  </div>
-				<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control form-control-dark"
+				<input type="password" id="bot-token-parameters-input" aria-describedby="token-addon" class="form-control "
 				placeholder="{token}">
 				</div>
 				<button type="button" onclick="editBotData()" id="edit-bot-data-btn" class="btn btn-success">{update}</button>
@@ -210,7 +213,7 @@
 				<div class="input-group-prepend">
 					<span class="input-group-text" id="prefix-addon">{prefix}</span>
 				  </div>
-				<input type="text" id="bot-prefix-parameters-input" aria-describedby="prefix-addon" class="form-control form-control-dark"
+				<input type="text" id="bot-prefix-parameters-input" aria-describedby="prefix-addon" class="form-control "
 				placeholder="{prefix}">
 				</div>
 				<button type="button" onclick="editBotPrefix()" id="edit-bot-prefix-btn" class="btn btn-success">{update}</button>
@@ -228,7 +231,7 @@
 				<div class="input-group-prepend">
 					<span class="input-group-text" id="user-addon">{user}</span>
 				  </div>
-				<input type="text" id="bot-user-parameters-input" aria-describedby="user-addon" class="form-control form-control-dark"
+				<input type="text" id="bot-user-parameters-input" aria-describedby="user-addon" class="form-control "
 				placeholder="{yourId}">
 				</div>
 				<button type="button" onclick="editBotUser()" id="edit-bot-user-btn" class="btn btn-success">{update}</button>
@@ -282,19 +285,70 @@
 			</div>
 		</div>
 	</section>
+	<section id="update-extension-section" style="display: none;" class="center all-screen-size">
+		<div style="position:absolute;" class="all-screen-size" onclick="closeUpdateExtensionSection()">
+
+		</div>
+		<div id="update-extension-main-div" class="popup-long-div">
+			<h3 class="text-white">
+				{updateExtension}
+			</h3>
+			<div id="extension-update-placement">
+				Chargement...
+			</div>
+			
+		</div>
+		
+	</section>
+	<section id="uninstall-extension-section" style="display: none;" class="center all-screen-size">
+		<div style="position:absolute;" class="all-screen-size" onclick="closeUninstallExtensionSection()">
+
+		</div>
+		<div id="uninstall-extension-main-div" class="popup">
+			<h3 class="text-white">
+				{uninstallExtension}
+			</h3>
+			<div id="extension-uninstall-placement">
+				{uninstallExtensionDescription}
+			</div>
+			<div class="footer">
+				<button type="button" onclick="" id="uninstall-bot-extension-btn"
+					class="btn btn-primary button-right-reduce">{confirm}</button>
+		</div>
+		</div>
+		
+	</section>
+	<section id="delete-bot-section" style="display: none;" class="center all-screen-size">
+		<div style="position:absolute;" class="all-screen-size" onclick="closeDeleteBotSection()">
+
+		</div>
+		<div id="delete-bot-main-div" class="popup">
+			<h3 class="text-white">
+				{deleteBot}
+			</h3>
+			<div id="delete-bot-placement">
+				{deleteBotDescription}
+			</div>
+			<div class="footer">
+				<button type="button" onclick="" id="delete-bot-btn"
+					class="btn btn-primary button-right-reduce">{confirm}</button>
+		</div>
+		</div>
+		
+	</section>
 	<section id="add-extension-section" style="display: none;" class="center all-screen-size">
 		<div style="position:absolute;" class="all-screen-size" onclick="closeAddExtensionSection()">
 
 		</div>
-		<div id="add-extension-main-div" class="add-extension-div">
+		<div id="add-extension-main-div" class="popup-div">
 			<h3 class="text-white">
 				{addExtension}
 			</h3>
 			<div id="extension-available-placement">
 
 			</div>
-			<a href="https://github.com/AlexisL61/BotsOn/blob/master/DossierAide/Extensions.md" target="_blank" class="center">
-				{whatIsExtension}
+			<a href="https://botsonapp.me/extensions" target="_blank" class="center">
+				{downloadExtensions}
 			</a>
 		</div>
 		<div id="add-extension-confirmation-div" class="add-extension-confirmation-div">
@@ -315,6 +369,25 @@
 			{indicatorActiveMode}
 		</div>
 	</section>
+
+	<div id="context-menu" style="display:none">
+		<div id="extension-context-menu" style="display:none" class="context-menu-div">
+			<div id="extension-context-menu-activate">
+				Désactiver
+			</div>
+			<div id="extension-context-menu-delete">
+				Supprimer
+			</div>
+			<div id="extension-context-menu-uninstall" onclick="openUninstallExtensionSection()" class="red">
+				Désinstaller
+			</div>
+		</div>
+		<div id="bot-context-menu" style="display:none" class="context-menu-div">
+			<div id="bot-context-menu-delete" class="red" onclick="openDeleteBotSection()">
+				Supprimer
+			</div>
+		</div>
+	</div>
 	<script src="./webpage-files/main-script.js"> </script>
 </body>
 

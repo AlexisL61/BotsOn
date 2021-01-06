@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package": "electron-forge package",
+    "package": "electron-forge package ",
     "packagemac": "electron-forge package --platform darwin",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -19,6 +19,7 @@
   "config": {
     "forge": {
       "packagerConfig": {},
+      "electronPackagerConfig": {},
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -44,10 +45,11 @@
     }
   },
   "dependencies": {
+    "asar": "^3.0.3",
     "axios": "^0.19.2",
     "canvas-to-buffer": "^1.1.1",
     "discord-rpc": "^3.1.4",
-    "discord.js": "^12.2.0",
+    "discord.js": "^12.5.1",
     "electron-squirrel-startup": "^1.0.0",
     "extract-zip": "^2.0.1",
     "fs-extra": "^9.0.1",
@@ -62,6 +64,7 @@
     "electron": "^9.3.5"
   },
   "build": {
+    "asar": true,
     "appId": "botson",
     "mac": {
       "category": ""

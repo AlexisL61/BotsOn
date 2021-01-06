@@ -44,5 +44,12 @@
     {"dest":"{exportationEnd}","translation":"Exportation terminée"},
     {"dest":"{connectingToDiscord}","translation":"Connexion à Discord"},
     {"dest":"{connectingToDiscordExplanation}","translation":"Assurez-vous d'avoir Discord ouvert sur votre pc pour vous connecter"},
-    {"dest":"{currentlyConnectingToDiscord}","translation":"Connexion à Discord en cours..."}
+    {"dest":"{currentlyConnectingToDiscord}","translation":"Connexion à Discord en cours..."},
+    {"dest":"{downloadExtensions}","translation":"Télécharger des extensions"},
+    {"dest":"{updateExtension}","translation":"Mise à jour de vos extensions"},
+    {"dest":"{confirm}","translation":"Confirmer"},
+    {"dest":"{uninstallExtension}","translation":"Désinstallation d'extension"},
+    {"dest":"{uninstallExtensionDescription}","translation":"Êtes-vous sûr de vouloir désinstaller cette extension?"},
+    {"dest":"{deleteBot}","translation":"Suppression de bot"},
+    {"dest":"{deleteBotDescription}","translation":"Êtes-vous sûr de vouloir supprimer ce bot?"}
 ]
