@@ -51,5 +51,11 @@
     {"dest":"{uninstallExtension}","translation":"Désinstallation d'extension"},
     {"dest":"{uninstallExtensionDescription}","translation":"Êtes-vous sûr de vouloir désinstaller cette extension?"},
     {"dest":"{deleteBot}","translation":"Suppression de bot"},
-    {"dest":"{deleteBotDescription}","translation":"Êtes-vous sûr de vouloir supprimer ce bot?"}
+    {"dest":"{deleteBotDescription}","translation":"Êtes-vous sûr de vouloir supprimer ce bot?"},
+    {"dest":"{tools}","translation":"Outils"},
+    {"dest":"{invite}","translation":"Invitation"},
+    {"dest":"{inviteExplanation}","translation":"L'invitation est un lien nécessaire pour un utilisateur afin d'ajouter votre bot</br>Il peut être généré à partir de ce panel sans passer par la page de votre application Discord"},
+    {"dest":"{invitePermissionCalculatorExplanation}","translation":"Il est aussi possible d'ajouter des permissions que le bot va demander lors de son ajout à un serveur.</br>Vous pouvez, à partir de <a target='_blank' href='https://discordapi.com/permissions.html'>ce site</a>, cocher les permissions nécessaires de votre bot et coller le nombre généré dans la case ci-dessous"},
+    {"dest":"{download}","translation":"Télécharger"},
+    {"dest":"{downloadInputText}","translation":"Entrez un lien de téléchargement ici"}
 ]

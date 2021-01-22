@@ -56,8 +56,19 @@
 		<img id="main-menu-button-activation" onclick="openMenu()"
 			src="https://img.icons8.com/ios-filled/50/000000/menu.png">
 		<div id="main-menu-div" class="menu-div menu-div-close">
-			<img id="main-menu-quit-button" onclick="closeMenu()"
-				src="https://img.icons8.com/emoji/50/000000/cross-mark-emoji.png">
+			
+			<div style="display:flex">
+				<div style="flex:1">
+					<img id="main-menu-quit-button" onclick="closeMenu()"
+					src="https://img.icons8.com/emoji/50/000000/cross-mark-emoji.png">
+				</div>
+				<div id="user-coins-placement" style="flex:1;text-align:right;padding:10px;">
+					<span style="color:gold;font-weight: 300;" id="user-coins-placement-value">
+						1500
+					</span><img id="main-menu-quit-button" onclick="closeMenu()" src="https://img.icons8.com/emoji/30/000000/coin-emoji.png">
+					
+				</div>
+			</div>
 				<div id="alwaysActiveMenuSection">
 				<div class="main-menu-button" onclick="openBotMenu()">
 					<img src="https://img.icons8.com/material/50/000000/bot.png">
@@ -78,17 +89,18 @@
 						{extensions}
 					</h4>
 				</div>
+				
+				<div class="main-menu-button" onclick="openBotToolsMenu()">
+					<img src="https://img.icons8.com/metro/50/000000/toolbox.png">
+					<h4>
+						{tools}
+					</h4>
+					
+				</div>
 				<div class="main-menu-button" onclick="openBotParametersMenu()">
 					<img src="https://img.icons8.com/ios-filled/50/000000/settings.png">
 					<h4>
 						{parameters}
-					</h4>
-					
-				</div>
-				<div class="main-menu-button" onclick="startBotExport()">
-					<img src="https://img.icons8.com/fluent-systems-filled/48/000000/share-rounded.png">
-					<h4>
-						{export}
 					</h4>
 					
 				</div>
@@ -182,7 +194,7 @@
 					{generalCommands}
 				</p>
 			</div>
-		</div>
+			</div>
 		</div>
 		<div id="bot-parameters-security-div" class="dark-background" style="display:none;text-align:center">
 			<h3 class='title'>
@@ -237,28 +249,28 @@
 				<button type="button" onclick="editBotUser()" id="edit-bot-user-btn" class="btn btn-success">{update}</button>
 				
 		</div>
-	<div id="bot-parameters-intents-div" class="dark-background" style="display:none;text-align:center">
-		<h3 class='title'>
-			{intents}
-		</h3>
-		<p class="subtitle">
-			{intentsExplanation}
-		</p>
-		<div>
-			<p class="text-white" style="font-size: 24px; display:contents">{presenceIntent}</p>
-			
-			<label class="switch" style="margin-left:15px"  >
-				<input type="checkbox" id="bot-intents-parameters-input-presence" >
-				<span class="slider round" onclick="editBotIntents('presence')"></span>
-		</div>
+		<div id="bot-parameters-intents-div" class="dark-background" style="display:none;text-align:center">
+			<h3 class='title'>
+				{intents}
+			</h3>
+			<p class="subtitle">
+				{intentsExplanation}
+			</p>
+			<div>
+				<p class="text-white" style="font-size: 24px; display:contents">{presenceIntent}</p>
+				
+				<label class="switch" style="margin-left:15px"  >
+					<input type="checkbox" id="bot-intents-parameters-input-presence" >
+					<span class="slider round" onclick="editBotIntents('presence')"></span>
+			</div>
 
-		<div>
-			<p class="text-white" style="font-size: 24px; display:contents">{guildMembersIntent}</p>
-			
-			<label class="switch" style="margin-left:15px"  >
-				<input type="checkbox" id="bot-intents-parameters-input-guild-members">
-				<span class="slider round" onclick="editBotIntents('guild_members')"></span>
-		</div>
+			<div>
+				<p class="text-white" style="font-size: 24px; display:contents">{guildMembersIntent}</p>
+				
+				<label class="switch" style="margin-left:15px"  >
+					<input type="checkbox" id="bot-intents-parameters-input-guild-members">
+					<span class="slider round" onclick="editBotIntents('guild_members')"></span>
+			</div>
 		
 			
 		</div>
@@ -282,6 +294,49 @@
 						{generalCommandsHelpExplanation}
 					</p>
 				</div>
+			</div>
+		</div>
+		<div id="bot-tools-main-div" class="dark-background" style="display:none;text-align:center">
+			<p class="title">
+				{tools}
+			</p>
+			<div class="all-screen-size">
+				<div class="parameters-button-opener" onclick="openBotToolsSubMenu('invite')">
+					<img src="https://img.icons8.com/fluent/100/000000/invite.png">
+					<p>
+						{invite}
+					</p>
+
+				</div>
+
+				<div class="parameters-button-opener" onclick="startBotExport()">
+					
+					<img src="https://img.icons8.com/fluent-systems-filled/100/000000/share-rounded.png" >
+					<p>
+						{export}
+					</p>
+				</div>
+
+			</div>
+		</div>
+		<div id="bot-tools-invite-div" class="dark-background" style="display: none; text-align: center;">
+			<h3 class="title">
+				{invite}
+			</h3>
+			<p class="subtitle">
+				{inviteExplanation}
+			</p>
+			<div class="token-modify-input">
+				<input type="text" id="bot-tools-invite-input" class="form-control "
+				placeholder="Une erreur est survenue lors de la génération du lien" readonly>
+				
+			</div>
+			<p class="subtitle" style="font-size: small;margin-top:40px;">
+				{invitePermissionCalculatorExplanation}
+			</p>
+			<div class="token-modify-input">
+				<input type="number" onblur="generateInviteLink()" id="bot-tools-invite-permission-number-input" class="form-control "
+				placeholder="Placez ici le nombre correspondant aux permissions que le bot va demander" value=0>
 			</div>
 		</div>
 	</section>
@@ -350,6 +405,11 @@
 			<a href="https://botsonapp.me/extensions" target="_blank" class="center">
 				{downloadExtensions}
 			</a>
+			<div class="input-group" style="width:80%;margin-left:10%;">
+				<input type="text" id="download-link-input" aria-describedby="download-addon" class="form-control "
+				placeholder="{downloadInputText}">
+				<button class="btn btn-success" onclick="startDownloadFromLink()" id="download-addon">{download}</button>
+			</div>
 		</div>
 		<div id="add-extension-confirmation-div" class="add-extension-confirmation-div">
 			<h3>

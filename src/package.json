@@ -7,6 +7,7 @@
   "scripts": {
     "start": "electron .",
     "package": "electron-forge package ",
+    "package-win32": "electron-forge package --platform=win32 --arch=ia32",
     "packagemac": "electron-forge package --platform darwin",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -46,7 +47,7 @@
   },
   "dependencies": {
     "asar": "^3.0.3",
-    "axios": "^0.21.1",
+    "axios": "^0.19.2",
     "canvas-to-buffer": "^1.1.1",
     "discord-rpc": "^3.1.4",
     "discord.js": "^12.5.1",

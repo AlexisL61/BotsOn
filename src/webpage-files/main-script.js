@@ -5,8 +5,9 @@ var currentBotOpenId
 var mainMenuSwitchActivate = false
 var currentlyHosting = false
 var currentlyInExtensionActiveMode = false
+var languageFile
 
-var mainMenuBotButton = `<div onclick="{onClickFunction}" class="bot-menu-btn center">
+var mainMenuBotButton = `<div onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="bot-menu-btn center">
 <div>
 		<img src="{botImg}" class="avatar">
 		<p class="text-white">
@@ -15,7 +16,8 @@ var mainMenuBotButton = `<div onclick="{onClickFunction}" class="bot-menu-btn ce
 		</div>
 </div>`
 
-var extensionActivateBtn = `<div onclick="{modifyConfigFunction}" oncontextmenu="{changeActivationFunction}" class="extension-bot-menu-btn {inactiveClass}" >
+var extensionActivateBtn = `<div onclick="{modifyConfigFunction}" id="{extensionId}" oncontextmenu="{openContextMenuFunction}" class="extension-bot-menu-btn {inactiveClass}" >
+		<span></span>
 		<img src="{extensionImg}" class="">
 		<div>
 			<h3>
@@ -53,9 +55,42 @@ var extensionAvailableBtn = `<div onclick="{onClickFunction}" class="extension-a
 		<div>
 </div>`
 
+var extensionUpdateDiv = `<div class="extension-in-line">
+                    <div class="left-part">
+                        <img src="{extensionImg}">
+                        <p>
+                            {extensionName}
+                        </p>
+                    </div>
+                    <div class="right-part"	style="display:{updateDisplay}">
+                        <a target="_blank" href="{updateLink}"><button class="btn btn-success">
+                            Mettre à jour
+                        </button></a><br/>  
+                        <a target="_blank" href="{informationLink}"><button class="btn btn-dark">
+                            Informations
+                        </button></a>
+					</div>
+					<div class="right-part"	style="display:{noUpdateDisplay}">
+                        <a><button class="btn btn-outline-success">
+                            À jour
+                        </button></a>
+					</div>
+					<div class="right-part"	style="display:{notFoundDisplay}">
+                        <a><button class="btn btn-outline-success">
+                            Non trouvée
+                        </button></a>
+                    </div>
+                   </div>`
+
 function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+document.getElementById("extension-config-div").style.height = (window.innerHeight - 100) + "px"
+window.addEventListener('resize', function(){
+	document.getElementById("extension-config-div").style.height = (window.innerHeight - 100) + "px"
+});
+
 
 async function createNewBot() {
 	document.getElementById("black-blur-background").style.display = "block"
@@ -91,11 +126,87 @@ function updateBotsMenu() {
 		var thisBot = botsData[i]
 		var thisBotDiv = mainMenuBotButton
 		thisBotDiv = thisBotDiv.replace("{onClickFunction}", "openBot('" + thisBot.id + "')")
+		thisBotDiv = thisBotDiv.replace("{openContextMenuFunction}", "openBotContextMenu('" + thisBot.id + "')")
+		thisBotDiv = thisBotDiv.replace("{botId}", "botWithId"+thisBot.id)
 		thisBotDiv = thisBotDiv.replace("{botImg}", thisBot.avatar)
 		thisBotDiv = thisBotDiv.replace("{botName}", thisBot.name)
 		document.getElementById("my-bots-placement").innerHTML = thisBotDiv + document.getElementById("my-bots-placement").innerHTML
 	}
 }
+
+async function openExtensionContextMenu(extensionId){
+	console.log("test")
+	var event = window.event;
+	var x =	event.pageX
+	var y = event.pageY
+	console.log(x,y)
+	var contextMenu = document.getElementById("context-menu")
+	document.getElementById("extension-context-menu").style.display = "unset"
+	document.getElementById("bot-context-menu").style.display = "none"
+	contextMenu.style.display = "unset"
+	if (x+contextMenu.clientHeight>window.innerWidth){
+		x = x-((x+contextMenu.clientWidth)-window.innerWidth)
+	}
+	if (y+contextMenu.clientHeight>window.innerHeight){
+		y = y-((y+contextMenu.clientHeight)-window.innerHeight)
+	}
+	contextMenu.style.marginLeft = x+"px";
+	contextMenu.style.marginTop = y+"px";
+	var botExtensions = ipcRenderer.sendSync("getBotExtensions", { id: currentBotOpenId })
+	var thisExtension = botExtensions.find(ext => ext.id == extensionId)
+	if (thisExtension.active){
+		document.getElementById("extension-context-menu-activate").innerHTML = "Désactiver"
+	}else{
+		document.getElementById("extension-context-menu-activate").innerHTML = "Activer"
+	}
+	document.getElementById("uninstall-bot-extension-btn").setAttribute("onclick","uninstallExtension('"+extensionId+"')")
+	document.getElementById("extension-context-menu-delete").setAttribute("onclick","deleteExtensionFromBot('"+extensionId+"')")
+	document.getElementById("extension-context-menu-activate").setAttribute("onclick","changeExtensionActivation('"+extensionId+"')")
+}
+
+async function openBotContextMenu(bot){
+	var event = window.event;
+	var x =	event.pageX
+	var y = event.pageY
+	console.log(x,y)
+	var contextMenu = document.getElementById("context-menu")
+	document.getElementById("extension-context-menu").style.display = "none"
+	document.getElementById("bot-context-menu").style.display = "unset"
+	contextMenu.style.display = "unset"
+	if (x+contextMenu.clientHeight>window.innerWidth){
+		x = x-((x+contextMenu.clientWidth)-window.innerWidth)
+	}
+	if (y+contextMenu.clientHeight>window.innerHeight){
+		y = y-((y+contextMenu.clientHeight)-window.innerHeight)
+	}
+	contextMenu.style.marginLeft = x+"px";
+	contextMenu.style.marginTop = y+"px";
+	var botsData = ipcRenderer.sendSync("getUserBots", "")
+	var thisBotData = botsData.find(b=>b.id == bot)
+	document.getElementById("delete-bot-btn").setAttribute("onclick","deleteBot('"+thisBotData.id+"')")
+}
+
+function uninstallExtension(extensionId){
+	document.getElementById("extensionWithId"+extensionId).style.display="none"
+	ipcRenderer.send("uninstallExtension",{"extensionId":extensionId})
+	closeUninstallExtensionSection()
+}
+
+function deleteBot(bot){
+	ipcRenderer.send("deleteBot",{"botId":bot})
+	document.getElementById("botWithId"+bot).style.display="none"
+	closeDeleteBotSection()
+}
+
+function deleteExtensionFromBot(extensionId){
+	ipcRenderer.sendSync("deleteExtensionFromBot",{"extensionId":extensionId,"botId":currentBotOpenId})
+	openBot(currentBotOpenId)
+}
+
+document.addEventListener("click",function(event){
+	var contextMenu = document.getElementById("context-menu")
+	contextMenu.style.display = "none"
+})
 
 async function openBot(id) {
 	console.log("openBot")
@@ -107,7 +218,8 @@ async function openBot(id) {
 	for (var i in botExtensions) {
 		var thisExtensionData = botExtensions[i]
 		var thisExtensionDiv = extensionActivateBtn
-		thisExtensionDiv = thisExtensionDiv.replace("{changeActivationFunction}","changeExtensionActiveMode()")
+		thisExtensionDiv = thisExtensionDiv.replace("{openContextMenuFunction}","openExtensionContextMenu('"+thisExtensionData.id+"')")
+		thisExtensionDiv = thisExtensionDiv.replace("{extensionId}","extensionWithId"+ thisExtensionData.id)
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionImg}", thisExtensionData.image)
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionName}", thisExtensionData.name)
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionDescription}", thisExtensionData.smallDescription)
@@ -140,8 +252,11 @@ async function openBot(id) {
 	changeExtensionActiveMode();
 }
 
-function changeExtensionActiveMode(){
+function changeExtensionActiveMode(data){
 	currentlyInExtensionActiveMode = !currentlyInExtensionActiveMode
+	if (data !==undefined){
+		currentlyInExtensionActiveMode = data
+	}
 	if (currentlyInExtensionActiveMode){
 		document.getElementById("indicator-active-mode").classList.add("active")
 		var objects = document.getElementsByClassName("extension-bot-menu-btn")
@@ -162,11 +277,17 @@ function changeExtensionActiveMode(){
 	}
 }
 
+function getTranslation(tr){
+	return languageFile.find(l=>l.dest == "{"+tr+"}").translation
+}
+
 function openExtensionMenu(){
 	document.getElementById("extension-config-div").style.display = "none"
 	document.getElementById("bot-extensions-list").style.display = "block"
 	document.getElementById("bot-parameters-main-div").style.display = "none"
+	document.getElementById("bot-tools-main-div").style.display = "none"
 	closeEveryBotParametersSubMenu()
+	closeEveryBotToolsSubMenu()
 	closeMenu()
 }
 
@@ -191,14 +312,61 @@ async function openConfigPage(extensionId){
 async function changeExtensionActivation(extensionId){
 	if (mainMenuSwitchActivate == false){
 		mainMenuSwitchActivate = true
-	console.log("AAAAAAAAAAAAAAAAAA")
-	var activationChange = ipcRenderer.sendSync("modifyExtensionActivation", { extensionId: extensionId , botId: currentBotOpenId})
-	openBot(currentBotOpenId)
+		var activationChange = ipcRenderer.sendSync("modifyExtensionActivation", { extensionId: extensionId , botId: currentBotOpenId})
+		openBot(currentBotOpenId)
 	}
 }
 
+async function openUpdateExtensionSection() {
+	document.getElementById("black-blur-background").style.display = "block"
+	document.getElementById("update-extension-section").style.display = "flex"
+	await delay(1)
+	document.getElementById("update-extension-main-div").style.marginTop = "0px"
+	document.getElementById("update-extension-main-div").style.opacity = "1"
+	document.getElementById("black-blur-background").style.opacity = "0.4"
+	ipcRenderer.send("checkUpdateExtensions")
+	ipcRenderer.on("checkUpdateExtensions",function(event,result){
+		console.log("AAAAAAAAAAAAAAAAAAAA")
+		var addToDiv = ""
+		for (var i in result){
+			var thisExtensionUpdateDiv = extensionUpdateDiv
+			console.log(result[i].status)
+			if (result[i].status == "notFound"){
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{notFoundDisplay}","unset")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{noUpdateDisplay}","none")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{updateDisplay}","none")
+			}
+			if (result[i].status == "updateAvailable"){
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{updateLink}",result[i].download)
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{informationLink}",result[i].extension)
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{notFoundDisplay}","none")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{noUpdateDisplay}","none")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{updateDisplay}","unset")
+			}
+			if (result[i].status == "updated"){
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{notFoundDisplay}","none")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{noUpdateDisplay}","unset")
+				thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{updateDisplay}","none")
+			}
+			thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{extensionName}",result[i].name)
+			thisExtensionUpdateDiv = thisExtensionUpdateDiv.replace("{extensionImg}",result[i].image)
+			addToDiv+=thisExtensionUpdateDiv
+		}
+		document.getElementById("extension-update-placement").innerHTML = addToDiv
+	})
+}
+
+async function openUninstallExtensionSection() {
+	document.getElementById("black-blur-background").style.display = "block"
+	document.getElementById("uninstall-extension-section").style.display = "flex"
+	await delay(1)
+	document.getElementById("uninstall-extension-main-div").style.marginTop = "0px"
+	document.getElementById("uninstall-extension-main-div").style.opacity = "1"
+	document.getElementById("black-blur-background").style.opacity = "0.4"
+}
+
 async function openAddExtensionSection() {
-	changeExtensionActiveMode();
+	changeExtensionActiveMode(false);
 	document.getElementById("black-blur-background").style.display = "block"
 	document.getElementById("add-extension-section").style.display = "flex"
 	await delay(1)
@@ -235,6 +403,42 @@ async function closeAddExtensionSection(){
 	await delay(1000)
 	document.getElementById("black-blur-background").style.display = "none"
 	document.getElementById("add-extension-section").style.display = "none"
+}
+
+async function closeUpdateExtensionSection(){
+	document.getElementById("black-blur-background").style.opacity = "0"
+	document.getElementById("update-extension-main-div").style.marginTop = "80vh"
+	document.getElementById("update-extension-main-div").style.opacity = "0"
+	await delay(1000)
+	document.getElementById("black-blur-background").style.display = "none"
+	document.getElementById("update-extension-section").style.display = "none"
+}
+
+async function closeUninstallExtensionSection(){
+	document.getElementById("black-blur-background").style.opacity = "0"
+	document.getElementById("uninstall-extension-main-div").style.marginTop = "80vh"
+	document.getElementById("uninstall-extension-main-div").style.opacity = "0"
+	await delay(1000)
+	document.getElementById("black-blur-background").style.display = "none"
+	document.getElementById("uninstall-extension-section").style.display = "none"
+}
+
+async function openDeleteBotSection() {
+	document.getElementById("black-blur-background").style.display = "block"
+	document.getElementById("delete-bot-section").style.display = "flex"
+	await delay(1)
+	document.getElementById("delete-bot-main-div").style.marginTop = "0px"
+	document.getElementById("delete-bot-main-div").style.opacity = "1"
+	document.getElementById("black-blur-background").style.opacity = "0.4"
+}
+
+async function closeDeleteBotSection(){
+	document.getElementById("black-blur-background").style.opacity = "0"
+	document.getElementById("delete-bot-main-div").style.marginTop = "80vh"
+	document.getElementById("delete-bot-main-div").style.opacity = "0"
+	await delay(1000)
+	document.getElementById("black-blur-background").style.display = "none"
+	document.getElementById("delete-bot-section").style.display = "none"
 }
 
 function changeHostingStatus(){
@@ -301,9 +505,18 @@ async function installExtension(id) {
 }
 
 async function start() {
+	languageFile = ipcRenderer.sendSync("getLanguageFile","fr_FR")
+	while (document.body.innerHTML.includes("{")){
+		console.log(document.body.innerHTML.split("{")[1])
+		for (var i in languageFile){
+			document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest,languageFile[i].translation)
+		}
+	  }
 	await delay(1000)
 	var user = ipcRenderer.sendSync("getUser", "")
-	document.getElementById("loading-section-title").innerHTML = "Bienvenue "+user.username
+	ipcRenderer.send("getUserCoins","")
+	console.log(user)
+	document.getElementById("loading-section-title").innerHTML = getTranslation("welcome")+" "+user.username
 		
 	document.getElementById("loading-section-title").style.marginTop = "0px"
 	document.getElementById("loading-section-title").style.opacity = "1"
@@ -332,7 +545,7 @@ async function verifyBotToken() {
 		if (tokenVerifierResult.success == false) {
 			document.getElementById("add-bot-token-btn").removeAttribute("disabled")
 			document.getElementById("add-bot-token-input").value = ""
-			document.getElementById("add-bot-token-input").setAttribute("placeholder", "Token incorrect")
+			document.getElementById("add-bot-token-input").setAttribute("placeholder", getTranslation("incorrectToken"))
 			document.getElementById("add-bot-token-input").classList.add("input-error")
 		} else {
 			document.getElementById("add-bot-main-div").style.marginTop = "-250px"
@@ -349,11 +562,34 @@ async function verifyBotToken() {
 	ipcRenderer.send("checkDiscordToken", { "token": token, "addBot": true })
 }
 
+function startBotExport(){
+	ipcRenderer.send("exportBot",{"bot":currentBotOpenId})
+}
+
 function openBotParametersMenu(){
 	openExtensionMenu()
 	document.getElementById("bot-extensions-list").style.display="none"
 	document.getElementById("bot-parameters-main-div").style.display = "block"
 	
+}
+
+function openBotToolsMenu(){
+	openExtensionMenu()
+	document.getElementById("bot-extensions-list").style.display="none"
+	document.getElementById("bot-tools-main-div").style.display = "block"
+}
+
+function generateInviteLink(){
+	var permission = document.getElementById("bot-tools-invite-permission-number-input").value 
+	document.getElementById("bot-tools-invite-input").value = "https://discord.com/oauth2/authorize?client_id="+currentBotOpenId+"&scope=bot&permissions="+permission
+}
+
+async function openBotToolsSubMenu(tool){
+	document.getElementById("bot-tools-main-div").style.display = "none"
+	if (tool == "invite"){
+		document.getElementById("bot-tools-invite-div").style.display = "block"
+		generateInviteLink()
+	}
 }
 
 async function openBotParametersSubMenu(parameter){
@@ -418,6 +654,10 @@ function closeEveryBotParametersSubMenu(){
 	document.getElementById("bot-parameters-user-div").style.display = "none"
 	document.getElementById("bot-parameters-intents-div").style.display = "none"
 	document.getElementById("bot-parameters-general-commands-div").style.display = "none"
+}
+
+function closeEveryBotToolsSubMenu(){
+	document.getElementById("bot-tools-invite-div").style.display = "none"
 }
 
 function editBotData(){
@@ -493,5 +733,18 @@ ipcRenderer.on("endHosting",function(event,data){
 		document.getElementById("heberg-bot-btn").classList.add("btn-primary")
 	}
 })
+
+ipcRenderer.on("getUserCoins",function(event,coins){
+	document.getElementById("user-coins-placement-value").innerHTML=coins
+})
+
+async function startDownloadFromLink(){
+	var link = document.getElementById("download-link-input").value
+	if (link.startsWith("botson://")){
+	ipcRenderer.send("startDownloadFromLink",link)
+	}else{
+		document.getElementById("download-link-input").value = "Lien invalide"
+	}
+}
 
 start()

@@ -16,6 +16,7 @@ const directory = app.getAppPath()
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
 var premiumData
+var linkSave = ""
 
 var currentlyBotHosting 
 const clientId = '774665586001051648';
@@ -125,21 +126,35 @@ function createDownloadWindow() {
     mainWindow.close()
   })
 
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   
 }
 
+app.on("open-url",function(e,url){
+  e.preventDefault();
+  linkSave = url
+  if (app.isReady()){
+    createDownloadWindow()
+  }
+})
+
 app.on("ready", () => {
+  
+  
   console.log(process.argv)
   if (!process.argv.find(arg=>arg.startsWith("botson://"))){
-    app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
-    createWindow()
-    //createDownloadWindow()
-    
+    if (linkSave){
+      createDownloadWindow()
+    }else{
+      app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
+      createWindow()
+      //createDownloadWindow()
+      
+    }
   }else{
+    linkSave = process.argv.find(arg=>arg.startsWith("botson://"))
     createDownloadWindow()
-    
   }
 
   app.on('activate', function () {
@@ -191,18 +206,24 @@ ipc.on("uninstallExtension",function(event,args){
   new Notification({"title":"Désinstallation terminée","body":"L'extension "+args.extensionId+" a bien été désinstallée."}).show()
 })
 
-ipc.on("connect-discord",function(event,args){
+ipc.on("connect-discord",async function(event,args){
   try{
-    RPCclient.login({ clientId});
+    RPCclient.login( {clientId,"scopes":["identify"],"redirect_uri":"https://botsonapp.me/connect"});
   }catch(e){
     
-    console.log("ERROR")
+    console.log(e)
   }
-  RPCclient.once("connected", async () => {
+  RPCclient.once("ready", async () => {
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
     mainWindow.loadFile('./index.html')
+    mainWindow.setAlwaysOnTop(true); 
+    // once show then it leaves from top when click outside
+    setTimeout(function()
+    {
+      mainWindow.setAlwaysOnTop(false);
+    },1000)
     axios.get("https://botsonapp.me/api/isPremium/"+RPCclient.user.id)
     .then(function(result){
       console.log("result")
@@ -237,6 +258,7 @@ function getTranslate(lang,tr){
   var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+lang+".json"),"utf8"))
   return languageFile.find(l=>l.dest == "{"+tr+"}").translation
 }
+
 
 ipc.on("exportBot",async function(event,args){
   const copyAsync = promisify(fse.copy)
@@ -326,8 +348,19 @@ ipc.on("getDataFolder",function(event,args){
   event.returnValue = dataFolder
 })
 
+ipc.on("startDownloadFromLink",function(event,url){
+  linkSave = url
+  createDownloadWindow()
+})
+
 ipc.on("downloadExtensionFromURL",function(event,args){
-  var url = process.argv.find(arg=>arg.startsWith("botson://")).split("botson://")[1]
+  var url
+  if (linkSave.startsWith("botson://")){
+    url = linkSave.split("botson://")[1]
+  }else{
+    url = linkSave
+  }
+  new Notification({"body":url,"title":"Test notif"}).show()
   var urlData = url.split("?")
   url = urlData[0]
   var params = urlData[1]
@@ -578,6 +611,18 @@ function getToken(id){
   return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json","utf8")).token
 }
 
+ipc.on("getProductInfo",async function(event,args){
+
+})
+
+ipc.on("userOwnProduct",async function(event,args){
+  
+})
+
+ipc.on("buyProduct",async function(event,args){
+  
+})
+
 ipc.on("getGuilds", async function (event, args) {
   if (args.botId){
     var thisBotToken = getToken(args.botId)
@@ -697,10 +742,6 @@ ipc.on("endHosting",async function (event,args){
   }
 })
 
-ipc.on("canvas",async function(event,args){
-  console.log(args.canvas)
-})
-
 ipc.on("getBotExtensions",async function (event, args) {
   var botExtensions =  getBotExtensionsData(args)
   event.returnValue = botExtensions
@@ -712,6 +753,20 @@ ipc.on("getBotData", function (event, args) {
 
 ipc.on("getUser",function(event,args){
   event.returnValue = RPCclient.user
+})
+
+ipc.on("getUserCoins",async function(event,args){
+  var fetchResult = await axios({"method":"GET",
+  "url":"https://botsonapp.me/api/get-user-coins", 
+    headers: {
+      authorization: RPCclient.accessToken,
+    },
+  })
+  if (fetchResult.data.success){
+    event.sender.send("getUserCoins",fetchResult.data.data.coins)
+  }else{
+    event.sender.send("getUserCoins",0)
+  }
 })
 
 ipc.on("getUserBots", function (event, args) {
