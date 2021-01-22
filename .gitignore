@@ -1,3 +1,2 @@
 ffmpeg.exe
-node_modules/*
-!discord-rpc
+node_modules
