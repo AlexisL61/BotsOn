@@ -27,6 +27,8 @@ var currentlyBotHosting
 const clientId = '774665586001051648';
 const scopes = [ 'identify'];
 
+var botsOnUser
+
 var mainWindow
 
 console.log(dataFolder)
@@ -34,6 +36,7 @@ console.log(dataFolder)
 const discordTokenVerify = require("./main_scripts/verify-token.js")
 const api = require("./main_scripts/api.js")
 const richPresence = require("./main_scripts/rich-presence.js")
+const botsOnUserModule = require("./main_scripts/botson-user.js")
 
 var mainWebContent
 
@@ -220,30 +223,21 @@ ipc.on("connect-discord",async function(event,args){
     console.log(e)
   }
   RPCclient.once("ready", async () => {
-  	//Mise à jour du rich presence et chargement de la page principale
+    //Mise à jour du rich presence et chargement de la page principale
+    botsOnUser = new botsOnUserModule.BotsOnUser(RPCclient.accessToken,RPCclient.user)
+
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
+
     mainWindow.loadFile('./index.html')
     mainWindow.setAlwaysOnTop(true); 
-    // once show then it leaves from top when click outside
     setTimeout(function()
     {
       mainWindow.setAlwaysOnTop(false);
-    },1000)
+    },500)
 
-    //Regarde si la personne est bien premium
-    axios.get("https://botsonapp.me/api/isPremium/"+RPCclient.user.id)
-    .then(function(result){
-      console.log("result")
-      premiumData = result.data
-      event.sender.send("connect-discord",{"status":"connect"})
-    })
-    .catch(function(e){
-      console.log(e)
-      premiumData = {premium:false}
-      event.sender.send("connect-discord",{"status":"connect"})
-    })
+    premiumData = await botsOnUser.checkMembership()
   })
   RPCclient.on("error",()=>{
   })
@@ -800,17 +794,7 @@ ipc.on("getUser",function(event,args){
 
 //Récupération des pièces de l'utilisateur pour l'afficher
 ipc.on("getUserCoins",async function(event,args){
-  var fetchResult = await axios({"method":"GET",
-  "url":"https://botsonapp.me/api/get-user-coins", 
-    headers: {
-      authorization: RPCclient.accessToken,
-    },
-  })
-  if (fetchResult.data.success){
-    event.sender.send("getUserCoins",fetchResult.data.data.coins)
-  }else{
-    event.sender.send("getUserCoins",0)
-  }
+    event.sender.send("getUserCoins",await botsOnUser.getCoins())
 })
 
 //Récupération de tous les bots sauvegardées sur BotsOn
