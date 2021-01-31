@@ -342,7 +342,7 @@ ipc.on("exportBot",async function(event,args){
   await mainWindow.loadFile('./webpage-files/export/export.html')
 })
 
-//Ouvre le donnsier d'exportation
+//Ouvre le dossier d'exportation
 ipc.on("openExportFolder",function(event,args){
   console.log("receive")
   child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function(stdout) {
