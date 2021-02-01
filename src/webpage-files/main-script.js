@@ -7,6 +7,7 @@ var currentlyHosting = false
 var currentlyInExtensionActiveMode = false
 var languageFile
 
+console.log("HEY")
 var mainMenuBotButton = `<div onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="bot-menu-btn center">
 <div>
 		<img src="{botImg}" class="avatar">

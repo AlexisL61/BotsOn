@@ -23,7 +23,7 @@ class BotsOnUser {
             {"method":"GET",
             "url":"https://botsonapp.me/api/get-user-coins", 
             headers: {
-                authorization: RPCclient.accessToken,
+                authorization: this.token,
             },
         })
         if (fetchResult.data.success){

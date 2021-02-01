@@ -229,13 +229,23 @@ ipc.on("connect-discord",async function(event,args){
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
-
-    mainWindow.loadFile('./index.html')
+    event.sender.send("loading",{"color":"red","type":"start"})
+    
+    var mainWebFile = fs.readFileSync("./index.html","utf-8")
     mainWindow.setAlwaysOnTop(true); 
     setTimeout(function()
     {
       mainWindow.setAlwaysOnTop(false);
     },500)
+
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
+	  while (mainWebFile.includes("{")){
+      for (var i in languageFile){
+        mainWebFile = mainWebFile.replace(languageFile[i].dest,languageFile[i].translation)
+      }
+    }
+    event.sender.send("append",{"file":mainWebFile})
+    
 
     premiumData = await botsOnUser.checkMembership()
   })
