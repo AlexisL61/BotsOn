@@ -9,6 +9,8 @@ function connectToDiscord() {
     document.getElementById("connect-btn").classList.add("btn-blinking")
 }
 
+
+
 languageFile = ipcRenderer.sendSync("getLanguageFile", "fr_FR")
 while (document.body.innerHTML.includes("{")) {
     for (var i in languageFile) {
@@ -112,7 +114,11 @@ async function stopLoadingScreen() {
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-startLoadingScreen("blue")
+
+ipcRenderer.on("discord-rpc-loading-error",function(event,args){
+    document.getElementById("connect-btn").innerHTML = "Se connecter à Discord"
+    document.getElementById("connect-btn").classList.remove("btn-blinking")
+})
 
 ipcRenderer.on("loading", function (event, data) {
     if (data.type == "start") {

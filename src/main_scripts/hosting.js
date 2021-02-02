@@ -62,7 +62,7 @@ module.exports = {
                     width:1000,
                     height:1000,
                     center: true,
-                    show:false,
+                    show:true,
                     webPreferences: {
                         preload: path.join(__dirname, '../preload.js')
                     }

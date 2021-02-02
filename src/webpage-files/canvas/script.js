@@ -1,5 +1,8 @@
 function requestBuffer(id){
-    var canvas = new canvasToBuffer(document.getElementById(id))
+    var canvas = new canvasToBuffer(document.getElementById(id), {
+        quality: 1,
+        types:["png"]
+    })
     ipcRenderer.send(id+"-buffer-request",{"send":canvas.toBuffer()})
 }
 
@@ -18,10 +21,4 @@ async function addFont(id,Name,FontFileName){
     document.fonts.add(font);
     ipcRenderer.send(id+"-addfont-request",{})
    
-}
-
-function test(id){
-    var canvas = new canvasToBuffer(document.getElementById(id))
-    console.log(canvas.toBuffer())
-    ipcRenderer.send("canvas-bug",{"send":canvas.toBuffer()})
 }

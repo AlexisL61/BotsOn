@@ -219,7 +219,7 @@ ipc.on("connect-discord",async function(event,args){
   	//Commence la connexion avec Discord
     RPCclient.login( {clientId,"scopes":["identify"],"redirect_uri":"https://botsonapp.me/connect"});
   }catch(e){
-    
+    event.sender.send("discord-rpc-loading-error")
     console.log(e)
   }
   RPCclient.once("ready", async () => {
@@ -229,7 +229,7 @@ ipc.on("connect-discord",async function(event,args){
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
-    event.sender.send("loading",{"color":"red","type":"start"})
+    event.sender.send("loading",{"color":"rgb(0,79,163)","type":"start"})
     
     var mainWebFile = fs.readFileSync("./index.html","utf-8")
     mainWindow.setAlwaysOnTop(true); 

@@ -19,6 +19,7 @@ class Canvas{
         currentOpenWebPage.executeJavaScript(`requestBuffer("`+this.id+`")`)
         return new Promise(function(resolve, reject) {
             ipc.once(thisObjectId+"-buffer-request",function(sender,intArray){
+                console.log(intArray)
                 resolve(Buffer.from(intArray.send))
             })
         })
