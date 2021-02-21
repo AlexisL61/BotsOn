@@ -36,7 +36,11 @@ console.log(dataFolder)
 const discordTokenVerify = require("./main_scripts/verify-token.js")
 const api = require("./main_scripts/api.js")
 const richPresence = require("./main_scripts/rich-presence.js")
-const botsOnUserModule = require("./main_scripts/botson-user.js")
+const botsOnUserModule = require("./main_scripts/class/botson-user.js")
+const extensionModule = require("./main_scripts/class/extension.js")
+
+//Init module
+extensionModule.init(dataFolder);
 
 var mainWebContent
 
@@ -614,31 +618,7 @@ ipc.on("getExtensionData",function(event,args){
 
 //Récupère les mises à jour dispo pour une extension
 ipc.on("checkUpdateExtensions",async function(event){
-  var extensionsFound = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
-    availableExtensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
-        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
-        console.log(extensionData)
-        var toPush = {}
-        toPush.id = extensionData.id
-        toPush.version = "1"
-        if (extensionData.version){
-          toPush.version = extensionData.version
-        }
-        extensionsFound.push(toPush)
-      }
-    })
-  }
-  var result = await axios.get("https://botsonapp.me/api/verify-update?extensions="+JSON.stringify(extensionsFound))
-  result = result.data
-  var toSend = []
-  console.log(result)
-  for (var i in extensionsFound){
-    var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extensionsFound[i].id + "/extension-data.json"))
-    toSend.push({"name":extensionData.name,"id":extensionData.id,"image":extensionData.image,"status":result[extensionsFound[i].id].status,"download":result[extensionsFound[i].id].downloadLink,"extension":result[extensionsFound[i].id].extensionLink})
-  }
+  var toSend = await extensionModule.verifyUpdate()
   event.sender.send("checkUpdateExtensions",toSend)
 })
 
@@ -712,19 +692,8 @@ ipc.on("getGuildEmojis", async function (event, args) {
 
 //Récupération des extensions disponible (extensions téléchargées)
 ipc.on("getAvailableExtensions", function (event, args) {
-  var extensionsFound = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
-    availableExtensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
-        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
-        console.log(extensionData)
-        extensionsFound.push({ "name": extensionData.name, "author": extensionData.author, "description": extensionData.description, "id": extensionData.id, "smallDescription": extensionData.smallDescription, "image": extensionData.image })
-      }
-    })
-  }
-  console.log(extensionsFound)
-  event.returnValue = extensionsFound
+  var installExtensions = extensionModule.getInstallExtensions()
+  event.returnValue = installExtensions
 })
 
 //Démarre l'hébergement d'un bot
@@ -789,6 +758,7 @@ ipc.on("endHosting",async function (event,args){
 //Récupération des extensions d'un bot
 ipc.on("getBotExtensions",async function (event, args) {
   var botExtensions =  getBotExtensionsData(args)
+  console.log("botExtension")
   event.returnValue = botExtensions
 })
 
