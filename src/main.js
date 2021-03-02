@@ -367,6 +367,12 @@ ipc.on("startDownloadFromLink",function(event,url){
   createDownloadWindow()
 })
 
+/**
+ * Télécharge le product et l'ajoute dans son dossier dans l'extension voulue
+ * @param {string} extension Id de l'extension
+ * @param {string} id Id du product
+ * @param {string} downloadLink Lien de téléchargement du product
+ */
 async function installProduct(extension,id,downloadLink){
   return new Promise((resolve) => {
     axios({
