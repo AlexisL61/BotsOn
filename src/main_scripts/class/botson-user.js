@@ -32,6 +32,33 @@ class BotsOnUser {
          return 0
         }
     }
+    async getProductOwnLink(extensionId){
+        var fetchResult = await axios(
+            {"method":"GET",
+            "url":"https://botsonapp.me/api/get-products-from-extension/"+extensionId, 
+            headers: {
+                authorization: this.token,
+            },
+        })
+        if (fetchResult.data.success){
+            var products = JSON.parse(fetchResult.data.data)
+            var productToSend = []
+            for (var i in products){
+                var productFetch = await axios(
+                    {"method":"GET",
+                    "url":"https://botsonapp.me/api/own-product/"+products[i], 
+                    headers: {
+                        authorization: this.token,
+                    },
+                })
+                if (productFetch.data.success && productFetch.data.data.hasProduct){
+                    productToSend.push({"id":products[i],"download":productFetch.data.data.download})
+                }
+            }
+            return productToSend
+        }
+        return []
+    }
 }
 
 module.exports={

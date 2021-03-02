@@ -52,8 +52,8 @@ function createErrorCode(errorCode){
 }
 
 function createWindow() {
-
-	//Création de la fenêtre principale 
+  
+  //Création de la fenêtre principale 
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 1000,
@@ -62,7 +62,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   mainWindow.loadFile('./webpage-files/connect/connect.html')
   mainWindow.setMenu(Menu.buildFromTemplate([{
     label: "Debug",
@@ -89,7 +89,7 @@ function createWindow() {
     e.preventDefault();
     require('electron').shell.openExternal(url);
   });
-
+  
   //Appel lorsque la fenêtre est fermée
   mainWindow.on("closed",function(){
     app.quit()
@@ -105,26 +105,26 @@ function createDownloadWindow() {
   mainWindow = new BrowserWindow({
     width: 400,
     height: 100,
-      x:dimensions.width-410,
-      y:dimensions.height-110,
-      frame:false,
+    x:dimensions.width-410,
+    y:dimensions.height-110,
+    frame:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   //load the index.html of the app.
   mainWindow.loadFile('download.html')
   mainWindow.setMenu(null)
-
+  
   //Fermeture de la fenêtre si l'utilisateur appuie sur la croix
   ipc.once("closeDownload",function(){
     mainWindow.close()
   })
-
+  
   //Ouverture des dev tools pour les tests
   mainWindow.webContents.openDevTools()
-
+  
   
 }
 
@@ -145,24 +145,24 @@ app.on("ready", () => {
   //Regarde si il n'y a pas un argument commençant par BotsOn
   //Cela veut dire que BotsOn a été ouvert à partir d'un lien BotsOn
   if (!process.argv.find(arg=>arg.startsWith("botson://"))){
-    if (linkSave){
-      createDownloadWindow()
-    }else{
-      app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
-      createWindow()
-      //createDownloadWindow()
-      
-    }
-  }else{
-    linkSave = process.argv.find(arg=>arg.startsWith("botson://"))
+  if (linkSave){
     createDownloadWindow()
+  }else{
+    app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
+    createWindow()
+    //createDownloadWindow()
+    
   }
+}else{
+  linkSave = process.argv.find(arg=>arg.startsWith("botson://"))
+  createDownloadWindow()
+}
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+app.on('activate', function () {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+})
 })
 
 // Quit when all windows are closed
@@ -212,7 +212,7 @@ ipc.on("uninstallExtension",function(event,args){
 //Initialisation de la connexion avec Discord
 ipc.on("connect-discord",async function(event){
   try{
-
+    
     //Commence la connexion avec Discord
     RPCclient.login( {clientId,"scopes":["identify"],"redirect_uri":"https://botsonapp.me/connect"});
   }catch(e){
@@ -222,7 +222,7 @@ ipc.on("connect-discord",async function(event){
   RPCclient.once("ready", async () => {
     //Mise à jour du rich presence et chargement de la page principale
     botsOnUser = new botsOnUserModule.BotsOnUser(RPCclient.accessToken,RPCclient.user)
-
+    
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
@@ -234,7 +234,7 @@ ipc.on("connect-discord",async function(event){
     {
       mainWindow.setAlwaysOnTop(false);
     },500)
-
+    
     var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
     while (mainWebFile.includes("{")){
       for (var i in languageFile){
@@ -332,8 +332,8 @@ ipc.on("exportBot",async function(event,args){
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationEnd"),"percentage":100,"bot":args.bot})
     
   })
-
-
+  
+  
   //Ouvre la fenêtre de l'exportation
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -343,7 +343,7 @@ ipc.on("exportBot",async function(event,args){
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   //load the index.html of the app.
   await mainWindow.loadFile('./webpage-files/export/export.html')
 })
@@ -353,7 +353,7 @@ ipc.on("openExportFolder",function(){
   console.log("receive")
   child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function() {
     console.log(dataFolder)
-});
+  });
 })
 
 //Retourne le dossier des données
@@ -366,6 +366,26 @@ ipc.on("startDownloadFromLink",function(event,url){
   linkSave = url
   createDownloadWindow()
 })
+
+async function installProduct(extension,id,downloadLink){
+  return new Promise((resolve) => {
+    axios({
+      method: "get",
+      url: downloadLink,
+      responseType: "stream"
+    }).then(async function (response) {
+      var stream = fs.createWriteStream(dataFolder+"/temp.zip")
+      response.data.pipe(stream);
+      stream.on("finish",async function(){
+        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/product")
+        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/product/"+id)
+        await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install/"+extension+"/product/"+id}) 
+        resolve()
+      })
+    })
+  });
+  
+}
 
 //Commence le téléchargement d'une extension
 ipc.on("downloadExtensionFromURL",function(event){
@@ -392,23 +412,23 @@ ipc.on("downloadExtensionFromURL",function(event){
   }
   console.log(paramsDico)
   console.log("start")
-      axios({
-        method: "get",
-        url: url,
-        responseType: "stream"
-    }).then(async function (response) {
-      var fileName
-      if (paramsDico["id"]){
-        fileName = paramsDico["id"]
-      }
-      event.sender.send("downloadFinish")
-      var stream = fs.createWriteStream(dataFolder+"/temp.zip")
-      response.data.pipe(stream);
-      stream.on("finish",async function(){
-        try{
-      if (!fs.existsSync(dataFolder + "/extension-install")){
-        fs.mkdirSync(dataFolder + "/extension-install")
-      }
+  axios({
+    method: "get",
+    url: url,
+    responseType: "stream"
+  }).then(async function (response) {
+    var fileName
+    if (paramsDico["id"]){
+      fileName = paramsDico["id"]
+    }
+    event.sender.send("downloadFinish")
+    var stream = fs.createWriteStream(dataFolder+"/temp.zip")
+    response.data.pipe(stream);
+    stream.on("finish",async function(){
+      try{
+        if (!fs.existsSync(dataFolder + "/extension-install")){
+          fs.mkdirSync(dataFolder + "/extension-install")
+        }
         await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) 
         console.log("unzip")
         event.sender.send("unzipFinish")
@@ -419,14 +439,18 @@ ipc.on("downloadExtensionFromURL",function(event){
           }
           fs.writeFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json",JSON.stringify(data))
         }
-
+        var thisUser = new BotsOnUser(getUserDataFile().token)
+        var extensionProducts =await thisUser.getProductOwnLink(paramsDico["id"])
+        for (i in extensionProducts){
+          await installProduct(paramsDico.id,extensionProducts[i].id,extensionProducts[i].download)
+        }
         event.sender.send("finalisationFinish")
-    }catch(e){
-      event.sender.send("error",{error:e})
-    }
+      }catch(e){
+        event.sender.send("error",{error:e})
+      }
       
     })
-    })
+  })
 })
 
 //Vérifie le token Discord
@@ -592,7 +616,7 @@ function getToken(id){
 
 //Coming soon!
 /*ipc.on("getProductInfo",async function(event,args){
-
+  
 })
 
 ipc.on("userOwnProduct",async function(event,args){
@@ -738,7 +762,7 @@ ipc.on("getUser",function(event){
 
 //Récupération des pièces de l'utilisateur pour l'afficher
 ipc.on("getUserCoins",async function(event){
-    event.sender.send("getUserCoins",await botsOnUser.getCoins())
+  event.sender.send("getUserCoins",await botsOnUser.getCoins())
 })
 
 //Récupération de tous les bots sauvegardées sur BotsOn
@@ -790,16 +814,16 @@ function copyDebugFile(){
 
 function getUserDataFile(){
   if (!fs.existsSync(dataFolder+"/user_data"))
-    fs.mkdirSync(dataFolder+"/user_data")
+  fs.mkdirSync(dataFolder+"/user_data")
   if (!fs.existsSync(dataFolder+"/user_data/data.json"))
-    fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
   return JSON.parse(fs.readFileSync(dataFolder+"/user_data/data.json"))
 }
 
 function setUserDataFile(data){
   if (!fs.existsSync(dataFolder+"/user_data"))
-    fs.mkdirSync(dataFolder+"/user_data")
+  fs.mkdirSync(dataFolder+"/user_data")
   if (!fs.existsSync(dataFolder+"/user_data/data.json"))
-    fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
   return fs.writeFileSync(dataFolder+"/user_data/data.json",JSON.stringify(data))
 }
