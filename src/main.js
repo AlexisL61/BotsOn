@@ -180,6 +180,7 @@ function getBotExtensionsData(args){
   var botExtensions = []
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
     var thisBot = new botModule.Bot(args.id)
+    console.log(thisBot)
     var botName = thisBot.name
     richPresence.changeRPC({"state":"Configure "+botName})
     botExtensions = thisBot.getExtensions()

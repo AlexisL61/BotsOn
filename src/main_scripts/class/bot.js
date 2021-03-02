@@ -2,7 +2,7 @@ var fs =require("fs")
 
 const {app} = require("electron")
 const dataFolder = app.getPath('userData')
-const {BotExtension} = require("./extension")
+const extensionModule = require("./extension.js")
 
 /**
  * Construction d'un nouveau bot géré par BotsOn
@@ -25,6 +25,7 @@ class Bot{
     constructor(id) {
         if (!fs.existsSync(dataFolder+"/bots/"+id+"/botdata.json"))
             return this.id = undefined
+        this.id = id
         this.bot_data = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+id+"/botdata.json","utf8"))
         this.name = this.bot_data.name
         this.token = this.bot_data.token
@@ -52,9 +53,10 @@ class Bot{
     getExtensions(){
         var extensions = fs.readdirSync(dataFolder + "/bots/" + this.id + "/extensions")
         var botExtensions = []
+        var thisBot = this
         extensions.forEach(function (extension) {
             if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
-                var thisBotExtension = new BotExtension(extension,this)
+                var thisBotExtension = new extensionModule.BotExtension(extension,thisBot.id)
                 botExtensions.push(thisBotExtension)
             }
         })
