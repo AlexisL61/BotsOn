@@ -8,9 +8,9 @@ class BotsOnUser {
     async checkMembership(){
         try{
             var data = await axios({"method":"GET",
-                "url":"https://botsonapp.me/api/isPremium/"+RPCclient.user.id, 
+                "url":"https://botsonapp.me/api/isPremium/"+this.userData.id, 
                 headers: {
-                    authorization: RPCclient.accessToken,
+                    authorization: this.token,
                 },
             })
             return data.data

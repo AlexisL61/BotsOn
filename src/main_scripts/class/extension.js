@@ -2,18 +2,23 @@ const fs = require("fs");
 const axios = require("axios")
 var dataFolder;
 
-class Extension{
-    id;
-    url;
-    name;
-    image;
-    smallDescription;
-    description;
-    author;
-    version;
-
-    constructor(data){
-        this.id = data;
+/**
+ * @class Extension
+ * @classdesc Extension BotsOn
+ * 
+ * @property {string} id - Id de l'extension
+ * @property {string} url - Url de l'extension
+ * @property {string} name - Nom de l'extension
+ * @property {string} image - Image de l'extension
+ * @property {string} smallDescription - Petite description de l'extension
+ * @property {string} description - Description de l'extension
+ * @property {string} author - Auteur de l'extension
+ * @property {string} version - Version de l'extension
+ * @property {object} extension_data - Données du fichier extension-data.json de l'extension
+ */
+class Extension{    
+    constructor(id){
+        this.id = id;
         this.url = dataFolder + "/extension-install/" + this.id + "/extension-data.json"
         console.log(this.url)
         if (!fs.existsSync(this.url)){
@@ -55,10 +60,74 @@ class Extension{
         return toPush
     }
 }
-
+/**
+ * Représentation d'une extension dans un bot
+ * 
+ * @class BotExtension
+ * @classdesc 
+ * 
+ * 
+ */
 class BotExtension extends Extension{
+    constructor(id,bot){
+        super(id)
+        this.bot = bot
+        this.status = fs.readFileSync(dataFolder+"/bots/"+bot.id+"/extensions/"+id+"/status.json","utf-8")
+    }
 
+    /**
+     * Supprime une extension d'un bot
+     * 
+     * @returns {boolean} Succès - true si la suppression s'est bien passé, false sinon
+     */
+    delete(){
+        try{
+            fs.rmdirSync(dataFolder + "/bots/" + this.bot.id + "/extensions/" + this.id, { recursive: true });
+            return true
+        }catch(e){
+            return false
+        }
+    }
+
+    /**
+     * Retourne la configuration de l'extension
+     * 
+     * @return {object} Configuration - Configuration de l'extension
+     */
+    getConfig(){
+        if (fs.existsSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json"))
+            return fs.readFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json","utf-8")
+        return undefined
+    }
+
+    /**
+     * Sauvegarde la configuration donnée
+     * @param {object} config - Configuration
+     */
+    saveConfig(config){
+        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json",JSON.stringify(config))
+    }
+
+    /**
+     * Retourne le statut de l'extension
+     * 
+     * @return {object} Statut - Statut de l'extension
+     */
+    getStatus(){
+        if (fs.existsSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json"))
+            return fs.readFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json","utf-8")
+        return undefined
+    }
+
+    /**
+     * Sauvegarde le statut donné
+     * @param {object} config - Configuration
+     */
+    saveStatus(config){
+        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json",JSON.stringify(config))
+    }
 }
+
 
 async function verifyUpdate(){
     var extensionsFound = getInstallExtensions()
@@ -69,7 +138,7 @@ async function verifyUpdate(){
     result = result.data
     var toSend = []
     console.log(result)
-    for (var i in extensionsFound){
+    for (i in extensionsFound){
         var extensionData = new Extension(extensionsFound[i].id)
         toSend.push({"name":extensionData.name,"id":extensionData.id,"image":extensionData.image,"status":result[extensionsFound[i].id].status,"download":result[extensionsFound[i].id].downloadLink,"extension":result[extensionsFound[i].id].extensionLink})
     }
@@ -84,7 +153,7 @@ function getInstallExtensions(){
         availableExtensions.forEach(function (extension) {
             if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json")){
                 //console.log(extension)
-                thisExtension = new Extension(extension)
+                var thisExtension = new Extension(extension)
                 extensionsFound.push(thisExtension)
             }
         })
@@ -97,5 +166,7 @@ module.exports = {
         dataFolder = dF;
     },
     getInstallExtensions:getInstallExtensions,
-    verifyUpdate:verifyUpdate
+    verifyUpdate:verifyUpdate,
+    Extension:Extension,
+    BotExtension:BotExtension
 }

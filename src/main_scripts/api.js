@@ -4,7 +4,7 @@ var botId
 function connectBot(discord, token) {
     client = new discord.Client()
     client.login(token)
-        .catch(function (error) {
+        .catch(function () {
             console.log("error")
             client.emit("botLogin", { "success": false })
         })
@@ -13,11 +13,11 @@ function connectBot(discord, token) {
         botId = client.user.id
         client.emit("botLogin", { "success": true})
     })
-    client.once("error", function (error) {
+    client.once("error", function () {
         client.emit("botLogin", { "success": false })
     })
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         client.once("botLogin", function (data) {
             resolve(data)
         })

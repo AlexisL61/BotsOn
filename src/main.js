@@ -1,9 +1,9 @@
+/* eslint-disable no-undef */
 //Code source de BotsOn
 //Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 //Modules and variables
-const { app, BrowserWindow, autoUpdater,protocol,Menu,clipboard,Notification,shell,screen, ipcRenderer } = require('electron')
-const appPath = app.getAppPath()
+const { app, BrowserWindow,Menu,clipboard,Notification,screen } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -15,7 +15,6 @@ const discord = require("discord.js")
 const dataFolder = app.getPath('userData')
 const {promisify} = require("util")
 const child_process = require("child_process")
-const directory = app.getAppPath()
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
 var premiumData
@@ -25,7 +24,6 @@ var currentlyBotHosting
 
 // id de l'application Discord suivi du scope identify pour se connecter à Discord
 const clientId = '774665586001051648';
-const scopes = [ 'identify'];
 
 var botsOnUser
 
@@ -38,11 +36,11 @@ const api = require("./main_scripts/api.js")
 const richPresence = require("./main_scripts/rich-presence.js")
 const botsOnUserModule = require("./main_scripts/class/botson-user.js")
 const extensionModule = require("./main_scripts/class/extension.js")
+const { BotsOnUser } = require('./main_scripts/class/botson-user.js')
+const botModule = require("./main_scripts/class/bot.js")
 
 //Init module
 extensionModule.init(dataFolder);
-
-var mainWebContent
 
 const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname,"jsonFolder/notifications/notifications.json"),"utf8"))
 console.log(process.arch)
@@ -85,8 +83,6 @@ function createWindow() {
       }
     ]
   }]))
-
-  mainWebContent = mainWindow.webContents;
   
   //Ouverture d'une page exterieur lors d'un clique sur un lien à la place de l'ouvrir dans electron
   mainWindow.webContents.on('new-window', function(e, url) {
@@ -122,7 +118,7 @@ function createDownloadWindow() {
   mainWindow.setMenu(null)
 
   //Fermeture de la fenêtre si l'utilisateur appuie sur la croix
-  ipc.once("closeDownload",function(event){
+  ipc.once("closeDownload",function(){
     mainWindow.close()
   })
 
@@ -182,45 +178,42 @@ app.on('window-all-closed', function () {
 //Récupère les données des extensions d'un bot précis
 function getBotExtensionsData(args){
   var botExtensions = []
-  var directory = app.getAppPath()
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
-    var botName = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id+"/botdata.json","utf8")).name
+    var thisBot = new botModule.Bot(args.id)
+    var botName = thisBot.name
     richPresence.changeRPC({"state":"Configure "+botName})
-    var extensions = fs.readdirSync(dataFolder + "/bots/" + args.id + "/extensions")
-    extensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
-      var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json","utf8"))
-      thisExtensionData.active = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id + "/extensions/" + extension + "/status.json", "utf8")).active
-      botExtensions.push(thisExtensionData)
-      }
-    })
+    botExtensions = thisBot.getExtensions()
   }
   return botExtensions
 }
 
 //Suppression d'une extension pour un bot
 ipc.on("deleteExtensionFromBot",function(event,args){
-  fs.rmdirSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId, { recursive: true });
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+  thisBotExtension.delete()
   event.returnValue = true
 })
 
 //Suppression d'un bot
 ipc.on("deleteBot",function(event,args){
-  fs.rmdirSync(dataFolder + "/bots/" + args.botId, { recursive: true });
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.delete()
   new Notification({"title":"Suppression terminée","body":"Ce bot a bien été supprimé"}).show()
 })
 
 //Désinstallation d'une extension
 ipc.on("uninstallExtension",function(event,args){
-  fs.rmdirSync(dataFolder + "/extension-install/" + args.extensionId, { recursive: true });
+  var thisExtension = new extensionModule.Extension(args.extensionId);
+  thisExtension.uninstall()
   new Notification({"title":"Désinstallation terminée","body":"L'extension "+args.extensionId+" a bien été désinstallée."}).show()
 })
 
 //Initialisation de la connexion avec Discord
-ipc.on("connect-discord",async function(event,args){
+ipc.on("connect-discord",async function(event){
   try{
 
-  	//Commence la connexion avec Discord
+    //Commence la connexion avec Discord
     RPCclient.login( {clientId,"scopes":["identify"],"redirect_uri":"https://botsonapp.me/connect"});
   }catch(e){
     event.sender.send("discord-rpc-loading-error")
@@ -243,15 +236,14 @@ ipc.on("connect-discord",async function(event,args){
     },500)
 
     var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
-	  while (mainWebFile.includes("{")){
+    while (mainWebFile.includes("{")){
       for (var i in languageFile){
         mainWebFile = mainWebFile.replace(languageFile[i].dest,languageFile[i].translation)
       }
     }
     event.sender.send("append",{"file":mainWebFile})
-    
-
     premiumData = await botsOnUser.checkMembership()
+    setUserDataFile({"token":BotsOnUser.token})
   })
   RPCclient.on("error",()=>{
   })
@@ -264,7 +256,7 @@ ipc.on("getLanguageFile",function(event,language){
 })
 
 //communicate with webpage
-ipc.on("firstTimeOpenApp", function (event, args) {
+ipc.on("firstTimeOpenApp", function (event) {
   if (fs.existsSync(dataFolder + "/appdata")) {
     event.returnValue = false
   } else {
@@ -357,15 +349,15 @@ ipc.on("exportBot",async function(event,args){
 })
 
 //Ouvre le dossier d'exportation
-ipc.on("openExportFolder",function(event,args){
+ipc.on("openExportFolder",function(){
   console.log("receive")
-  child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function(stdout) {
+  child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function() {
     console.log(dataFolder)
 });
 })
 
 //Retourne le dossier des données
-ipc.on("getDataFolder",function(event,args){
+ipc.on("getDataFolder",function(event){
   event.returnValue = dataFolder
 })
 
@@ -376,7 +368,7 @@ ipc.on("startDownloadFromLink",function(event,url){
 })
 
 //Commence le téléchargement d'une extension
-ipc.on("downloadExtensionFromURL",function(event,args){
+ipc.on("downloadExtensionFromURL",function(event){
   var url
   if (linkSave.startsWith("botson://")){
     url = linkSave.split("botson://")[1]
@@ -427,6 +419,7 @@ ipc.on("downloadExtensionFromURL",function(event,args){
           }
           fs.writeFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json",JSON.stringify(data))
         }
+
         event.sender.send("finalisationFinish")
     }catch(e){
       event.sender.send("error",{error:e})
@@ -466,22 +459,17 @@ ipc.on("checkDiscordToken", async function (event, args) {
 
 //Installe l'extension sur un bot
 ipc.on("installExtension",function(event,args){
-  if (!fs.existsSync(dataFolder+"/bots/"+args.botId+"/extensions")){
-    fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions")
-  }
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/status.json",JSON.stringify({"active":true}))
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data")
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data")
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json",JSON.stringify({}))
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/bot-data")
+  var thisBot = botModule.Bot(args.botId)
+  thisBot.installExtension(args.extensionId)
   event.returnValue = {success:true}
 })
 
 //Récupère le config d'un bot
 ipc.on("getConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    event.sender.send("getConfigData",JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json","utf8")))
+    var thisBot = botModule.Bot(args.botId)
+    var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+    return thisBotExtension.getConfig()
   }else{
     new Notification(createErrorCode("config-2")).show()
   }
@@ -490,8 +478,9 @@ ipc.on("getConfigData",function(event,args){
 //Save le config d'un bot
 ipc.on("saveConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json",JSON.stringify(args.config))
-    event.sender.send("saveConfigData",{"success":true})
+    var thisBot = botModule.Bot(args.botId)
+    var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+    return thisBotExtension.saveConfig(args.config)
   }else{
     new Notification(createErrorCode("config-1")).show()
   }
@@ -505,31 +494,22 @@ ipc.on("getBotPrivateData",function(event,args){
 
 //Récupération des intents d'un bot
 ipc.on("getBotIntents",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotIntents = {"presence_intent":false, "server_members_intent":false}
-  if (botData.intents){
-    thisBotIntents = botData.intents
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotIntents = thisBot.intents
   event.sender.send("getBotIntents",thisBotIntents)
 })
 
 //Récupération des commandes générales (help)
 ipc.on("getBotGeneralCommands",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotGeneralCommands = {"help":false}
-  if (botData.generalCommands){
-    thisBotGeneralCommands = botData.generalCommands
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotGeneralCommands = thisBot.generalCommands
   event.sender.send("getBotGeneralCommands",thisBotGeneralCommands)
 })
 
 //Récupération du préfix du bot
 ipc.on("getBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotPrefix = "!"
-  if (botData.prefix){
-    thisBotPrefix = botData.prefix
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotPrefix = thisBot.prefix
   event.sender.send("getBotPrefix",thisBotPrefix)
 })
 
@@ -545,9 +525,9 @@ ipc.on("getBotUser",function(event,args){
 
 //Modification du préfix du bot
 ipc.on("modifyBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  botData.prefix = args.prefix
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.prefix = args.prefix
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
@@ -561,52 +541,36 @@ ipc.on("modifyBotUser",function(event,args){
 
 //Modification des intents du bot
 ipc.on("modifyBotIntent",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  if (!botData.intents){
-    botData.intents = {}
-  }
-  if (!botData.intents[args.intent]){
-    botData.intents[args.intent] = false
-  }
-  botData.intents[args.intent] = !botData.intents[args.intent]
-  console.log("intents: "+botData.intents)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.intents[args.intent] = !thisBot.intents[args.intent]
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
 //Modification des commandes générales du bot (help)
 ipc.on("modifyBotGeneralCommand",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  if (!botData.generalCommands){
-    botData.generalCommands = {}
-  }
-  if (!botData.generalCommands[args.command]){
-    botData.generalCommands[args.command] = false
-  }
-  botData.generalCommands[args.command] = !botData.generalCommands[args.command]
-  console.log("intents: "+botData.generalCommands)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.generalCommands[args.command] = !thisBot.generalCommands[args.command]
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
 //Modification de l'activation de l'extension
 ipc.on("modifyExtensionActivation",function(event,args){
-  currentActive = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId + "/status.json", "utf8")).active
-  if (currentActive == false){
-    currentActive = true
-  }else{
-    currentActive = false
-  }
-  console.log("active"+ currentActive)
-  fs.writeFileSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId + "/status.json", JSON.stringify({"active":currentActive}))
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotExtension = extensionModule.BotExtension(args.extensionId,thisBot)
+  var currentStatus  = thisBotExtension.getStatus()
+  currentStatus.active = !currentStatus.active
+  thisBotExtension.saveStatus(currentStatus)
   event.returnValue = {"success":true}
 })
 
 //Récupération des données d'une extension (Nom, description etc)
 ipc.on("getExtensionData",function(event,args){
   if (args.id){
-    if (fs.existsSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json")) {
-      event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json","utf8"))
+    var thisExtension = new extensionModule.Extension(args.id)
+    if (thisExtension.id){
+      event.returnValue = thisExtension.extension_data
     }else{
       new Notification(createErrorCode("eData-2")).show()
     }
@@ -627,7 +591,7 @@ function getToken(id){
 }
 
 //Coming soon!
-ipc.on("getProductInfo",async function(event,args){
+/*ipc.on("getProductInfo",async function(event,args){
 
 })
 
@@ -637,7 +601,7 @@ ipc.on("userOwnProduct",async function(event,args){
 
 ipc.on("buyProduct",async function(event,args){
   
-})
+})*/
 
 //Récupération des serveurs d'un bot
 ipc.on("getGuilds", async function (event, args) {
@@ -691,7 +655,7 @@ ipc.on("getGuildEmojis", async function (event, args) {
 })
 
 //Récupération des extensions disponible (extensions téléchargées)
-ipc.on("getAvailableExtensions", function (event, args) {
+ipc.on("getAvailableExtensions", function (event) {
   var installExtensions = extensionModule.getInstallExtensions()
   event.returnValue = installExtensions
 })
@@ -699,7 +663,7 @@ ipc.on("getAvailableExtensions", function (event, args) {
 //Démarre l'hébergement d'un bot
 ipc.on("startHosting",async function (event,args){
   if (currentlyBotHosting){
-  	//Si il y a déjà un hébergement en cours, on le stop
+    //Si il y a déjà un hébergement en cours, on le stop
     currentlyBotHosting.stopHosting()
   }
   var botHosting = require("./main_scripts/hosting.js")
@@ -748,7 +712,7 @@ ipc.on("startHosting",async function (event,args){
 })
 
 //Fin de l'hébergement
-ipc.on("endHosting",async function (event,args){
+ipc.on("endHosting",async function (event){
   if (currentlyBotHosting){
     var botHostingResult = await currentlyBotHosting.stopHosting()
     event.sender.send("endHosting",botHostingResult)
@@ -768,17 +732,17 @@ ipc.on("getBotData", function (event, args) {
 })
 
 //Récupération de l'utlisateur qui utilise BotsOn
-ipc.on("getUser",function(event,args){
+ipc.on("getUser",function(event){
   event.returnValue = RPCclient.user
 })
 
 //Récupération des pièces de l'utilisateur pour l'afficher
-ipc.on("getUserCoins",async function(event,args){
+ipc.on("getUserCoins",async function(event){
     event.sender.send("getUserCoins",await botsOnUser.getCoins())
 })
 
 //Récupération de tous les bots sauvegardées sur BotsOn
-ipc.on("getUserBots", function (event, args) {
+ipc.on("getUserBots", function (event) {
   var currentBots = []
   //check if folder with bot exist
   if (fs.existsSync(dataFolder + "/bots")) {
@@ -817,17 +781,25 @@ function copyDebugFile(){
       }
     })
   }
-  var currentExtensions = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var extensions = fs.readdirSync(dataFolder + "/extension-install")
-    extensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json")){
-        var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json", "utf8"))
-        currentExtensions.push(thisExtensionData)
-      }
-    })
-  }
+  var currentExtensions = extensionModule.getInstallExtensions()
+  
   console.log(JSON.stringify(currentBots), JSON.stringify(currentExtensions))
   console.log(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
   clipboard.writeText(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
+}
+
+function getUserDataFile(){
+  if (!fs.existsSync(dataFolder+"/user_data"))
+    fs.mkdirSync(dataFolder+"/user_data")
+  if (!fs.existsSync(dataFolder+"/user_data/data.json"))
+    fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  return JSON.parse(fs.readFileSync(dataFolder+"/user_data/data.json"))
+}
+
+function setUserDataFile(data){
+  if (!fs.existsSync(dataFolder+"/user_data"))
+    fs.mkdirSync(dataFolder+"/user_data")
+  if (!fs.existsSync(dataFolder+"/user_data/data.json"))
+    fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  return fs.writeFileSync(dataFolder+"/user_data/data.json",JSON.stringify(data))
 }
