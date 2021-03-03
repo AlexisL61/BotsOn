@@ -7,7 +7,12 @@ Chaque bot peut être modifié par des extensions créés par de nombreux dével
 
 ## Extensions
 
-Chaque développeur peut créér ses propres extensions et les envoyer aux utilisateurs de bot. La documentation pour créer des extensions est disponible ici: https://github.com/AlexisL61/BotsOn/tree/master/Documentation
+Chaque développeur peut créer ses propres extensions et les envoyer aux utilisateurs de bot. La documentation pour créer des extensions est disponible ici: https://github.com/AlexisL61/BotsOn/tree/master/Documentation
+
+## Site internet
+
+Un site internet a été mis en place pour répertorier toutes les extensions connues à ce jour. 
+Vous pouvez le retrouver ici: [https://botsonapp.me/](https://botsonapp.me)
 
 ## Contributeurs
 
