@@ -264,3 +264,43 @@ ipcRenderer.once("getProductInfo", function (data) {
 }
 ```
 
+#### ipcRenderer.send("userOwnProduct",data)
+Cette requête permet de savoir si un utilisateur a bien un product
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+productId | String | L'identifiant du product
+
+__**Données récupérées**__
+> Electron renvoie une seule variable, un boolean qui indique si l'utilisateur a le product ou non
+
+Paramètres | Types | Description
+------------ | ------------- | -------------
+hasProduct | String | Si l'utilisateur a le product ou non
+__**Exemple**__
+```javascript
+ipcRenderer.send("userOwnProduct", {"productId":"126483950"})
+ipcRenderer.once("userOwnProduct", function (hasProduct) {
+   if (hasProduct){
+      console.log("L'utilisateur a le product")
+   }
+}
+```
+
+#### ipcRenderer.send("openProduct",data)
+Cette requête permet d'ouvrir le navigateur internet de l'utilisateur vers la page d'un product donné
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+productId | String | L'identifiant du product
+
+__**Données récupérées**__
+> Electron ne renvoie aucune variable
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("openProduct", {"productId":"126483950"})
+//Ouverture de la page du product sur le site de BotsOn
+```

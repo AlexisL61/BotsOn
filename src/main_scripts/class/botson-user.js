@@ -59,6 +59,20 @@ class BotsOnUser {
         }
         return []
     }
+    async ownProduct(id){
+        var productFetch = await axios(
+            {"method":"GET",
+            "url":"https://botsonapp.me/api/own-product/"+id, 
+            headers: {
+                authorization: this.token,
+            },
+        })
+        if (productFetch.data.success && productFetch.data.data.hasProduct){
+            return true
+        }else{
+            return false
+        }
+    }
 }
 
 module.exports={

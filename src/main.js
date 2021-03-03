@@ -636,18 +636,27 @@ function getToken(id){
 //Coming soon!
 ipc.on("getProductInfo",async function(event,args){
   if (args.productId){
-    event.sender.send(api.getProductInfo(args.productId))
+    event.sender.send("getProductInfo",api.getProductInfo(args.productId))
   }else{
     return new Notification(createErrorCode("gProduct-1")).show()
   }
 })
 
 ipc.on("userOwnProduct",async function(event,args){
-  
+  if (args.productId){
+    var owned = await botsOnUser.ownProduct(args.productId)
+    event.sender.send("userOwnProduct",owned)
+  }else{
+    return new Notification(createErrorCode("gProduct-2")).show()
+  }
 })
 
 ipc.on("openProduct",async function(event,args){
-  
+  if (args.productId){
+    require("shell").openExternal("http://botsonapp.me/product/"+args.productId)
+  }else{
+    return new Notification(createErrorCode("gProduct-3")).show()
+  }
 })
 
 //Récupération des serveurs d'un bot
