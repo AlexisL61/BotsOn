@@ -123,7 +123,7 @@ function createDownloadWindow() {
   })
   
   //Ouverture des dev tools pour les tests
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
   
   
 }
@@ -229,7 +229,7 @@ ipc.on("connect-discord",async function(event){
     console.log(RPCclient.user.username)
     event.sender.send("loading",{"color":"rgb(0,79,163)","type":"start"})
     
-    var mainWebFile = fs.readFileSync("./index.html","utf-8")
+    var mainWebFile = fs.readFileSync(path.join(__dirname,"index.html"),"utf-8")
     mainWindow.setAlwaysOnTop(true); 
     setTimeout(function()
     {
@@ -244,7 +244,7 @@ ipc.on("connect-discord",async function(event){
     }
     event.sender.send("append",{"file":mainWebFile})
     premiumData = await botsOnUser.checkMembership()
-    setUserDataFile({"token":BotsOnUser.token})
+    setUserDataFile({"token":botsOnUser.token})
   })
   RPCclient.on("error",()=>{
     event.sender.send("discord-rpc-loading-error")
@@ -376,6 +376,7 @@ ipc.on("startDownloadFromLink",function(event,url){
  * @param {string} downloadLink Lien de téléchargement du product
  */
 async function installProduct(extension,id,downloadLink){
+  const rmdirAsync = promisify(fs.rmdir)
   return new Promise((resolve) => {
     axios({
       method: "get",
@@ -385,9 +386,14 @@ async function installProduct(extension,id,downloadLink){
       var stream = fs.createWriteStream(dataFolder+"/temp.zip")
       response.data.pipe(stream);
       stream.on("finish",async function(){
-        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/product")
-        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/product/"+id)
-        await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install/"+extension+"/product/"+id}) 
+        if (!fs.existsSync(dataFolder+"/extension-install/"+extension+"/products")){
+          fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/products")
+        }
+        if (fs.existsSync(dataFolder+"/extension-install/"+extension+"/products/"+id)){
+          await rmdirAsync(dataFolder+"/extension-install/"+extension+"/products/"+id,{recursive:true})
+        }
+        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/products/"+id)
+        await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install/"+extension+"/products/"+id}) 
         resolve()
       })
     })
@@ -403,7 +409,6 @@ ipc.on("downloadExtensionFromURL",function(event){
   }else{
     url = linkSave
   }
-  new Notification({"body":url,"title":"Test notif"}).show()
   var urlData = url.split("?")
   url = urlData[0]
   var params = urlData[1]
@@ -447,9 +452,14 @@ ipc.on("downloadExtensionFromURL",function(event){
           }
           fs.writeFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json",JSON.stringify(data))
         }
+        new Notification({"body":"test","title":"Test notif 1"}).show()
         var thisUser = new BotsOnUser(getUserDataFile().token)
-        var extensionProducts =await thisUser.getProductOwnLink(paramsDico["id"])
+        new Notification({"body":paramsDico["botsonid"],"title":"Test notif 2"}).show()
+        var extensionProducts =await thisUser.getProductOwnLink(paramsDico["botsonid"])
+        new Notification({"body":"test","title":"Test notif 3"}).show()
+        console.log(extensionProducts)
         for (i in extensionProducts){
+          new Notification({"body":"test","title":"Test notif 4"}).show()
           await installProduct(paramsDico.id,extensionProducts[i].id,extensionProducts[i].download)
         }
         event.sender.send("finalisationFinish")
@@ -624,17 +634,21 @@ function getToken(id){
 }
 
 //Coming soon!
-/*ipc.on("getProductInfo",async function(event,args){
-  
+ipc.on("getProductInfo",async function(event,args){
+  if (args.productId){
+    event.sender.send(api.getProductInfo(args.productId))
+  }else{
+    return new Notification(createErrorCode("gProduct-1")).show()
+  }
 })
 
 ipc.on("userOwnProduct",async function(event,args){
   
 })
 
-ipc.on("buyProduct",async function(event,args){
+ipc.on("openProduct",async function(event,args){
   
-})*/
+})
 
 //Récupération des serveurs d'un bot
 ipc.on("getGuilds", async function (event, args) {

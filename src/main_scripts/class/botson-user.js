@@ -41,7 +41,7 @@ class BotsOnUser {
             },
         })
         if (fetchResult.data.success){
-            var products = JSON.parse(fetchResult.data.data)
+            var products = fetchResult.data.data
             var productToSend = []
             for (var i in products){
                 var productFetch = await axios(

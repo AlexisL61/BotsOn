@@ -54,7 +54,7 @@ botId | String | L'identifiant du bot sélectionné
 extensionId | String | L'identifiant de l'extension
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > Aucun tableau car le type de donnée n'est pas le même en fonction des données sauvegardées 
 
@@ -79,7 +79,7 @@ extensionId | String | L'identifiant de l'extension
 config | Array ou dictionnary | Les données de la configuration à sauvegarder
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen  
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen  
 
 
 __**Exemple**__
@@ -101,7 +101,7 @@ Paramètres | Types | Description
 botId | String | L'identifiant du bot sélectionné
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des serveurs discord ayant comme propriété: 
 
@@ -132,7 +132,7 @@ botId | String | L'identifiant du bot sélectionné
 guildId | String | L'identifiant du serveur sélectionné 
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des salons discord ayant comme propriété: 
 
@@ -163,7 +163,7 @@ botId | String | L'identifiant du bot sélectionné
 guildId | String | L'identifiant du serveur sélectionné 
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des salons discord ayant comme propriété: 
 
@@ -196,7 +196,7 @@ botId | String | L'identifiant du bot sélectionné
 guildId | String | L'identifiant du serveur sélectionné 
 
 __**Données récupérées**__
-> Electron renvoi un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
 
 > La variable data est un tableau contenant des salons discord ayant comme propriété: 
 
@@ -227,13 +227,40 @@ Paramètres | Types | Description
 botId | String | L'identifiant du bot sélectionné
 
 __**Données récupérées**__
-> Electron renvoi le prefix sans variable success
+> Electron renvoie le prefix sans variable success
 
 __**Exemple**__
 ```javascript
 ipcRenderer.send("getBotPrefix", {"botId":"567828934689"})
 ipcRenderer.on("getBotPrefix", function (prefix) {
    console.log("Le prefix du bot est "+prefix)
+}
+```
+
+#### ipcRenderer.send("getProductInfo",data)
+Cette requête permet de récupérer les informations d'un certain product
+
+__**Paramètres d'envoi**__
+Paramètres | Types | Description
+------------ | ------------- | -------------
+productId | String | L'identifiant du product
+
+__**Données récupérées**__
+> Electron renvoie un dictionnaire contenant la variable success (qui permet de voir si la requête a abouti) de type booléen et la variable data où se trouve les données 
+
+> La variable data est un dictionnaire contenant les propriétés suivantes:
+
+Paramètres | Types | Description
+------------ | ------------- | -------------
+id | String | L'identifiant du product
+name | String | Le nom du product
+price | Number | Le prix du product en pièces
+
+__**Exemple**__
+```javascript
+ipcRenderer.send("getProductInfo", {"productId":"126483950"})
+ipcRenderer.once("getProductInfo", function (data) {
+   console.log("Le nom du product est "+data.id)
 }
 ```
 
