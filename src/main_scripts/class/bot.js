@@ -56,7 +56,7 @@ class Bot{
         var thisBot = this
         extensions.forEach(function (extension) {
             if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
-                var thisBotExtension = new extensionModule.BotExtension(extension,thisBot.id)
+                var thisBotExtension = new extensionModule.BotExtension(extension,thisBot)
                 botExtensions.push(thisBotExtension)
             }
         })

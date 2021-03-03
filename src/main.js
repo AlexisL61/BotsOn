@@ -247,6 +247,7 @@ ipc.on("connect-discord",async function(event){
     setUserDataFile({"token":BotsOnUser.token})
   })
   RPCclient.on("error",()=>{
+    event.sender.send("discord-rpc-loading-error")
   })
 })
 
@@ -490,7 +491,7 @@ ipc.on("checkDiscordToken", async function (event, args) {
 
 //Installe l'extension sur un bot
 ipc.on("installExtension",function(event,args){
-  var thisBot = botModule.Bot(args.botId)
+  var thisBot = new botModule.Bot(args.botId)
   thisBot.installExtension(args.extensionId)
   event.returnValue = {success:true}
 })
@@ -498,7 +499,7 @@ ipc.on("installExtension",function(event,args){
 //Récupère le config d'un bot
 ipc.on("getConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    var thisBot = botModule.Bot(args.botId)
+    var thisBot = new botModule.Bot(args.botId)
     var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
     return thisBotExtension.getConfig()
   }else{
@@ -509,7 +510,7 @@ ipc.on("getConfigData",function(event,args){
 //Save le config d'un bot
 ipc.on("saveConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    var thisBot = botModule.Bot(args.botId)
+    var thisBot = new botModule.Bot(args.botId)
     var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
     return thisBotExtension.saveConfig(args.config)
   }else{
@@ -589,7 +590,8 @@ ipc.on("modifyBotGeneralCommand",function(event,args){
 //Modification de l'activation de l'extension
 ipc.on("modifyExtensionActivation",function(event,args){
   var thisBot = new botModule.Bot(args.botId)
-  var thisBotExtension = extensionModule.BotExtension(args.extensionId,thisBot)
+  console.log(thisBot)
+  var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
   var currentStatus  = thisBotExtension.getStatus()
   currentStatus.active = !currentStatus.active
   thisBotExtension.saveStatus(currentStatus)

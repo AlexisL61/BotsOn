@@ -72,7 +72,7 @@ class BotExtension extends Extension{
     constructor(id,bot){
         super(id)
         this.bot = bot
-        this.status = fs.readFileSync(dataFolder+"/bots/"+bot.id+"/extensions/"+id+"/status.json","utf-8")
+        this.status = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+bot.id+"/extensions/"+id+"/status.json","utf-8"))
     }
 
     /**
@@ -95,8 +95,9 @@ class BotExtension extends Extension{
      * @return {object} Configuration - Configuration de l'extension
      */
     getConfig(){
-        if (fs.existsSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json"))
-            return fs.readFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json","utf-8")
+        console.log(this.bot)
+        if (fs.existsSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.id+"/data/webpage-data/config.json"))
+            return fs.readFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.id+"/data/webpage-data/config.json","utf-8")
         return undefined
     }
 
@@ -105,7 +106,8 @@ class BotExtension extends Extension{
      * @param {object} config - Configuration
      */
     saveConfig(config){
-        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/data/webpage-data/config.json",JSON.stringify(config))
+        this.status = config
+        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.id+"/data/webpage-data/config.json",JSON.stringify(config))
     }
 
     /**
@@ -114,8 +116,9 @@ class BotExtension extends Extension{
      * @return {object} Statut - Statut de l'extension
      */
     getStatus(){
-        if (fs.existsSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json"))
-            return fs.readFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json","utf-8")
+        var thisExtension = this
+        if (fs.existsSync(dataFolder+"/bots/"+thisExtension.bot.id+"/extensions/"+thisExtension.id+"/status.json"))
+            return JSON.parse(fs.readFileSync(dataFolder+"/bots/"+thisExtension.bot.id+"/extensions/"+thisExtension.id+"/status.json","utf-8"))
         return undefined
     }
 
@@ -124,7 +127,8 @@ class BotExtension extends Extension{
      * @param {object} config - Configuration
      */
     saveStatus(config){
-        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.extension.id+"/status.json",JSON.stringify(config))
+        fs.writeFileSync(dataFolder+"/bots/"+this.bot.id+"/extensions/"+this.id+"/status.json",JSON.stringify(config))
+        return
     }
 }
 

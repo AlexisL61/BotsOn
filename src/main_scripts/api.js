@@ -1,5 +1,4 @@
 var client
-var botId
 
 function connectBot(discord, token) {
     client = new discord.Client()
@@ -10,7 +9,6 @@ function connectBot(discord, token) {
         })
     client.once("ready", function () {
         console.log("client "+client)
-        botId = client.user.id
         client.emit("botLogin", { "success": true})
     })
     client.once("error", function () {
