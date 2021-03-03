@@ -47,10 +47,9 @@ module.exports = {
         })
         
         client.once("ready",async function(){
-            console.log(extensions)
             var needCanvas = false
             for (var i in extensions){
-                if (extensions[i].active){
+                if (extensions[i].status.active){
                     var thisExtensionHost = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
                     if (thisExtensionHost.require && thisExtensionHost.require.find(data=>data=="canvas")){
                         needCanvas = true
@@ -64,6 +63,7 @@ module.exports = {
                     center: true,
                     show:true,
                     webPreferences: {
+                        // eslint-disable-next-line no-undef
                         preload: path.join(__dirname, '../preload.js')
                     }
                 })
@@ -72,7 +72,7 @@ module.exports = {
                 canvas.init(currentOpenWebPage.webContents,ipcRenderer)
             }
             for (i in extensions){
-                if (extensions[i].active){
+                if (extensions[i].status.active){
                     try{
                     var thisExtensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
                     if (require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]){
@@ -139,7 +139,6 @@ module.exports = {
             }
             console.log(helpEmbed)
             client.on("message",function(message){
-                console.log("MESSAGE")
                 if (message.content.toLowerCase().startsWith(prefix+"help")){
                     message.channel.send({"embed":helpEmbed})
                 }
