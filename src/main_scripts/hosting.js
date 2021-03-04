@@ -61,7 +61,7 @@ module.exports = {
                     width:1000,
                     height:1000,
                     center: true,
-                    show:true,
+                    show:false,
                     webPreferences: {
                         // eslint-disable-next-line no-undef
                         preload: path.join(__dirname, '../preload.js')
