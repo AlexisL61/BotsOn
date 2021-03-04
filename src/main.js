@@ -3,7 +3,7 @@
 //Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 //Modules and variables
-const { app, BrowserWindow,Menu,clipboard,Notification,screen } = require('electron')
+const { app, BrowserWindow,Menu,clipboard,Notification,screen,shell } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -633,10 +633,10 @@ function getToken(id){
   return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json","utf8")).token
 }
 
-//Coming soon!
+
 ipc.on("getProductInfo",async function(event,args){
   if (args.productId){
-    event.sender.send("getProductInfo",api.getProductInfo(args.productId))
+    event.sender.send("getProductInfo",await api.getProductInfo(args.productId))
   }else{
     return new Notification(createErrorCode("gProduct-1")).show()
   }
@@ -653,7 +653,7 @@ ipc.on("userOwnProduct",async function(event,args){
 
 ipc.on("openProduct",async function(event,args){
   if (args.productId){
-    require("shell").openExternal("http://botsonapp.me/product/"+args.productId)
+    shell.openExternal("https://botsonapp.me/product/"+args.productId)
   }else{
     return new Notification(createErrorCode("gProduct-3")).show()
   }
