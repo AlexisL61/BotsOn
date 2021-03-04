@@ -6,7 +6,9 @@ var mainMenuSwitchActivate = false
 var currentlyHosting = false
 var currentlyInExtensionActiveMode = false
 var languageFile
+var ipcRenderer
 
+console.log("HEY")
 var mainMenuBotButton = `<div onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="bot-menu-btn center">
 <div>
 		<img src="{botImg}" class="avatar">
@@ -154,7 +156,7 @@ async function openExtensionContextMenu(extensionId){
 	contextMenu.style.marginTop = y+"px";
 	var botExtensions = ipcRenderer.sendSync("getBotExtensions", { id: currentBotOpenId })
 	var thisExtension = botExtensions.find(ext => ext.id == extensionId)
-	if (thisExtension.active){
+	if (thisExtension.status.active){
 		document.getElementById("extension-context-menu-activate").innerHTML = "Désactiver"
 	}else{
 		document.getElementById("extension-context-menu-activate").innerHTML = "Activer"
@@ -225,7 +227,7 @@ async function openBot(id) {
 		thisExtensionDiv = thisExtensionDiv.replace("{extensionDescription}", thisExtensionData.smallDescription)
 		thisExtensionDiv = thisExtensionDiv.replace("{modifyConfigFunction}", "openConfigPage('"+thisExtensionData.id+"')")
 		
-		if (thisExtensionData.active == true){
+		if (thisExtensionData.status.active == true){
 			thisExtensionDiv = thisExtensionDiv.replace("{switchPosition}","checked")
 			thisExtensionDiv = thisExtensionDiv.replace("{inactiveClass}","")
 		}else{

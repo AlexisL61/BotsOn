@@ -1,5 +1,5 @@
 
-var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path,discord,Notification
+var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path,discord,Notification,electron,generalCommands
 var fs = require("fs")
 var currentOpenWebPage
 var canvas  = require("./canvas.js")
@@ -47,10 +47,9 @@ module.exports = {
         })
         
         client.once("ready",async function(){
-            console.log(extensions)
             var needCanvas = false
             for (var i in extensions){
-                if (extensions[i].active){
+                if (extensions[i].status.active){
                     var thisExtensionHost = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
                     if (thisExtensionHost.require && thisExtensionHost.require.find(data=>data=="canvas")){
                         needCanvas = true
@@ -64,6 +63,7 @@ module.exports = {
                     center: true,
                     show:false,
                     webPreferences: {
+                        // eslint-disable-next-line no-undef
                         preload: path.join(__dirname, '../preload.js')
                     }
                 })
@@ -71,14 +71,14 @@ module.exports = {
                 currentOpenWebPage.webContents.openDevTools()
                 canvas.init(currentOpenWebPage.webContents,ipcRenderer)
             }
-            for (var i in extensions){
-                if (extensions[i].active){
+            for (i in extensions){
+                if (extensions[i].status.active){
                     try{
                     var thisExtensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
                     if (require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]){
                         delete require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]
                     }
-                    var thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
+                    thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
                     thisExtensionHost.client = client
                     thisExtensionHost.electron = electron
                     thisExtensionHost.location = directory+"/extension-install/"+extensions[i].id
@@ -106,7 +106,7 @@ module.exports = {
                         customNotification.addListener('click', () => { 
                             console.log("click")
                             console.log(directory)
-                            child_process.exec('start "" '+directory+"\\logs\\"+extensions[thisIndex].id+".txt", function(stdout) {
+                            child_process.exec('start "" '+directory+"\\logs\\"+extensions[thisIndex].id+".txt", function() {
                             });
                         });
                     }
@@ -117,7 +117,7 @@ module.exports = {
 
         if (generalCommands.help){
             for (var i in extensions){
-                if (extensions[i].active){
+                if (extensions[i].status.active){
                     var extensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json","utf-8"));
                     if (extensionData.help && extensionData.help.active){
                         while (extensionData.help.field.name.includes("{prefix}")){
@@ -137,15 +137,15 @@ module.exports = {
                     "value": "Créé avec [BotsOn](https://botsonapp.me/)"
                 })
             }
+            console.log(helpEmbed)
             client.on("message",function(message){
-                console.log("MESSAGE")
                 if (message.content.toLowerCase().startsWith(prefix+"help")){
                     message.channel.send({"embed":helpEmbed})
                 }
             })
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             client.once("botLogin",function(data){
                 resolve(data)
             })
@@ -164,7 +164,7 @@ module.exports = {
             try{
             currentOpenWebPage.close()
             }catch(e){
-
+                //
             }
         }
         return {"success":true}

@@ -1,23 +1,24 @@
+//Ce fichier gère toutes les requêtes que electron effectue pour envoyer des données au front-end
+
 var client
-var botId
+var axios = require("axios")
 
 function connectBot(discord, token) {
     client = new discord.Client()
     client.login(token)
-        .catch(function (error) {
+        .catch(function () {
             console.log("error")
             client.emit("botLogin", { "success": false })
         })
     client.once("ready", function () {
         console.log("client "+client)
-        botId = client.user.id
         client.emit("botLogin", { "success": true})
     })
-    client.once("error", function (error) {
+    client.once("error", function () {
         client.emit("botLogin", { "success": false })
     })
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         client.once("botLogin", function (data) {
             resolve(data)
         })
@@ -90,5 +91,17 @@ module.exports = {
         var finalData = cleanData(client.guilds.cache.get(guildId).emojis.cache,dataToKeep)
         
     return {"success":true,"data":finalData,guildId:guildId}
+    },
+    async getProductInfo(product){
+        var fetchResult = await axios(
+            {"method":"GET",
+            "url":"https://botsonapp.me/api/product-info/"+product, 
+            headers: {},
+        })
+        if (fetchResult.data && fetchResult.data.success){
+            return {"success":true,"data":fetchResult.data.data}
+        }else{
+            return {"success":false}
+        }
     }
 }

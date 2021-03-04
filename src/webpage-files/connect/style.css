@@ -11,6 +11,39 @@
     width:80vw;
     position:absolute;
 }
+
+.loadingSmallBarre{
+    width:100vw;
+    height:1vw;
+    margin-top:100vh;
+    position:absolute;
+    background-color:rgb(255, 123, 0);
+    transform:rotate(-75deg);
+    transform-origin:0px 50%;
+    z-index:10
+  }
+  .loadingMovingBarre{
+    width:3vw;
+    height:0.5vw;
+    margin-top:110vh;
+    position:absolute;
+    background-color:rgb(255, 123, 0);
+    transform:rotate(-75deg);
+    transform-origin:0px 50%;
+    z-index:10;
+  }
+  .loadingBigBarre{
+    width:100vw;
+    margin-top:100vh;
+    position:absolute;
+    background-color:#2C2F33;
+    transform:rotate(-75deg);
+    transform-origin:0px 50%;
+    z-index:9;
+  }
+  #loadingScreen{
+    width:100vw;height:100vh;background-color:#23272A;position:absolute;opacity:1;transition:0.5s;z-index:2;
+  }
 #right-background-img{
     background-image: url("../../files/images/background.jpg");
 	background-repeat:repeat;

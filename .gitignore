@@ -1,2 +1,4 @@
 ffmpeg.exe
 node_modules
+out
+.eslintrc.js
