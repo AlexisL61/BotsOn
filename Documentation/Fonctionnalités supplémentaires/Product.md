@@ -9,24 +9,35 @@ Vous pouvez créer un product directement à partir de votre extension dans votr
 
 Vous pouvez mettre dans votre product tous type de fichiers qui seront téléchargeables par un utilisateur ayant acheté le product.
 
+Tous ces fichiers doivent se trouver dans un .zip
+
 ### Téléchargement du product
 Les fichiers contenus dans le product seront ajoutés automatiquement dans votre extension si l'utilisateur a le product.
 
-Les fichiers sont ajoutés dans une extension de la manière suivante:
+Exemple: 
+Si dans mon zip, j'ajoute un fichier nommé "fichier_product_1" et un fichier nommé "fichier_product_2" et que l'id de mon product est 12345 alors, l'arborescence de mes fichiers donnera:
 
+Si l'utilisateur a le product:
 ```
 <id-extension>
  |__📁front-end
  |__📁back-end
  |__📁products
- |   |__📁<id-product>
+ |   |__📁12345
  |       |__📇fichier_product_1
  |       |__📇fichier_product_2
- |       |__...
  |__📇extension-data.json
  ``` 
 
-Les utilisateurs ne pourront donc pas accéder à certains fichiers si ils n'ont pas le product.
+ Si l'utilisateur n'a pas le product:
+```
+<id-extension>
+ |__📁front-end
+ |__📁back-end
+ |__📇extension-data.json
+ ``` 
+
+BotsOn ne va donc pas faire télécharger le product a une personne qui n'a pas le product
 
 ### Publier un product
 
