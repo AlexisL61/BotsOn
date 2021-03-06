@@ -55,6 +55,7 @@ function createWindow() {
   
   //Création de la fenêtre principale 
   mainWindow = new BrowserWindow({
+    icon: __dirname + '\\files\\images\\logo.png',
     width: 1000,
     height: 1000,
     center: true,
@@ -103,6 +104,7 @@ function createDownloadWindow() {
   var dimensions = mainScreen.workAreaSize;
   console.log(dimensions)
   mainWindow = new BrowserWindow({
+    icon: __dirname + '\\files\\images\\logo.png',
     width: 400,
     height: 100,
     x:dimensions.width-410,
@@ -338,6 +340,7 @@ ipc.on("exportBot",async function(event,args){
   
   //Ouvre la fenêtre de l'exportation
   mainWindow = new BrowserWindow({
+    icon: __dirname + '\\files\\images\\logo.png',
     width: 1000,
     height: 1000,
     center: true,
