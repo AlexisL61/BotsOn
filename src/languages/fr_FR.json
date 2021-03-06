@@ -1,7 +1,7 @@
 [
     {"dest":"{addToken}","translation":"Insérez le token de votre bot afin de l'ajouter à l'application"},
     {"dest":"{token}","translation":"Token"},
-    {"dest":"{noToken}","translation":"Je n'ai pas de token 😕"},
+    {"dest":"{noToken}","translation":"Je n'ai pas de token"},
     {"dest":"{add}","translation":"Ajouter"},
     {"dest":"{botAddSuccess}","translation":"Ce bot a bien été ajouté"},
     {"dest":"{perfectExclamative}","translation":"Parfait!"},
