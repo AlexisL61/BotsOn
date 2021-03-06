@@ -1,61 +1,238 @@
 [
-    {"dest":"{addToken}","translation":"Insérez le token de votre bot afin de l'ajouter à l'application"},
-    {"dest":"{token}","translation":"Token"},
-    {"dest":"{noToken}","translation":"Je n'ai pas de token"},
-    {"dest":"{add}","translation":"Ajouter"},
-    {"dest":"{botAddSuccess}","translation":"Ce bot a bien été ajouté"},
-    {"dest":"{perfectExclamative}","translation":"Parfait!"},
-    {"dest":"{bots}","translation":"Bots"},
-    {"dest":"{extensions}","translation":"Extensions"},
-    {"dest":"{parameters}","translation":"Paramètres"},
-    {"dest":"{export}","translation":"Exportation"},
-    {"dest":"{loading}","translation":"Chargement"},
-    {"dest":"{yourBots}","translation":"Vos bots"},
-    {"dest":"{host}","translation":"Héberger"},
-    {"dest":"{security}","translation":"Sécurité"},
-    {"dest":"{prefix}","translation":"Préfix"},
-    {"dest":"{user}","translation":"Utilisateur"},
-    {"dest":"{intents}","translation":"Intents"},
-    {"dest":"{generalCommands}","translation":"Commandes générales"},
-    {"dest":"{tokenExplanation}","translation":"Le token est la clé vers votre bot<br/>C'est le seul moyen pour l'application de se connecter à votre bot Discord.<br/><b>Ce token doit être gardé secret</b>"},
-    {"dest":"{prefixExplanation}","translation":"Le prefix est utilisé par certaines extensions pour l'utilisation des commandes<br/>Changer ce prefix changera la majorité des prefix de vos extensions"},
-    {"dest":"{update}","translation":"Mettre à jour"},
-    {"dest":"{user}","translation":"Utilisateur"},
-    {"dest":"{userExplanation}","translation":"L'utilisateur est la personne utilisant l'app, c'est vous<br/>Ce paramètre sera enlevé dans une prochaine mise à jour."},
-    {"dest":"{yourId}","translation":"Votre Id"},
-    {"dest":"{intentsExplanation}","translation":"Les intents sont des options permettant à un bot de recevoir des données supplémentaires.<br/>Pour que les intents marchent, vous devez auparavant les activer dans les paramètres de votre application Discord"},
-    {"dest":"{presenceIntent}","translation":"Presence intent"},
-    {"dest":"{guildMembersIntent}","translation":"Guild members intent"},
-    {"dest":"{generalCommandsExplanation}","translation":"Les commandes générales sont des commandes optionnelles intégrées à votre bot. <br>Ces commandes changent en fonction des extensions que vous utilisez pour votre bot"},
-    {"dest":"{generalCommandsHelpExplanation}","translation":"La commande help permet de montrer un message d'aide. Les fonctionnalités inclut dans le help sont modifiés par les extensions que vous avez installées."},
-    {"dest":"{addExtension}","translation":"Ajouter une extension"},
-    {"dest":"{whatIsExtension}","translation":"Que sont les extensions?"},
-    {"dest":"{confirmation}","translation":"Confirmation"},
-    {"dest":"{annulation}","translation":"Annuler"},
-    {"dest":"{indicatorActiveMode}","translation":"Clique gauche: activer / désactiver une extension <br/>Clique droit: Quitter le mode désactivation"},
-    {"dest":"{welcome}","translation":"Bienvenue"},
-    {"dest":"{incorrectToken}","translation":"Token invalide"},
-    {"dest":"{creatingExportationFile}","translation":"Création du dossier d'exportation"},
-    {"dest":"{deletingExportationFile}","translation":"Suppression de l'ancienne exportation"},
-    {"dest":"{creatingThisExportationFolder}","translation":"Création du dossier de cette exportation"},
-    {"dest":"{exportationSystemCopy}","translation":"Copie du système d'exportation"},
-    {"dest":"{extensionCopy}","translation":"Copie de l'extension"},
-    {"dest":"{finishing}","translation":"Finalisation"},
-    {"dest":"{exportationEnd}","translation":"Exportation terminée"},
-    {"dest":"{connectingToDiscord}","translation":"Connexion à Discord"},
-    {"dest":"{connectingToDiscordExplanation}","translation":"Assurez-vous d'avoir Discord ouvert sur votre pc pour vous connecter"},
-    {"dest":"{currentlyConnectingToDiscord}","translation":"Connexion en cours..."},
-    {"dest":"{downloadExtensions}","translation":"Télécharger des extensions"},
-    {"dest":"{updateExtension}","translation":"Mise à jour de vos extensions"},
-    {"dest":"{confirm}","translation":"Confirmer"},
-    {"dest":"{uninstallExtension}","translation":"Désinstallation d'extension"},
-    {"dest":"{uninstallExtensionDescription}","translation":"Êtes-vous sûr de vouloir désinstaller cette extension?"},
-    {"dest":"{deleteBot}","translation":"Suppression de bot"},
-    {"dest":"{deleteBotDescription}","translation":"Êtes-vous sûr de vouloir supprimer ce bot?"},
-    {"dest":"{tools}","translation":"Outils"},
-    {"dest":"{invite}","translation":"Invitation"},
-    {"dest":"{inviteExplanation}","translation":"L'invitation est un lien nécessaire pour un utilisateur afin d'ajouter votre bot</br>Il peut être généré à partir de ce panel sans passer par la page de votre application Discord"},
-    {"dest":"{invitePermissionCalculatorExplanation}","translation":"Il est aussi possible d'ajouter des permissions que le bot va demander lors de son ajout à un serveur.</br>Vous pouvez, à partir de <a target='_blank' href='https://discordapi.com/permissions.html'>ce site</a>, cocher les permissions nécessaires de votre bot et coller le nombre généré dans la case ci-dessous"},
-    {"dest":"{download}","translation":"Télécharger"},
-    {"dest":"{downloadInputText}","translation":"Entrez un lien de téléchargement ici"}
+  {
+    "dest": "{addToken}",
+    "translation": "Insérez le token de votre bot afin de l'ajouter à l'application"
+  },
+  {
+    "dest": "{token}",
+    "translation": "Token"
+  },
+  {
+    "dest": "{noToken}",
+    "translation": "Je n'ai pas de token"
+  },
+  {
+    "dest": "{add}",
+    "translation": "Ajouter"
+  },
+  {
+    "dest": "{botAddSuccess}",
+    "translation": "Ce bot a bien été ajouté"
+  },
+  {
+    "dest": "{perfectExclamative}",
+    "translation": "Parfait!"
+  },
+  {
+    "dest": "{bots}",
+    "translation": "Bots"
+  },
+  {
+    "dest": "{extensions}",
+    "translation": "Extensions"
+  },
+  {
+    "dest": "{parameters}",
+    "translation": "Paramètres"
+  },
+  {
+    "dest": "{export}",
+    "translation": "Exportation"
+  },
+  {
+    "dest": "{loading}",
+    "translation": "Chargement"
+  },
+  {
+    "dest": "{yourBots}",
+    "translation": "Vos bots"
+  },
+  {
+    "dest": "{host}",
+    "translation": "Héberger"
+  },
+  {
+    "dest": "{security}",
+    "translation": "Sécurité"
+  },
+  {
+    "dest": "{prefix}",
+    "translation": "Préfix"
+  },
+  {
+    "dest": "{user}",
+    "translation": "Utilisateur"
+  },
+  {
+    "dest": "{intents}",
+    "translation": "Intents"
+  },
+  {
+    "dest": "{generalCommands}",
+    "translation": "Commandes générales"
+  },
+  {
+    "dest": "{tokenExplanation}",
+    "translation": "Le token est la clé vers votre bot<br/>C'est le seul moyen pour l'application de se connecter à votre bot Discord.<br/><b>Ce token doit être gardé secret</b>"
+  },
+  {
+    "dest": "{prefixExplanation}",
+    "translation": "Le prefix est utilisé par certaines extensions pour l'utilisation des commandes<br/>Changer ce prefix changera la majorité des prefix de vos extensions"
+  },
+  {
+    "dest": "{update}",
+    "translation": "Mettre à jour"
+  },
+  {
+    "dest": "{user}",
+    "translation": "Utilisateur"
+  },
+  {
+    "dest": "{userExplanation}",
+    "translation": "L'utilisateur est la personne utilisant l'app, c'est vous<br/>Ce paramètre sera enlevé dans une prochaine mise à jour."
+  },
+  {
+    "dest": "{yourId}",
+    "translation": "Votre Id"
+  },
+  {
+    "dest": "{intentsExplanation}",
+    "translation": "Les intents sont des options permettant à un bot de recevoir des données supplémentaires.<br/>Pour que les intents marchent, vous devez auparavant les activer dans les paramètres de votre application Discord"
+  },
+  {
+    "dest": "{presenceIntent}",
+    "translation": "Presence intent"
+  },
+  {
+    "dest": "{guildMembersIntent}",
+    "translation": "Guild members intent"
+  },
+  {
+    "dest": "{generalCommandsExplanation}",
+    "translation": "Les commandes générales sont des commandes optionnelles intégrées à votre bot. <br>Ces commandes changent en fonction des extensions que vous utilisez pour votre bot"
+  },
+  {
+    "dest": "{generalCommandsHelpExplanation}",
+    "translation": "La commande help permet de montrer un message d'aide. Les fonctionnalités inclut dans le help sont modifiés par les extensions que vous avez installées."
+  },
+  {
+    "dest": "{addExtension}",
+    "translation": "Ajouter une extension"
+  },
+  {
+    "dest": "{whatIsExtension}",
+    "translation": "Que sont les extensions?"
+  },
+  {
+    "dest": "{confirmation}",
+    "translation": "Confirmation"
+  },
+  {
+    "dest": "{annulation}",
+    "translation": "Annuler"
+  },
+  {
+    "dest": "{indicatorActiveMode}",
+    "translation": "Clique gauche: activer / désactiver une extension <br/>Clique droit: Quitter le mode désactivation"
+  },
+  {
+    "dest": "{welcome}",
+    "translation": "Bienvenue"
+  },
+  {
+    "dest": "{incorrectToken}",
+    "translation": "Token invalide"
+  },
+  {
+    "dest": "{creatingExportationFile}",
+    "translation": "Création du dossier d'exportation"
+  },
+  {
+    "dest": "{deletingExportationFile}",
+    "translation": "Suppression de l'ancienne exportation"
+  },
+  {
+    "dest": "{creatingThisExportationFolder}",
+    "translation": "Création du dossier de cette exportation"
+  },
+  {
+    "dest": "{exportationSystemCopy}",
+    "translation": "Copie du système d'exportation"
+  },
+  {
+    "dest": "{extensionCopy}",
+    "translation": "Copie de l'extension"
+  },
+  {
+    "dest": "{finishing}",
+    "translation": "Finalisation"
+  },
+  {
+    "dest": "{exportationEnd}",
+    "translation": "Exportation terminée"
+  },
+  {
+    "dest": "{connectingToDiscord}",
+    "translation": "Connexion à Discord"
+  },
+  {
+    "dest": "{connectingToDiscordExplanation}",
+    "translation": "Assurez-vous d'avoir Discord ouvert sur votre pc pour vous connecter"
+  },
+  {
+    "dest": "{currentlyConnectingToDiscord}",
+    "translation": "Connexion en cours..."
+  },
+  {
+    "dest": "{downloadExtensions}",
+    "translation": "Télécharger des extensions"
+  },
+  {
+    "dest": "{updateExtension}",
+    "translation": "Mise à jour de vos extensions"
+  },
+  {
+    "dest": "{confirm}",
+    "translation": "Confirmer"
+  },
+  {
+    "dest": "{uninstallExtension}",
+    "translation": "Désinstallation d'extension"
+  },
+  {
+    "dest": "{uninstallExtensionDescription}",
+    "translation": "Êtes-vous sûr de vouloir désinstaller cette extension?"
+  },
+  {
+    "dest": "{deleteBot}",
+    "translation": "Suppression de bot"
+  },
+  {
+    "dest": "{deleteBotDescription}",
+    "translation": "Êtes-vous sûr de vouloir supprimer ce bot?"
+  },
+  {
+    "dest": "{tools}",
+    "translation": "Outils"
+  },
+  {
+    "dest": "{invite}",
+    "translation": "Invitation"
+  },
+  {
+    "dest": "{inviteExplanation}",
+    "translation": "L'invitation est un lien nécessaire pour un utilisateur afin d'ajouter votre bot</br>Il peut être généré à partir de ce panel sans passer par la page de votre application Discord"
+  },
+  {
+    "dest": "{invitePermissionCalculatorExplanation}",
+    "translation": "Il est aussi possible d'ajouter des permissions que le bot va demander lors de son ajout à un serveur.</br>Vous pouvez, à partir de <a target='_blank' href='https://discordapi.com/permissions.html'>ce site</a>, cocher les permissions nécessaires de votre bot et coller le nombre généré dans la case ci-dessous"
+  },
+  {
+    "dest": "{download}",
+    "translation": "Télécharger"
+  },
+  {
+    "dest": "{downloadInputText}",
+    "translation": "Entrez un lien de téléchargement ici"
+  }
 ]
