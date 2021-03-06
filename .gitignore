@@ -2,3 +2,5 @@ ffmpeg.exe
 node_modules
 out
 .eslintrc.js
+**package-lock.json
+.gitignore
