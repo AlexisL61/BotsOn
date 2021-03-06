@@ -1,9 +1,9 @@
+/* eslint-disable no-undef */
 //Code source de BotsOn
 //Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 //Modules and variables
-const { app, BrowserWindow, autoUpdater,protocol,Menu,clipboard,Notification,shell,screen, ipcRenderer } = require('electron')
-const appPath = app.getAppPath()
+const { app, BrowserWindow,Menu,clipboard,Notification,screen,shell } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -15,7 +15,6 @@ const discord = require("discord.js")
 const dataFolder = app.getPath('userData')
 const {promisify} = require("util")
 const child_process = require("child_process")
-const directory = app.getAppPath()
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
 var premiumData
@@ -25,7 +24,6 @@ var currentlyBotHosting
 
 // id de l'application Discord suivi du scope identify pour se connecter à Discord
 const clientId = '774665586001051648';
-const scopes = [ 'identify'];
 
 var botsOnUser
 
@@ -36,9 +34,13 @@ console.log(dataFolder)
 const discordTokenVerify = require("./main_scripts/verify-token.js")
 const api = require("./main_scripts/api.js")
 const richPresence = require("./main_scripts/rich-presence.js")
-const botsOnUserModule = require("./main_scripts/botson-user.js")
+const botsOnUserModule = require("./main_scripts/class/botson-user.js")
+const extensionModule = require("./main_scripts/class/extension.js")
+const { BotsOnUser } = require('./main_scripts/class/botson-user.js')
+const botModule = require("./main_scripts/class/bot.js")
 
-var mainWebContent
+//Init module
+extensionModule.init(dataFolder);
 
 const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname,"jsonFolder/notifications/notifications.json"),"utf8"))
 console.log(process.arch)
@@ -50,8 +52,8 @@ function createErrorCode(errorCode){
 }
 
 function createWindow() {
-
-	//Création de la fenêtre principale 
+  
+  //Création de la fenêtre principale 
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 1000,
@@ -60,7 +62,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   mainWindow.loadFile('./webpage-files/connect/connect.html')
   mainWindow.setMenu(Menu.buildFromTemplate([{
     label: "Debug",
@@ -81,15 +83,13 @@ function createWindow() {
       }
     ]
   }]))
-
-  mainWebContent = mainWindow.webContents;
   
   //Ouverture d'une page exterieur lors d'un clique sur un lien à la place de l'ouvrir dans electron
   mainWindow.webContents.on('new-window', function(e, url) {
     e.preventDefault();
     require('electron').shell.openExternal(url);
   });
-
+  
   //Appel lorsque la fenêtre est fermée
   mainWindow.on("closed",function(){
     app.quit()
@@ -105,26 +105,26 @@ function createDownloadWindow() {
   mainWindow = new BrowserWindow({
     width: 400,
     height: 100,
-      x:dimensions.width-410,
-      y:dimensions.height-110,
-      frame:false,
+    x:dimensions.width-410,
+    y:dimensions.height-110,
+    frame:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   //load the index.html of the app.
   mainWindow.loadFile('download.html')
   mainWindow.setMenu(null)
-
+  
   //Fermeture de la fenêtre si l'utilisateur appuie sur la croix
-  ipc.once("closeDownload",function(event){
+  ipc.once("closeDownload",function(){
     mainWindow.close()
   })
-
+  
   //Ouverture des dev tools pour les tests
-  mainWindow.webContents.openDevTools()
-
+  //mainWindow.webContents.openDevTools()
+  
   
 }
 
@@ -145,24 +145,24 @@ app.on("ready", () => {
   //Regarde si il n'y a pas un argument commençant par BotsOn
   //Cela veut dire que BotsOn a été ouvert à partir d'un lien BotsOn
   if (!process.argv.find(arg=>arg.startsWith("botson://"))){
-    if (linkSave){
-      createDownloadWindow()
-    }else{
-      app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
-      createWindow()
-      //createDownloadWindow()
-      
-    }
-  }else{
-    linkSave = process.argv.find(arg=>arg.startsWith("botson://"))
+  if (linkSave){
     createDownloadWindow()
+  }else{
+    app.setAsDefaultProtocolClient("botson",process.execPath,{extensionInstaller:true})
+    createWindow()
+    //createDownloadWindow()
+    
   }
+}else{
+  linkSave = process.argv.find(arg=>arg.startsWith("botson://"))
+  createDownloadWindow()
+}
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+app.on('activate', function () {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+})
 })
 
 // Quit when all windows are closed
@@ -178,68 +178,76 @@ app.on('window-all-closed', function () {
 //Récupère les données des extensions d'un bot précis
 function getBotExtensionsData(args){
   var botExtensions = []
-  var directory = app.getAppPath()
   if (fs.existsSync(dataFolder + "/bots/" + args.id + "/extensions")) {
-    var botName = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id+"/botdata.json","utf8")).name
+    var thisBot = new botModule.Bot(args.id)
+    console.log(thisBot)
+    var botName = thisBot.name
     richPresence.changeRPC({"state":"Configure "+botName})
-    var extensions = fs.readdirSync(dataFolder + "/bots/" + args.id + "/extensions")
-    extensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
-      var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json","utf8"))
-      thisExtensionData.active = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.id + "/extensions/" + extension + "/status.json", "utf8")).active
-      botExtensions.push(thisExtensionData)
-      }
-    })
+    botExtensions = thisBot.getExtensions()
   }
   return botExtensions
 }
 
 //Suppression d'une extension pour un bot
 ipc.on("deleteExtensionFromBot",function(event,args){
-  fs.rmdirSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId, { recursive: true });
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+  thisBotExtension.delete()
   event.returnValue = true
 })
 
 //Suppression d'un bot
 ipc.on("deleteBot",function(event,args){
-  fs.rmdirSync(dataFolder + "/bots/" + args.botId, { recursive: true });
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.delete()
   new Notification({"title":"Suppression terminée","body":"Ce bot a bien été supprimé"}).show()
 })
 
 //Désinstallation d'une extension
 ipc.on("uninstallExtension",function(event,args){
-  fs.rmdirSync(dataFolder + "/extension-install/" + args.extensionId, { recursive: true });
+  var thisExtension = new extensionModule.Extension(args.extensionId);
+  thisExtension.uninstall()
   new Notification({"title":"Désinstallation terminée","body":"L'extension "+args.extensionId+" a bien été désinstallée."}).show()
 })
 
 //Initialisation de la connexion avec Discord
-ipc.on("connect-discord",async function(event,args){
+ipc.on("connect-discord",async function(event){
   try{
-
-  	//Commence la connexion avec Discord
+    
+    //Commence la connexion avec Discord
     RPCclient.login( {clientId,"scopes":["identify"],"redirect_uri":"https://botsonapp.me/connect"});
   }catch(e){
-    
+    event.sender.send("discord-rpc-loading-error")
     console.log(e)
   }
   RPCclient.once("ready", async () => {
     //Mise à jour du rich presence et chargement de la page principale
     botsOnUser = new botsOnUserModule.BotsOnUser(RPCclient.accessToken,RPCclient.user)
-
+    
     richPresence.init(RPCclient)
     richPresence.changeRPC({"state":"Sélectionne son bot"})
     console.log(RPCclient.user.username)
-
-    mainWindow.loadFile('./index.html')
+    event.sender.send("loading",{"color":"rgb(0,79,163)","type":"start"})
+    
+    var mainWebFile = fs.readFileSync(path.join(__dirname,"index.html"),"utf-8")
     mainWindow.setAlwaysOnTop(true); 
     setTimeout(function()
     {
       mainWindow.setAlwaysOnTop(false);
     },500)
-
+    
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
+    while (mainWebFile.includes("{")){
+      for (var i in languageFile){
+        mainWebFile = mainWebFile.replace(languageFile[i].dest,languageFile[i].translation)
+      }
+    }
+    event.sender.send("append",{"file":mainWebFile})
     premiumData = await botsOnUser.checkMembership()
+    setUserDataFile({"token":botsOnUser.token})
   })
   RPCclient.on("error",()=>{
+    event.sender.send("discord-rpc-loading-error")
   })
 })
 
@@ -250,7 +258,7 @@ ipc.on("getLanguageFile",function(event,language){
 })
 
 //communicate with webpage
-ipc.on("firstTimeOpenApp", function (event, args) {
+ipc.on("firstTimeOpenApp", function (event) {
   if (fs.existsSync(dataFolder + "/appdata")) {
     event.returnValue = false
   } else {
@@ -326,8 +334,8 @@ ipc.on("exportBot",async function(event,args){
     event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationEnd"),"percentage":100,"bot":args.bot})
     
   })
-
-
+  
+  
   //Ouvre la fenêtre de l'exportation
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -337,21 +345,21 @@ ipc.on("exportBot",async function(event,args){
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   //load the index.html of the app.
   await mainWindow.loadFile('./webpage-files/export/export.html')
 })
 
-//Ouvre le donnsier d'exportation
-ipc.on("openExportFolder",function(event,args){
+//Ouvre le dossier d'exportation
+ipc.on("openExportFolder",function(){
   console.log("receive")
-  child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function(stdout) {
+  child_process.exec("explorer.exe /select,"+dataFolder+"\\export", function() {
     console.log(dataFolder)
-});
+  });
 })
 
 //Retourne le dossier des données
-ipc.on("getDataFolder",function(event,args){
+ipc.on("getDataFolder",function(event){
   event.returnValue = dataFolder
 })
 
@@ -361,15 +369,46 @@ ipc.on("startDownloadFromLink",function(event,url){
   createDownloadWindow()
 })
 
+/**
+ * Télécharge le product et l'ajoute dans son dossier dans l'extension voulue
+ * @param {string} extension Id de l'extension
+ * @param {string} id Id du product
+ * @param {string} downloadLink Lien de téléchargement du product
+ */
+async function installProduct(extension,id,downloadLink){
+  const rmdirAsync = promisify(fs.rmdir)
+  return new Promise((resolve) => {
+    axios({
+      method: "get",
+      url: downloadLink,
+      responseType: "stream"
+    }).then(async function (response) {
+      var stream = fs.createWriteStream(dataFolder+"/temp.zip")
+      response.data.pipe(stream);
+      stream.on("finish",async function(){
+        if (!fs.existsSync(dataFolder+"/extension-install/"+extension+"/products")){
+          fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/products")
+        }
+        if (fs.existsSync(dataFolder+"/extension-install/"+extension+"/products/"+id)){
+          await rmdirAsync(dataFolder+"/extension-install/"+extension+"/products/"+id,{recursive:true})
+        }
+        fs.mkdirSync(dataFolder+"/extension-install/"+extension+"/products/"+id)
+        await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install/"+extension+"/products/"+id}) 
+        resolve()
+      })
+    })
+  });
+  
+}
+
 //Commence le téléchargement d'une extension
-ipc.on("downloadExtensionFromURL",function(event,args){
+ipc.on("downloadExtensionFromURL",function(event){
   var url
   if (linkSave.startsWith("botson://")){
     url = linkSave.split("botson://")[1]
   }else{
     url = linkSave
   }
-  new Notification({"body":url,"title":"Test notif"}).show()
   var urlData = url.split("?")
   url = urlData[0]
   var params = urlData[1]
@@ -386,23 +425,23 @@ ipc.on("downloadExtensionFromURL",function(event,args){
   }
   console.log(paramsDico)
   console.log("start")
-      axios({
-        method: "get",
-        url: url,
-        responseType: "stream"
-    }).then(async function (response) {
-      var fileName
-      if (paramsDico["id"]){
-        fileName = paramsDico["id"]
-      }
-      event.sender.send("downloadFinish")
-      var stream = fs.createWriteStream(dataFolder+"/temp.zip")
-      response.data.pipe(stream);
-      stream.on("finish",async function(){
-        try{
-      if (!fs.existsSync(dataFolder + "/extension-install")){
-        fs.mkdirSync(dataFolder + "/extension-install")
-      }
+  axios({
+    method: "get",
+    url: url,
+    responseType: "stream"
+  }).then(async function (response) {
+    var fileName
+    if (paramsDico["id"]){
+      fileName = paramsDico["id"]
+    }
+    event.sender.send("downloadFinish")
+    var stream = fs.createWriteStream(dataFolder+"/temp.zip")
+    response.data.pipe(stream);
+    stream.on("finish",async function(){
+      try{
+        if (!fs.existsSync(dataFolder + "/extension-install")){
+          fs.mkdirSync(dataFolder + "/extension-install")
+        }
         await unzip(dataFolder+"/temp.zip", {dir:dataFolder+"/extension-install"}) 
         console.log("unzip")
         event.sender.send("unzipFinish")
@@ -413,13 +452,23 @@ ipc.on("downloadExtensionFromURL",function(event,args){
           }
           fs.writeFileSync(dataFolder+"/extension-install/"+fileName+"/extension-data.json",JSON.stringify(data))
         }
+        new Notification({"body":"test","title":"Test notif 1"}).show()
+        var thisUser = new BotsOnUser(getUserDataFile().token)
+        new Notification({"body":paramsDico["botsonid"],"title":"Test notif 2"}).show()
+        var extensionProducts =await thisUser.getProductOwnLink(paramsDico["botsonid"])
+        new Notification({"body":"test","title":"Test notif 3"}).show()
+        console.log(extensionProducts)
+        for (i in extensionProducts){
+          new Notification({"body":"test","title":"Test notif 4"}).show()
+          await installProduct(paramsDico.id,extensionProducts[i].id,extensionProducts[i].download)
+        }
         event.sender.send("finalisationFinish")
-    }catch(e){
-      event.sender.send("error",{error:e})
-    }
+      }catch(e){
+        event.sender.send("error",{error:e})
+      }
       
     })
-    })
+  })
 })
 
 //Vérifie le token Discord
@@ -452,22 +501,17 @@ ipc.on("checkDiscordToken", async function (event, args) {
 
 //Installe l'extension sur un bot
 ipc.on("installExtension",function(event,args){
-  if (!fs.existsSync(dataFolder+"/bots/"+args.botId+"/extensions")){
-    fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions")
-  }
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/status.json",JSON.stringify({"active":true}))
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data")
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data")
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json",JSON.stringify({}))
-  fs.mkdirSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/bot-data")
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.installExtension(args.extensionId)
   event.returnValue = {success:true}
 })
 
 //Récupère le config d'un bot
 ipc.on("getConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    event.sender.send("getConfigData",JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json","utf8")))
+    var thisBot = new botModule.Bot(args.botId)
+    var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+    return thisBotExtension.getConfig()
   }else{
     new Notification(createErrorCode("config-2")).show()
   }
@@ -476,8 +520,9 @@ ipc.on("getConfigData",function(event,args){
 //Save le config d'un bot
 ipc.on("saveConfigData",function(event,args){
   if (args.botId && args.extensionId){
-    fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/extensions/"+args.extensionId+"/data/webpage-data/config.json",JSON.stringify(args.config))
-    event.sender.send("saveConfigData",{"success":true})
+    var thisBot = new botModule.Bot(args.botId)
+    var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+    return thisBotExtension.saveConfig(args.config)
   }else{
     new Notification(createErrorCode("config-1")).show()
   }
@@ -491,31 +536,22 @@ ipc.on("getBotPrivateData",function(event,args){
 
 //Récupération des intents d'un bot
 ipc.on("getBotIntents",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotIntents = {"presence_intent":false, "server_members_intent":false}
-  if (botData.intents){
-    thisBotIntents = botData.intents
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotIntents = thisBot.intents
   event.sender.send("getBotIntents",thisBotIntents)
 })
 
 //Récupération des commandes générales (help)
 ipc.on("getBotGeneralCommands",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotGeneralCommands = {"help":false}
-  if (botData.generalCommands){
-    thisBotGeneralCommands = botData.generalCommands
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotGeneralCommands = thisBot.generalCommands
   event.sender.send("getBotGeneralCommands",thisBotGeneralCommands)
 })
 
 //Récupération du préfix du bot
 ipc.on("getBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  var thisBotPrefix = "!"
-  if (botData.prefix){
-    thisBotPrefix = botData.prefix
-  }
+  var thisBot = new botModule.Bot(args.botId)
+  var thisBotPrefix = thisBot.prefix
   event.sender.send("getBotPrefix",thisBotPrefix)
 })
 
@@ -531,9 +567,9 @@ ipc.on("getBotUser",function(event,args){
 
 //Modification du préfix du bot
 ipc.on("modifyBotPrefix",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  botData.prefix = args.prefix
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.prefix = args.prefix
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
@@ -547,52 +583,37 @@ ipc.on("modifyBotUser",function(event,args){
 
 //Modification des intents du bot
 ipc.on("modifyBotIntent",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  if (!botData.intents){
-    botData.intents = {}
-  }
-  if (!botData.intents[args.intent]){
-    botData.intents[args.intent] = false
-  }
-  botData.intents[args.intent] = !botData.intents[args.intent]
-  console.log("intents: "+botData.intents)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.intents[args.intent] = !thisBot.intents[args.intent]
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
 //Modification des commandes générales du bot (help)
 ipc.on("modifyBotGeneralCommand",function(event,args){
-  var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json","utf8"))
-  if (!botData.generalCommands){
-    botData.generalCommands = {}
-  }
-  if (!botData.generalCommands[args.command]){
-    botData.generalCommands[args.command] = false
-  }
-  botData.generalCommands[args.command] = !botData.generalCommands[args.command]
-  console.log("intents: "+botData.generalCommands)
-  fs.writeFileSync(dataFolder+"/bots/"+args.botId+"/botdata.json",JSON.stringify(botData))
+  var thisBot = new botModule.Bot(args.botId)
+  thisBot.generalCommands[args.command] = !thisBot.generalCommands[args.command]
+  thisBot.save()
   event.returnValue = {"success":true}
 })
 
 //Modification de l'activation de l'extension
 ipc.on("modifyExtensionActivation",function(event,args){
-  currentActive = JSON.parse(fs.readFileSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId + "/status.json", "utf8")).active
-  if (currentActive == false){
-    currentActive = true
-  }else{
-    currentActive = false
-  }
-  console.log("active"+ currentActive)
-  fs.writeFileSync(dataFolder + "/bots/" + args.botId + "/extensions/" + args.extensionId + "/status.json", JSON.stringify({"active":currentActive}))
+  var thisBot = new botModule.Bot(args.botId)
+  console.log(thisBot)
+  var thisBotExtension = new extensionModule.BotExtension(args.extensionId,thisBot)
+  var currentStatus  = thisBotExtension.getStatus()
+  currentStatus.active = !currentStatus.active
+  thisBotExtension.saveStatus(currentStatus)
   event.returnValue = {"success":true}
 })
 
 //Récupération des données d'une extension (Nom, description etc)
 ipc.on("getExtensionData",function(event,args){
   if (args.id){
-    if (fs.existsSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json")) {
-      event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + args.id + "/extension-data.json","utf8"))
+    var thisExtension = new extensionModule.Extension(args.id)
+    if (thisExtension.id){
+      event.returnValue = thisExtension.extension_data
     }else{
       new Notification(createErrorCode("eData-2")).show()
     }
@@ -604,31 +625,7 @@ ipc.on("getExtensionData",function(event,args){
 
 //Récupère les mises à jour dispo pour une extension
 ipc.on("checkUpdateExtensions",async function(event){
-  var extensionsFound = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
-    availableExtensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
-        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
-        console.log(extensionData)
-        var toPush = {}
-        toPush.id = extensionData.id
-        toPush.version = "1"
-        if (extensionData.version){
-          toPush.version = extensionData.version
-        }
-        extensionsFound.push(toPush)
-      }
-    })
-  }
-  var result = await axios.get("https://botsonapp.me/api/verify-update?extensions="+JSON.stringify(extensionsFound))
-  result = result.data
-  var toSend = []
-  console.log(result)
-  for (var i in extensionsFound){
-    var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extensionsFound[i].id + "/extension-data.json"))
-    toSend.push({"name":extensionData.name,"id":extensionData.id,"image":extensionData.image,"status":result[extensionsFound[i].id].status,"download":result[extensionsFound[i].id].downloadLink,"extension":result[extensionsFound[i].id].extensionLink})
-  }
+  var toSend = await extensionModule.verifyUpdate()
   event.sender.send("checkUpdateExtensions",toSend)
 })
 
@@ -636,17 +633,30 @@ function getToken(id){
   return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json","utf8")).token
 }
 
-//Coming soon!
-ipc.on("getProductInfo",async function(event,args){
 
+ipc.on("getProductInfo",async function(event,args){
+  if (args.productId){
+    event.sender.send("getProductInfo",await api.getProductInfo(args.productId))
+  }else{
+    return new Notification(createErrorCode("gProduct-1")).show()
+  }
 })
 
 ipc.on("userOwnProduct",async function(event,args){
-  
+  if (args.productId){
+    var owned = await botsOnUser.ownProduct(args.productId)
+    event.sender.send("userOwnProduct",owned)
+  }else{
+    return new Notification(createErrorCode("gProduct-2")).show()
+  }
 })
 
-ipc.on("buyProduct",async function(event,args){
-  
+ipc.on("openProduct",async function(event,args){
+  if (args.productId){
+    shell.openExternal("https://botsonapp.me/product/"+args.productId)
+  }else{
+    return new Notification(createErrorCode("gProduct-3")).show()
+  }
 })
 
 //Récupération des serveurs d'un bot
@@ -701,26 +711,15 @@ ipc.on("getGuildEmojis", async function (event, args) {
 })
 
 //Récupération des extensions disponible (extensions téléchargées)
-ipc.on("getAvailableExtensions", function (event, args) {
-  var extensionsFound = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var availableExtensions = fs.readdirSync(dataFolder + "/extension-install")
-    availableExtensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension + "/extension-data.json")) {
-        var extensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install/" + extension + "/extension-data.json"))
-        console.log(extensionData)
-        extensionsFound.push({ "name": extensionData.name, "author": extensionData.author, "description": extensionData.description, "id": extensionData.id, "smallDescription": extensionData.smallDescription, "image": extensionData.image })
-      }
-    })
-  }
-  console.log(extensionsFound)
-  event.returnValue = extensionsFound
+ipc.on("getAvailableExtensions", function (event) {
+  var installExtensions = extensionModule.getInstallExtensions()
+  event.returnValue = installExtensions
 })
 
 //Démarre l'hébergement d'un bot
 ipc.on("startHosting",async function (event,args){
   if (currentlyBotHosting){
-  	//Si il y a déjà un hébergement en cours, on le stop
+    //Si il y a déjà un hébergement en cours, on le stop
     currentlyBotHosting.stopHosting()
   }
   var botHosting = require("./main_scripts/hosting.js")
@@ -769,7 +768,7 @@ ipc.on("startHosting",async function (event,args){
 })
 
 //Fin de l'hébergement
-ipc.on("endHosting",async function (event,args){
+ipc.on("endHosting",async function (event){
   if (currentlyBotHosting){
     var botHostingResult = await currentlyBotHosting.stopHosting()
     event.sender.send("endHosting",botHostingResult)
@@ -779,6 +778,7 @@ ipc.on("endHosting",async function (event,args){
 //Récupération des extensions d'un bot
 ipc.on("getBotExtensions",async function (event, args) {
   var botExtensions =  getBotExtensionsData(args)
+  console.log("botExtension")
   event.returnValue = botExtensions
 })
 
@@ -788,17 +788,17 @@ ipc.on("getBotData", function (event, args) {
 })
 
 //Récupération de l'utlisateur qui utilise BotsOn
-ipc.on("getUser",function(event,args){
+ipc.on("getUser",function(event){
   event.returnValue = RPCclient.user
 })
 
 //Récupération des pièces de l'utilisateur pour l'afficher
-ipc.on("getUserCoins",async function(event,args){
-    event.sender.send("getUserCoins",await botsOnUser.getCoins())
+ipc.on("getUserCoins",async function(event){
+  event.sender.send("getUserCoins",await botsOnUser.getCoins())
 })
 
 //Récupération de tous les bots sauvegardées sur BotsOn
-ipc.on("getUserBots", function (event, args) {
+ipc.on("getUserBots", function (event) {
   var currentBots = []
   //check if folder with bot exist
   if (fs.existsSync(dataFolder + "/bots")) {
@@ -837,17 +837,25 @@ function copyDebugFile(){
       }
     })
   }
-  var currentExtensions = []
-  if (fs.existsSync(dataFolder + "/extension-install")) {
-    var extensions = fs.readdirSync(dataFolder + "/extension-install")
-    extensions.forEach(function (extension) {
-      if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json")){
-        var thisExtensionData = JSON.parse(fs.readFileSync(dataFolder + "/extension-install" + "/" + extension + "/extension-data.json", "utf8"))
-        currentExtensions.push(thisExtensionData)
-      }
-    })
-  }
+  var currentExtensions = extensionModule.getInstallExtensions()
+  
   console.log(JSON.stringify(currentBots), JSON.stringify(currentExtensions))
   console.log(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
   clipboard.writeText(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
+}
+
+function getUserDataFile(){
+  if (!fs.existsSync(dataFolder+"/user_data"))
+  fs.mkdirSync(dataFolder+"/user_data")
+  if (!fs.existsSync(dataFolder+"/user_data/data.json"))
+  fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  return JSON.parse(fs.readFileSync(dataFolder+"/user_data/data.json"))
+}
+
+function setUserDataFile(data){
+  if (!fs.existsSync(dataFolder+"/user_data"))
+  fs.mkdirSync(dataFolder+"/user_data")
+  if (!fs.existsSync(dataFolder+"/user_data/data.json"))
+  fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
+  return fs.writeFileSync(dataFolder+"/user_data/data.json",JSON.stringify(data))
 }
