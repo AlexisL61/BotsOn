@@ -217,10 +217,7 @@ section {
 }
 
 .footer{
-	text-align:right;
 	margin-top:16px;
-	display:flex;
-	flex-direction:row-reverse;
 	border-radius:0px 0px 5px 5px;
 	background-color:#2f3136;
 	padding:15px;
@@ -859,3 +856,8 @@ h3 {
 	text-align:center;
 }
 
+.txt3 {
+	font-size: 11px;
+	color: white;
+	text-align: left;
+  }
