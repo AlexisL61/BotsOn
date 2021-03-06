@@ -280,7 +280,7 @@ function changeExtensionActiveMode(data){
 }
 
 function getTranslation(tr){
-	return languageFile.find(l=>l.dest == "{"+tr+"}").translation
+	return languageFile["{"+tr+"}"]
 }
 
 function openExtensionMenu(){
@@ -508,12 +508,12 @@ async function installExtension(id) {
 
 async function start() {
 	languageFile = ipcRenderer.sendSync("getLanguageFile","fr_FR")
-	while (document.body.innerHTML.includes("{")){
+	/*while (document.body.innerHTML.includes("{")){
 		console.log(document.body.innerHTML.split("{")[1])
 		for (var i in languageFile){
 			document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest,languageFile[i].translation)
 		}
-	  }
+	  }*/
 	await delay(1000)
 	var user = ipcRenderer.sendSync("getUser", "")
 	ipcRenderer.send("getUserCoins","")

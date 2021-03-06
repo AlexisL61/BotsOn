@@ -239,9 +239,10 @@ ipc.on("connect-discord",async function(event){
     },500)
     
     var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
+    var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"translations"+".json"),"utf8"))
     while (mainWebFile.includes("{")){
-      for (var i in languageFile){
-        mainWebFile = mainWebFile.replace(languageFile[i].dest,languageFile[i].translation)
+      for (var i in allLanguagesFile){
+        mainWebFile = mainWebFile.replace(allLanguagesFile[i],languageFile[allLanguagesFile[i]])
       }
     }
     event.sender.send("append",{"file":mainWebFile})
@@ -259,6 +260,11 @@ ipc.on("getLanguageFile",function(event,language){
   event.returnValue = JSON.parse(languageFile)
 })
 
+ipc.on("getAllLanguagesFile",function(event){
+  var languageFile = fs.readFileSync(path.join(__dirname,"languages/translations.json"),"utf8")
+  event.returnValue = JSON.parse(languageFile)
+})
+
 //communicate with webpage
 ipc.on("firstTimeOpenApp", function (event) {
   if (fs.existsSync(dataFolder + "/appdata")) {
@@ -271,7 +277,7 @@ ipc.on("firstTimeOpenApp", function (event) {
 //Récupère la traduction
 function getTranslate(lang,tr){
   var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+lang+".json"),"utf8"))
-  return languageFile.find(l=>l.dest == "{"+tr+"}").translation
+  return languageFile["{"+tr+"}"]
 }
 
 //Démarre l'exportation du bot

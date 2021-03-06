@@ -10,11 +10,11 @@ function connectToDiscord() {
 }
 
 
-
+var allLanguages = ipcRenderer.sendSync("getAllLanguagesFile")
 languageFile = ipcRenderer.sendSync("getLanguageFile", "fr_FR")
 while (document.body.innerHTML.includes("{")) {
-    for (var i in languageFile) {
-        document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest, languageFile[i].translation)
+    for (var i in allLanguages) {
+        document.body.innerHTML = document.body.innerHTML.replace(allLanguages[i], languageFile[allLanguages[i]])
     }
 }
 
