@@ -13,7 +13,9 @@ function connectToDiscord() {
 
 
 var allLanguages = ipcRenderer.sendSync("getAllLanguagesFile")
-languageFile = ipcRenderer.sendSync("getCurrentLanguageFile")
+var languageData = ipcRenderer.sendSync("getCurrentLanguageFile")
+languageFile = languageData.data
+document.getElementById("flag").src = "../../files/images/languages/"+languageData.language+".png"
 while (document.body.innerHTML.includes("{")) {
     for (var i in allLanguages) {
         document.body.innerHTML = document.body.innerHTML.replace(allLanguages[i], languageFile[allLanguages[i]])
@@ -147,3 +149,7 @@ ipcRenderer.on("append", async function (event, data) {
     scEl.src = "../main-script.js"
     document.body.appendChild(scEl)
 })
+
+function modifyLanguage(){
+    ipcRenderer.send("modifyLanguage")
+}

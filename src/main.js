@@ -17,6 +17,7 @@ const {promisify} = require("util")
 const child_process = require("child_process")
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
+const languagesAvailable = ["fr_FR","en_EN"]
 var premiumData
 var linkSave = ""
 var currentLanguage
@@ -142,15 +143,9 @@ app.on("open-url",function(e,url){
 
 //Lorsque l'app est prête à être lancée
 app.on("ready", () => {
-  var languages = fs.readdirSync(path.join(__dirname,"languages"))
-    languages.forEach(function (language) {
-      if (language!="translations.json" && language!="en_EN.json"){
-        currentLanguage = language.replace(".json","") 
-      }
-    })
-    console.log(currentLanguage)
+  currentLanguage = getUserDataFile().language
   if (!currentLanguage){
-    currentLanguage = "en_EN"
+    currentLanguage = "fr_FR"
   }
   console.log(process.argv)
   //Regarde si il n'y a pas un argument commençant par BotsOn
@@ -221,6 +216,17 @@ ipc.on("uninstallExtension",function(event,args){
   new Notification({"title":"Désinstallation terminée","body":"L'extension "+args.extensionId+" a bien été désinstallée."}).show()
 })
 
+ipc.on("modifyLanguage",function(){
+  var currentUserData = getUserDataFile()
+  var index = languagesAvailable.findIndex(l=>l==currentLanguage)+1
+  if (index == languagesAvailable.length){
+    index = 0
+  }
+  currentUserData.language = languagesAvailable[index]
+  setUserDataFile(currentUserData)
+  currentLanguage = currentUserData.language
+  mainWindow.loadFile("./webpage-files/connect/connect.html")
+})
 //Initialisation de la connexion avec Discord
 ipc.on("connect-discord",async function(event){
   try{
@@ -271,7 +277,7 @@ ipc.on("getLanguageFile",function(event,language){
 
 ipc.on("getCurrentLanguageFile",function(event){
   var languageFile = fs.readFileSync(path.join(__dirname,"languages/"+currentLanguage+".json"),"utf8")
-  event.returnValue = JSON.parse(languageFile)
+  event.returnValue = {"language":currentLanguage,"data":JSON.parse(languageFile)}
 })
 
 ipc.on("getAllLanguagesFile",function(event){

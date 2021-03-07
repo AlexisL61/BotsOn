@@ -507,7 +507,8 @@ async function installExtension(id) {
 }
 
 async function start() {
-	languageFile = ipcRenderer.sendSync("getCurrentLanguageFile")
+	var languageData = ipcRenderer.sendSync("getCurrentLanguageFile")
+	languageFile = languageData.data
 	/*while (document.body.innerHTML.includes("{")){
 		console.log(document.body.innerHTML.split("{")[1])
 		for (var i in languageFile){
