@@ -87,6 +87,9 @@ class Bot{
         if (!fs.existsSync(dataFolder+"/bots/"+this.id+"/extensions")){
             fs.mkdirSync(dataFolder+"/bots/"+this.id+"/extensions")
         }
+        if (fs.existsSync(dataFolder+"/bots/"+this.id+"/extensions/"+extension)){
+            fs.rmdirSync(dataFolder+"/bots/"+this.id+"/extensions/"+extension,{recursive:true})
+        }
         fs.mkdirSync(dataFolder+"/bots/"+this.id+"/extensions/"+extension)
         fs.writeFileSync(dataFolder+"/bots/"+this.id+"/extensions/"+extension+"/status.json",JSON.stringify({"active":true}))
         fs.mkdirSync(dataFolder+"/bots/"+this.id+"/extensions/"+extension+"/data")

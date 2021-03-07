@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 var languageFile
 function getTranslation(tr) {
-    return languageFile.find(l => l.dest == "{" + tr + "}").translation
+    return languageFile["{" + tr + "}"]
 }
 
 function connectToDiscord() {
@@ -11,7 +13,7 @@ function connectToDiscord() {
 
 
 var allLanguages = ipcRenderer.sendSync("getAllLanguagesFile")
-languageFile = ipcRenderer.sendSync("getLanguageFile", "fr_FR")
+languageFile = ipcRenderer.sendSync("getCurrentLanguageFile")
 while (document.body.innerHTML.includes("{")) {
     for (var i in allLanguages) {
         document.body.innerHTML = document.body.innerHTML.replace(allLanguages[i], languageFile[allLanguages[i]])

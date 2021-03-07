@@ -19,6 +19,7 @@ const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
 var premiumData
 var linkSave = ""
+var currentLanguage
 
 var currentlyBotHosting 
 
@@ -141,8 +142,16 @@ app.on("open-url",function(e,url){
 
 //Lorsque l'app est prête à être lancée
 app.on("ready", () => {
-  
-  
+  var languages = fs.readdirSync(path.join(__dirname,"languages"))
+    languages.forEach(function (language) {
+      if (language!="translations.json" && language!="en_EN.json"){
+        currentLanguage = language.replace(".json","") 
+      }
+    })
+    console.log(currentLanguage)
+  if (!currentLanguage){
+    currentLanguage = "en_EN"
+  }
   console.log(process.argv)
   //Regarde si il n'y a pas un argument commençant par BotsOn
   //Cela veut dire que BotsOn a été ouvert à partir d'un lien BotsOn
@@ -238,7 +247,7 @@ ipc.on("connect-discord",async function(event){
       mainWindow.setAlwaysOnTop(false);
     },500)
     
-    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"fr_FR"+".json"),"utf8"))
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+currentLanguage+".json"),"utf8"))
     var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname,"languages/"+"translations"+".json"),"utf8"))
     while (mainWebFile.includes("{")){
       for (var i in allLanguagesFile){
@@ -257,6 +266,11 @@ ipc.on("connect-discord",async function(event){
 //Récupère le fichier de langage
 ipc.on("getLanguageFile",function(event,language){
   var languageFile = fs.readFileSync(path.join(__dirname,"languages/"+language+".json"),"utf8")
+  event.returnValue = JSON.parse(languageFile)
+})
+
+ipc.on("getCurrentLanguageFile",function(event){
+  var languageFile = fs.readFileSync(path.join(__dirname,"languages/"+currentLanguage+".json"),"utf8")
   event.returnValue = JSON.parse(languageFile)
 })
 
@@ -288,28 +302,28 @@ ipc.on("exportBot",async function(event,args){
   const rmdirAsync = promisify(fs.rmdir)
   ipc.once("confirmWebPageExport",async function(event){
     if (! (await existsAsync(dataFolder+"/export"))){
-      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingExportationFile")})
+      event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"creatingExportationFile")})
       await mkdirAsync(dataFolder+"/export");
     }
     var currentId = Date.now()
     if (existsAsync(dataFolder+"/export/"+args.bot+" - "+currentId)){
-      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","deletingExportationFile")})
+      event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"deletingExportationFile")})
       await rmdirAsync(dataFolder+"/export/"+args.bot+" - "+currentId,{recursive:true})
     }
-    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","creatingThisExportationFolder")})
+    event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"creatingThisExportationFolder")})
     await mkdirAsync(dataFolder+"/export/"+args.bot+" - "+currentId)
-    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationSystemCopy")})
+    event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"exportationSystemCopy")})
     await copyAsync(path.join(__dirname,"export"), dataFolder+"/export/"+args.bot+" - "+currentId)
     var extensions = getBotExtensionsData({"id":args.bot})
     for (var i in extensions){
-      event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","extensionCopy")+": "+extensions[i].name + " (1/2)","percentage":Math.floor((i*2)*99/(extensions.length*2))})
+      event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"extensionCopy")+": "+extensions[i].name + " (1/2)","percentage":Math.floor((i*2)*99/(extensions.length*2))})
       console.log(extensions[i].id + "1/2")
       await copyAsync(dataFolder+"/extension-install/"+extensions[i].id,dataFolder+"/export/"+args.bot+" - "+currentId+"/extensions/"+extensions[i].id)
       console.log(extensions[i].id + "2/2")
       event.sender.send("webPageExport",{"subtitle":"Copie de l'extension: "+extensions[i].name + " (2/2)","percentage":Math.floor((i*2+1)*99/extensions.length)})
       await copyAsync(dataFolder+"/bots/"+args.bot+"/extensions/"+extensions[i].id,dataFolder+"/export/"+args.bot+" - "+currentId+"/extensions-data/"+extensions[i].id)
     }
-    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","finishing"),"percentage":99})
+    event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"finishing"),"percentage":99})
     var finalData = {}
     var botData = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+args.bot+"/botdata.json","utf8"))
     console.log(botData)
@@ -339,7 +353,7 @@ ipc.on("exportBot",async function(event,args){
     }
     finalData.generalCommands = thisBotGeneralCommands
     fs.writeFileSync(dataFolder+"/export/"+args.bot+" - "+currentId+"/config.json",JSON.stringify(finalData))
-    event.sender.send("webPageExport",{"subtitle":getTranslate("fr_FR","exportationEnd"),"percentage":100,"bot":args.bot})
+    event.sender.send("webPageExport",{"subtitle":getTranslate(currentLanguage,"exportationEnd"),"percentage":100,"bot":args.bot})
     
   })
   
