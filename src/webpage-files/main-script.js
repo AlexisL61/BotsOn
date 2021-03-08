@@ -11,78 +11,78 @@ var ipcRenderer
 console.log("HEY")
 var mainMenuBotButton = `<div onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="bot-menu-btn center">
 <div>
-		<img src="{botImg}" class="avatar">
-		<p class="text-white">
-			{botName}
-		</p>
-		</div>
+<img src="{botImg}" class="avatar">
+<p class="text-white">
+{botName}
+</p>
+</div>
 </div>`
 
 var extensionActivateBtn = `<div onclick="{modifyConfigFunction}" id="{extensionId}" oncontextmenu="{openContextMenuFunction}" class="extension-bot-menu-btn {inactiveClass}" >
-		<span></span>
-		<img src="{extensionImg}" class="">
-		<div>
-			<h3>
-				{extensionName}
-			</h3>
-			<p>
-				{extensionDescription}
-			</p>
-		</div>
+<span></span>
+<img src="{extensionImg}" class="">
+<div>
+<h3>
+{extensionName}
+</h3>
+<p>
+{extensionDescription}
+</p>
+</div>
 
-		<img class="edit-extension-img" src="https://img.icons8.com/pastel-glyph/100/000000/edit.png">
-		
-		<label class="switch">
-		<input type="checkbox" {switchPosition}>
-		<span class="slider round"></span>
-  </label>
+<img class="edit-extension-img" src="https://img.icons8.com/pastel-glyph/100/000000/edit.png">
+
+<label class="switch">
+<input type="checkbox" {switchPosition}>
+<span class="slider round"></span>
+</label>
 </div>`
 
 var addExtensionBtn = `<div onclick="openAddExtensionSection()" class="extension-bot-menu-btn extension-bot-menu-btn-no-color">
 <img src="https://img.icons8.com/ios/100/000000/plus.png" class="">
 <h3>
-	Ajouter une extension
+Ajouter une extension
 </h3>
 </div>`
 
 var extensionAvailableBtn = `<div onclick="{onClickFunction}" class="extension-available-menu-btn {inactiveClass}">
-		<img src="{extensionImg}" class="">
-		<div>
-			<h3>
-				{extensionName}
-			</h3>
-			<p>
-				{extensionDescription}
-			</p>
-		<div>
+<img src="{extensionImg}" class="">
+<div>
+<h3>
+{extensionName}
+</h3>
+<p>
+{extensionDescription}
+</p>
+<div>
 </div>`
 
 var extensionUpdateDiv = `<div class="extension-in-line">
-                    <div class="left-part">
-                        <img src="{extensionImg}">
-                        <p>
-                            {extensionName}
-                        </p>
-                    </div>
-                    <div class="right-part"	style="display:{updateDisplay}">
-                        <a target="_blank" href="{updateLink}"><button class="btn btn-success">
-                            Mettre à jour
-                        </button></a><br/>  
-                        <a target="_blank" href="{informationLink}"><button class="btn btn-dark">
-                            Informations
-                        </button></a>
-					</div>
-					<div class="right-part"	style="display:{noUpdateDisplay}">
-                        <a><button class="btn btn-outline-success">
-                            À jour
-                        </button></a>
-					</div>
-					<div class="right-part"	style="display:{notFoundDisplay}">
-                        <a><button class="btn btn-outline-success">
-                            Non trouvée
-                        </button></a>
-                    </div>
-                   </div>`
+<div class="left-part">
+<img src="{extensionImg}">
+<p>
+{extensionName}
+</p>
+</div>
+<div class="right-part"	style="display:{updateDisplay}">
+<a target="_blank" href="{updateLink}"><button class="btn btn-success">
+Mettre à jour
+</button></a><br/>  
+<a target="_blank" href="{informationLink}"><button class="btn btn-dark">
+Informations
+</button></a>
+</div>
+<div class="right-part"	style="display:{noUpdateDisplay}">
+<a><button class="btn btn-outline-success">
+À jour
+</button></a>
+</div>
+<div class="right-part"	style="display:{notFoundDisplay}">
+<a><button class="btn btn-outline-success">
+Non trouvée
+</button></a>
+</div>
+</div>`
 
 function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -101,13 +101,13 @@ async function createNewBot() {
 	await delay(1)
 	document.getElementById("add-bot-main-div").style.marginTop = "0vh"
 	document.getElementById("add-bot-main-div").style.opacity = "1"
-
+	
 	document.getElementById("black-blur-background").style.opacity = "0.4"
 }
 
 async function closeCreateNewBot(){
 	document.getElementById("black-blur-background").style.opacity = "0"
-
+	
 	document.getElementById("add-bot-main-div").style.marginTop = "-40vh"
 	document.getElementById("add-bot-main-div").style.opacity = "0"
 	await delay(1000)
@@ -214,9 +214,9 @@ async function openBot(id) {
 	console.log("openBot")
 	var botExtensions = ipcRenderer.sendSync("getBotExtensions", { id: id })
 	var extensionList = document.getElementById("bot-extensions-list")
-
+	
 	extensionList.innerHTML = addExtensionBtn
-
+	
 	for (var i in botExtensions) {
 		var thisExtensionData = botExtensions[i]
 		var thisExtensionDiv = extensionActivateBtn
@@ -238,14 +238,14 @@ async function openBot(id) {
 	}
 	document.getElementById("bot-select-section").style.display = "block"
 	document.getElementById("my-bots-section").style.display = "none"
-
+	
 	var botData = ipcRenderer.sendSync("getBotData", { id: id })
 	document.getElementById("bot-heberg-menu-img").src = botData.avatar
 	document.getElementById("bot-heberg-menu-name").innerHTML = botData.name
-
+	
 	currentBotOpenId = id
 	mainMenuSwitchActivate = false
-
+	
 	document.getElementById("botActiveMenuSection").style.display = "block"
 	document.getElementById("menuBotImage").src = botData.avatar
 	document.getElementById("menuBotName").innerHTML = botData.name
@@ -469,7 +469,7 @@ async function openConfirmInstall(extensionId) {
 	var extensionData = ipcRenderer.sendSync("getExtensionData", { "id": extensionId })
 	document.getElementById("add-extension-confirmation-description").innerHTML = "Vous allez ajouter l'extension <b>" + extensionData.name + "</b>. Cette extension peut accéder à votre bot lorsque vous l'hébergez. Ajoutez donc seulement des extensions de sources connues."
 	document.getElementById("add-extension-confirmation-btn").setAttribute("onclick", "installExtension('" + extensionId + "')")
-
+	
 	document.getElementById("add-extension-main-div").style.marginTop = "-250px"
 	document.getElementById("add-extension-main-div").style.opacity = "0"
 	document.getElementById("add-extension-confirmation-div").style.display = "block"
@@ -484,7 +484,7 @@ async function cancelAddExtension() {
 	document.getElementById("add-extension-main-div").style.marginTop = "0px"
 	document.getElementById("add-extension-main-div").style.opacity = "1"
 	await delay(800)
-
+	
 	document.getElementById("add-extension-confirmation-div").style.display = "none"
 }
 
@@ -492,14 +492,14 @@ async function installExtension(id) {
 	var installResult = ipcRenderer.sendSync("installExtension", { "extensionId": id, "botId": currentBotOpenId })
 	if (installResult.success == true) {
 		openBot(currentBotOpenId)
-
+		
 		document.getElementById("add-extension-confirmation-div").style.marginTop = "-250px"
 		document.getElementById("add-extension-confirmation-div").style.opacity = "0"
-
+		
 		document.getElementById("black-blur-background").style.opacity = "0"
-
+		
 		await delay(800)
-
+		
 		document.getElementById("add-extension-confirmation-div").style.display = "none"
 		document.getElementById("add-extension-section").style.display = "none"
 		document.getElementById("black-blur-background").style.display = "none"
@@ -514,23 +514,23 @@ async function start() {
 		for (var i in languageFile){
 			document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest,languageFile[i].translation)
 		}
-	  }*/
+	}*/
 	await delay(1000)
 	var user = ipcRenderer.sendSync("getUser", "")
 	ipcRenderer.send("getUserCoins","")
 	console.log(user)
 	document.getElementById("loading-section-title").innerHTML = getTranslation("welcome")+" "+user.username
-		
+	
 	document.getElementById("loading-section-title").style.marginTop = "0px"
 	document.getElementById("loading-section-title").style.opacity = "1"
-
+	
 	await delay(2000)
-
+	
 	document.getElementById("my-bots-section").style.display = "block"
 	document.getElementById("loading-section").style.opacity = 0
-
+	
 	updateBotsMenu()
-
+	
 	await delay(1000)
 	document.getElementById("loading-section").style.display = "none"
 }
@@ -543,7 +543,7 @@ function openMenu() {
 async function verifyBotToken() {
 	var token = document.getElementById("add-bot-token-input").value
 	document.getElementById("add-bot-token-btn").setAttribute("disabled", "true")
-
+	
 	ipcRenderer.once("checkDiscordTokenResult", function (event, tokenVerifierResult) {
 		if (tokenVerifierResult.success == false) {
 			document.getElementById("add-bot-token-btn").removeAttribute("disabled")
@@ -555,10 +555,10 @@ async function verifyBotToken() {
 			document.getElementById("add-bot-main-div").style.opacity = "0"
 			document.getElementById("add-bot-second-div").style.marginTop = "0px"
 			document.getElementById("add-bot-second-div").style.opacity = "1"
-
+			
 			document.getElementById("add-bot-second-div-img").src = tokenVerifierResult.bot.avatar
 			document.getElementById("add-bot-second-div-bot-name").innerHTML = tokenVerifierResult.bot.name
-
+			
 			updateBotsMenu()
 		}
 	})
@@ -631,12 +631,12 @@ async function openBotParametersSubMenu(parameter){
 		ipcRenderer.send("getBotIntents",{"botId":currentBotOpenId})
 		ipcRenderer.once("getBotIntents",function(event,intents){
 			console.log(intents)
-		if (intents.presence){
-			document.getElementById("bot-intents-parameters-input-presence").checked = "true"
-		}
-		if (intents.guild_members){
-			document.getElementById("bot-intents-parameters-input-guild-members").checked = "true"
-		}
+			if (intents.presence){
+				document.getElementById("bot-intents-parameters-input-presence").checked = "true"
+			}
+			if (intents.guild_members){
+				document.getElementById("bot-intents-parameters-input-guild-members").checked = "true"
+			}
 		})
 	}
 	if (parameter=="generalcommands"){
@@ -703,11 +703,11 @@ function editBotGeneralCommands(command){
 async function closeAddBot() {
 	document.getElementById("add-bot-second-div").style.marginTop = "-250px"
 	document.getElementById("add-bot-second-div").style.opacity = "0"
-
+	
 	document.getElementById("black-blur-background").style.opacity = "0"
-
+	
 	await delay(800)
-
+	
 	document.getElementById("add-bot-section").style.display = "none"
 	document.getElementById("black-blur-background").style.display = "none"
 }
@@ -745,9 +745,9 @@ async function startDownloadFromLink(){
 	var link = document.getElementById("download-link-input").value
 	if (link.startsWith("botson://")){
 	ipcRenderer.send("startDownloadFromLink",link)
-	}else{
-		document.getElementById("download-link-input").value = "Lien invalide"
-	}
+}else{
+	document.getElementById("download-link-input").value = "Lien invalide"
+}
 }
 
 start()

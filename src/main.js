@@ -3,7 +3,7 @@
 //Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 //Modules and variables
-const { app, BrowserWindow,Menu,clipboard,Notification,screen,shell } = require('electron')
+const { app, BrowserWindow,Notification,shell } = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -40,6 +40,7 @@ const botsOnUserModule = require("./main_scripts/class/botson-user.js")
 const extensionModule = require("./main_scripts/class/extension.js")
 const { BotsOnUser } = require('./main_scripts/class/botson-user.js')
 const botModule = require("./main_scripts/class/bot.js")
+const windowOpenerModule = require("./main_scripts/window-opener.js")
 
 //Init module
 extensionModule.init(dataFolder);
@@ -56,36 +57,7 @@ function createErrorCode(errorCode){
 function createWindow() {
   
   //Création de la fenêtre principale 
-  mainWindow = new BrowserWindow({
-    icon: __dirname + '\\files\\images\\logo.png',
-    width: 1000,
-    height: 1000,
-    center: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-  
-  mainWindow.loadFile('./webpage-files/connect/connect.html')
-  mainWindow.setMenu(Menu.buildFromTemplate([{
-    label: "Debug",
-    submenu: [
-      {
-        label: "Ouvrir les Dev Tools",
-        accelerator: "F12",
-        click: () => {
-          mainWindow.webContents.toggleDevTools();
-        }
-      },
-      {
-        label: "Copier les fichiers de débuggage",
-        accelerator: "F11",
-        click: () => {
-          copyDebugFile();
-        }
-      }
-    ]
-  }]))
+  mainWindow = windowOpenerModule.openMainWindow()
   
   //Ouverture d'une page exterieur lors d'un clique sur un lien à la place de l'ouvrir dans electron
   mainWindow.webContents.on('new-window', function(e, url) {
@@ -102,24 +74,8 @@ function createWindow() {
 function createDownloadWindow() {
   
   //Création de la fenêtre d'installation d'extension
-  var mainScreen = screen.getPrimaryDisplay();
-  var dimensions = mainScreen.workAreaSize;
   console.log(dimensions)
-  mainWindow = new BrowserWindow({
-    icon: __dirname + '\\files\\images\\logo.png',
-    width: 400,
-    height: 100,
-    x:dimensions.width-410,
-    y:dimensions.height-110,
-    frame:false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-  
-  //load the index.html of the app.
-  mainWindow.loadFile('download.html')
-  mainWindow.setMenu(null)
+  mainWindow = windowOpenerModule.openDownloadWindow
   
   //Fermeture de la fenêtre si l'utilisateur appuie sur la croix
   ipc.once("closeDownload",function(){
@@ -365,18 +321,7 @@ ipc.on("exportBot",async function(event,args){
   
   
   //Ouvre la fenêtre de l'exportation
-  mainWindow = new BrowserWindow({
-    icon: __dirname + '\\files\\images\\logo.png',
-    width: 1000,
-    height: 1000,
-    center: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-  
-  //load the index.html of the app.
-  await mainWindow.loadFile('./webpage-files/export/export.html')
+  currentWindow = windowOpenerModule.openExportWindow()
 })
 
 //Ouvre le dossier d'exportation
@@ -844,34 +789,6 @@ ipc.on("getUserBots", function (event) {
   event.returnValue = currentBots
 })
 
-//Copie du fichier de débuggage
-function copyDebugFile(){
-  var currentBots = []
-  if (fs.existsSync(dataFolder + "/bots")) {
-    //get all bots save
-    var bots = fs.readdirSync(dataFolder + "/bots")
-    bots.forEach(function (bot) {
-      if (!bot.startsWith(".")){
-        var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
-        console.log(thisBotData)
-        thisBotData.token = "***" 
-        var extensionsData = []
-        var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot +"/extensions")
-        extensions.forEach(function (extension) {
-          if (!extension.startsWith(".")){
-            extensionsData.push(extension)
-          }
-        })
-        currentBots.push({"data":thisBotData,"extensions":extensionsData})
-      }
-    })
-  }
-  var currentExtensions = extensionModule.getInstallExtensions()
-  
-  console.log(JSON.stringify(currentBots), JSON.stringify(currentExtensions))
-  console.log(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
-  clipboard.writeText(JSON.stringify({"bots":currentBots,"extensions":currentExtensions}))
-}
 
 function getUserDataFile(){
   if (!fs.existsSync(dataFolder+"/user_data"))
