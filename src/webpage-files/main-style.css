@@ -865,3 +865,7 @@ h3 {
 	color: white;
 	text-align: left;
   }
+
+  .dark-background{
+	  background-color: #2C2F33;
+  }

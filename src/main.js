@@ -17,7 +17,7 @@ const {promisify} = require("util")
 const child_process = require("child_process")
 const RPC = require("discord-rpc")
 const RPCclient = new RPC.Client({ transport: 'ipc' })
-const languagesAvailable = ["fr_FR","en_EN"]
+const languagesAvailable = ["fr_FR","en_EN","es_ES"]
 var premiumData
 var linkSave = ""
 var currentLanguage
@@ -218,7 +218,9 @@ ipc.on("connect-discord",async function(event){
     }
     event.sender.send("append",{"file":mainWebFile})
     premiumData = await botsOnUser.checkMembership()
-    setUserDataFile({"token":botsOnUser.token})
+    var userDataFile = getUserDataFile()
+    userDataFile.token = botsOnUser.token
+    setUserDataFile(userDataFile)
   })
   RPCclient.on("error",()=>{
     event.sender.send("discord-rpc-loading-error")
@@ -795,7 +797,7 @@ function getUserDataFile(){
   fs.mkdirSync(dataFolder+"/user_data")
   if (!fs.existsSync(dataFolder+"/user_data/data.json"))
   fs.writeFileSync(dataFolder+"/user_data/data.json","{}")
-  return JSON.parse(fs.readFileSync(dataFolder+"/user_data/data.json"))
+  return JSON.parse(fs.readFileSync(dataFolder+"/user_data/data.json","utf-8"))
 }
 
 function setUserDataFile(data){
