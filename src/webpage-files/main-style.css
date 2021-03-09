@@ -24,6 +24,7 @@ section {
 		color:white;
 		font-size:35px;
 		text-align:center;
+		line-height:35px;
 		font-family: Arial, Helvetica, sans-serif;
 	}
 
@@ -864,4 +865,12 @@ h3 {
 	font-size: 11px;
 	color: white;
 	text-align: left;
+  }
+
+  .dark-background{
+	  background-color: #2C2F33;
+  }
+
+  #bot-select-section{
+	  background-color:#2C2F33
   }

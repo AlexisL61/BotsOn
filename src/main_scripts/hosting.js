@@ -1,168 +1,166 @@
 
-var client,directory,dataExtensionFolder,ipcRenderer,prefix,intents,user,path,discord,Notification,electron,generalCommands
-var fs = require("fs")
-var currentOpenWebPage
-var canvas  = require("./canvas.js")
-const child_process = require("child_process")
-console.log(canvas)
-module.exports = {
 
-    startHosting(Discord,token,extensions,isPremium){
+var fs = require("fs")
+
+var Discord = require("discord.js")
+
+var electron = require("electron")
+var {Notification,app,ipcMain} = require("electron")
+
+const child_process = require("child_process")
+
+var canvas  = require("./canvas.js")
+var {openCanvasWindow} = require("./window-opener")
+
+const Bot = require("./class/bot")
+const Extension = require("./class/extension/extension.js")
+
+const directory = app.getPath('userData')
+
+
+class Hosting{
+    /**
+     * Créé un objet Hosting
+     * @param {Bot} bot discord
+     * @param {Array<Extension>} extensions Extensions du bot
+     * @param {boolean} isPremium Valeur montrant si l'utilisateur est premium ou non
+     */
+    constructor(bot,extensions,isPremium,currentUser){
+        this.bot = bot
+        this.extensions = extensions
+        this.premiumUser = isPremium
+        this.currentUser = currentUser
+    }
+
+    
+    startCanvas(){
+        var hostingNeedCanvas = false
+        for (var i in this.extensions){
+            var thisExtension = this.extensions[i]
+            if (thisExtension.status.active){
+                if (thisExtension.extension_data.require && thisExtension.extension_data.require.find(data=>data=="canvas")){
+                    hostingNeedCanvas = true
+                }
+            }
+        }
+        if (hostingNeedCanvas){
+            var currentOpenWebPage = openCanvasWindow()
+            this.currentOpenWebPage = currentOpenWebPage
+            canvas.init(currentOpenWebPage.webContents, ipcMain)
+        }
+    }
+    launchExtensions(){
+        try{
+            for (var i in this.extensions){
+                if (this.extensions[i].status.active){
+                    //Effaçage du cache pour le require pour que les tests d'extensions ne requiert pas de redémarrage de l'application
+                    if (require.cache[require.resolve(directory+"/extension-install/"+this.extensions[i].id+"/back-end/main.js")]){
+                        delete require.cache[require.resolve(directory+"/extension-install/"+this.extensions[i].id+"/back-end/main.js")]
+                    }
+
+                    //Ajout des variables:
+                    var thisExtensionHost = require(directory+"/extension-install/"+this.extensions[i].id+"/back-end/main.js")
+                    thisExtensionHost.client = this.client
+                    thisExtensionHost.electron = electron
+                    thisExtensionHost.location = directory+"/extension-install/"+this.extensions[i].id
+                    thisExtensionHost.dataFolder = directory + "/bots/" + this.bot.id + "/extensions/"+this.extensions[i].id+"/data"
+                    thisExtensionHost.prefix = this.bot.prefix
+                    thisExtensionHost.intents = this.bot.intents
+                    thisExtensionHost.user = this.currentUser
+                    thisExtensionHost.discord = Discord
+                    thisExtensionHost.onApp = true
+
+                    if (this.extensions[i].extension_data.require && this.extensions[i].extension_data.require.find(data=>data=="canvas")){
+                        thisExtensionHost.canvas = canvas
+                    }
+
+                    thisExtensionHost.start()
+                }
+            }
+
+
+        }catch(e){
+            if (!fs.existsSync(directory+"/logs")){
+                fs.mkdirSync(directory+"/logs")
+            }
+            fs.writeFileSync(directory+"/logs/"+this.extensions[i].id+".txt",e)
+            var thisIndex = i
+            var customNotification = new Notification({"title":"Erreur démarrage d'extension","body":"L'extension "+this.extensions[i].name+" n'a pas pu démarrer. Cliquez pour voir l'erreur"})
+            customNotification.show()
+            customNotification.addListener('click', () => { 
+                console.log("click")
+                console.log(directory)
+                child_process.exec('start "" '+directory+"\\logs\\"+this.extensions[thisIndex].id+".txt", function() {
+                });
+            });
+        }
+    }
+
+    startHelpFunction(){
         var helpEmbed = {
             "title":"Help",
-            "fields":[
-        
-            ]
+            "fields":[]
         }
-        Notification = this.notification
-        directory = this.directory
-        electron = this.electron
-        dataExtensionFolder = this.dataExtensionFolder
-        ipcRenderer = this.ipc
-        prefix = this.prefix
-        intents = this.intents
-        user = this.user
-        path = this.path
-        generalCommands = this.generalCommands
-        discord = Discord
-        if (client != undefined){
-            client.destroy()
-        }
-        var DiscordIntents = Discord.Intents
-        var totalIntentsBit = new Discord.Intents()
-        totalIntentsBit.add(DiscordIntents.NON_PRIVILEGED)
-        if (intents.presence){
-            totalIntentsBit.add("GUILD_PRESENCES")
-        }
-        if (intents.guild_members){
-            totalIntentsBit.add("GUILD_MEMBERS")
-        }
-        client = new Discord.Client({ws:{intents:totalIntentsBit}})
-        client.login(token)
-        
-        .then()
-        .catch(function(error){
-            console.log(error)
-            client.emit("botLogin",{"success":false,"error":"onLogin"})
-        })
-        
-        client.once("ready",async function(){
-            var needCanvas = false
-            for (var i in extensions){
-                if (extensions[i].status.active){
-                    var thisExtensionHost = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
-                    if (thisExtensionHost.require && thisExtensionHost.require.find(data=>data=="canvas")){
-                        needCanvas = true
-                    }
-                }
-            }
-            if (needCanvas == true){
-                currentOpenWebPage = new electron.BrowserWindow({
-                    width:1000,
-                    height:1000,
-                    center: true,
-                    show:false,
-                    webPreferences: {
-                        // eslint-disable-next-line no-undef
-                        preload: path.join(__dirname, '../preload.js')
-                    }
-                })
-                await currentOpenWebPage.loadFile('./webpage-files/canvas/canvas.html')
-                currentOpenWebPage.webContents.openDevTools()
-                canvas.init(currentOpenWebPage.webContents,ipcRenderer)
-            }
-            for (i in extensions){
-                if (extensions[i].status.active){
-                    try{
-                    var thisExtensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json"))
-                    if (require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]){
-                        delete require.cache[require.resolve(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")]
-                    }
-                    thisExtensionHost = require(directory+"/extension-install/"+extensions[i].id+"/back-end/main.js")
-                    thisExtensionHost.client = client
-                    thisExtensionHost.electron = electron
-                    thisExtensionHost.location = directory+"/extension-install/"+extensions[i].id
-                    thisExtensionHost.dataFolder = dataExtensionFolder+"/"+extensions[i].id+"/data"
-                    thisExtensionHost.prefix = prefix
-                    thisExtensionHost.intents = intents
-                    thisExtensionHost.user = user
-                    thisExtensionHost.discord = discord
-                    thisExtensionHost.onApp = true
-                    if (thisExtensionData.require && thisExtensionData.require.find(data=>data=="canvas")){
-                        thisExtensionHost.canvas = canvas
-                        console.log(canvas)
-                    }
-                    console.log("thisExtensionHost")
-                        thisExtensionHost.start()
-                    }catch(e){
-                        console.log(e)
-                        if (!fs.existsSync(directory+"/logs")){
-                            fs.mkdirSync(directory+"/logs")
-                        }
-                        fs.writeFileSync(directory+"/logs/"+extensions[i].id+".txt",e)
-                        var thisIndex = i
-                        var customNotification = new Notification({"title":"Erreur démarrage d'extension","body":"L'extension "+extensions[i].id+" n'a pas pu démarrer. Cliquez pour voir l'erreur"})
-                        customNotification.show()
-                        customNotification.addListener('click', () => { 
-                            console.log("click")
-                            console.log(directory)
-                            child_process.exec('start "" '+directory+"\\logs\\"+extensions[thisIndex].id+".txt", function() {
-                            });
-                        });
-                    }
-                }
-            }
-            client.emit("botLogin",{"success":true})
-        })
-
-        if (generalCommands.help){
-            for (var i in extensions){
-                if (extensions[i].status.active){
-                    var extensionData = JSON.parse(fs.readFileSync(directory+"/extension-install/"+extensions[i].id+"/extension-data.json","utf-8"));
+        if (this.bot.generalCommands.help){
+            for (var i in this.extensions){
+                if (this.extensions[i].status.active){
+                    var extensionData = this.extensions[i].extension_data
                     if (extensionData.help && extensionData.help.active){
                         while (extensionData.help.field.name.includes("{prefix}")){
-                            extensionData.help.field.name = extensionData.help.field.name.replace("{prefix}",prefix)
+                            extensionData.help.field.name = extensionData.help.field.name.replace("{prefix}",this.bot.prefix)
                         }
                         while (extensionData.help.field.value.includes("{prefix}")){
-                            extensionData.help.field.value = extensionData.help.field.value.replace("{prefix}",prefix)
+                            extensionData.help.field.value = extensionData.help.field.value.replace("{prefix}",this.bot.prefix)
                         }
                         helpEmbed.fields.push(extensionData.help.field)
                     }
                 }
             }
-            console.log(isPremium)
-            if (isPremium == false){
+            if (this.isPremium == false){
                 helpEmbed.fields.push({
                     "name": "Crédits",
                     "value": "Créé avec [BotsOn](https://botsonapp.me/)"
                 })
             }
-            console.log(helpEmbed)
-            client.on("message",function(message){
-                if (message.content.toLowerCase().startsWith(prefix+"help")){
+            this.client.on("message",function(message){
+                if (message.content.toLowerCase().startsWith(this.prefix+"help")){
                     message.channel.send({"embed":helpEmbed})
                 }
             })
         }
+    }
 
+    startHosting(){
+        var totalIntentsBit = this.bot.buildIntents()
+        var client = new Discord.Client({ws:{intents:totalIntentsBit}})
+        this.client = client
+        var currentHosting = this
+        client.login(this.bot.token)
+        .then()
+        .catch(function(error){
+            console.log(error)
+            currentHosting.client.emit("botLogin",{"success":false,"error":"onLogin"})
+        })
+        client.once("ready",function(){
+            currentHosting.startCanvas()
+            currentHosting.launchExtensions()
+            currentHosting.client.emit("botLogin",{"success":true})
+        })
         return new Promise((resolve) => {
             client.once("botLogin",function(data){
                 resolve(data)
             })
         })
+    }
 
-       
-
-        
-    },
     stopHosting(){
-        if (client){
-            client.emit("stopHosting")
-            client.destroy()
+        if (this.client){
+            this.client.emit("stopHosting")
+            this.client.destroy()
         }
-        if (currentOpenWebPage){
+        if (this.currentOpenWebPage){
             try{
-            currentOpenWebPage.close()
+                this.currentOpenWebPage.close()
             }catch(e){
                 //
             }
@@ -170,3 +168,5 @@ module.exports = {
         return {"success":true}
     }
 }
+
+module.exports = Hosting
