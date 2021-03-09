@@ -2,7 +2,7 @@ var path = require("path")
 var fs = require("fs")
 const {app, BrowserWindow, Menu, clipboard} = require('electron')
 const dataFolder = app.getPath('userData')
-const extensionModule = require("./class/extension.js")
+const extensionModule = require("./class/extension/extension.js")
 
 function copyDebugFile() {
     var currentBots = []
@@ -102,8 +102,23 @@ function openDownloadWindow() {
     return mainWindow
 }
 
+async function openCanvasWindow() {
+    var currentOpenWebPage = new BrowserWindow({
+        width: 1000,
+        height: 1000,
+        center: true,
+        show: false,
+        webPreferences: { // eslint-disable-next-line no-undef
+            preload: path.join(__dirname, '../preload.js')
+        }
+    })
+    await currentOpenWebPage.loadFile('./webpage-files/canvas/canvas.html')
+    return currentOpenWebPage
+}
+
 module.exports = {
     openMainWindow: openMainWindow,
     openExportWindow: openExportWindow,
-    openDownloadWindow: openDownloadWindow
+    openDownloadWindow: openDownloadWindow,
+    openCanvasWindow:openCanvasWindow
 }

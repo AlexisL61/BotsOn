@@ -2,29 +2,23 @@ var fs =require("fs")
 
 const {app} = require("electron")
 const dataFolder = app.getPath('userData')
-const extensionModule = require("./extension.js")
+const BotExtension = require("./extension/bot-extension")
+const Discord = require("discord.js")
 
 /**
- * Construction d'un nouveau bot géré par BotsOn
- * 
- * @class Bot
- * @classdesc Classe définissant un bot
- * 
- * @property {string} id                        - id du bot
- * @property {string} name                      - nom du bot
- * @property {string} token                     - token du bot
- * @property {string} avatar                    - avatar du bot
- * @property {string} prefix                    - prefix du bot
- * @property {object} intents                   - intents du bot
- * @property {boolean} intents.guild_members    - activation de l'intents guild_members du bot
- * @property {boolean} intents.presence         - activation de l'intents presence du bot
- * @property {object} generalCommands           - commandes générales du bot
- * @property {boolean} generalCommands.help     - activation de la commande help du bot
+ * Création d'un bot
  */
 class Bot{
+    /**
+     * Créé un bot Discord à partir d'un id de bot
+     * @param {Discord.Snowflake} id Id du bot
+     */
     constructor(id) {
         if (!fs.existsSync(dataFolder+"/bots/"+id+"/botdata.json"))
             return this.id = undefined
+        /**
+        * @type {Discord.Snowflake}
+        */
         this.id = id
         this.bot_data = JSON.parse(fs.readFileSync(dataFolder+"/bots/"+id+"/botdata.json","utf8"))
         this.name = this.bot_data.name
@@ -56,7 +50,7 @@ class Bot{
         var thisBot = this
         extensions.forEach(function (extension) {
             if (!extension.startsWith(".") && fs.existsSync(dataFolder + "/extension-install/" + extension )){
-                var thisBotExtension = new extensionModule.BotExtension(extension,thisBot)
+                var thisBotExtension = new BotExtension(extension,thisBot)
                 botExtensions.push(thisBotExtension)
             }
         })
@@ -113,8 +107,23 @@ class Bot{
 
         fs.writeFileSync(dataFolder+"/bots/"+this.id+"/botdata.json",JSON.stringify(toSave))
     }
+
+    /**
+     * Génère les intents requis du bot sous formes de Bit, compatible avec Discord.js
+     * @returns {Discord.Intents} Intents - Intents de discord.js
+     */
+    buildIntents(){
+        var DiscordIntents = Discord.Intents
+        var totalIntentsBit = new Discord.Intents()
+        totalIntentsBit.add(DiscordIntents.NON_PRIVILEGED)
+        if (this.intents.presence){
+            totalIntentsBit.add("GUILD_PRESENCES")
+        }
+        if (this.intents.guild_members){
+            totalIntentsBit.add("GUILD_MEMBERS")
+        }
+        return totalIntentsBit
+    }
 }
 
-module.exports = {
-    Bot:Bot
-}
+module.exports = Bot

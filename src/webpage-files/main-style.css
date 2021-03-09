@@ -858,6 +858,7 @@ iframe {
 
 h3 {
 	text-align:center;
+	line-height: 30px!important;
 }
 
 .txt3 {
@@ -868,4 +869,8 @@ h3 {
 
   .dark-background{
 	  background-color: #2C2F33;
+  }
+
+  #bot-select-section{
+	  background-color:#2C2F33
   }
