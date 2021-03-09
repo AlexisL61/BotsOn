@@ -1,1 +1,1 @@
-start /wait ../../botson.exe
+start /wait ../../../botson.exe

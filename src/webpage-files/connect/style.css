@@ -119,3 +119,11 @@ h3{
 #discord-logo-main{
   width: 200px;
 }
+
+#flag{
+  position:absolute;
+  z-index: 8;
+  width:50px;
+  margin-left:100vw;
+  transform: translateX(-75px) translateY(25px);
+}

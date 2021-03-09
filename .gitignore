@@ -4,3 +4,4 @@ out
 .eslintrc.js
 **package-lock.json
 .gitignore
+.vscode/

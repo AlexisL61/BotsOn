@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 var languageFile
 function getTranslation(tr) {
-    return languageFile.find(l => l.dest == "{" + tr + "}").translation
+    return languageFile["{" + tr + "}"]
 }
 
 function connectToDiscord() {
@@ -10,11 +12,13 @@ function connectToDiscord() {
 }
 
 
-
-languageFile = ipcRenderer.sendSync("getLanguageFile", "fr_FR")
+var allLanguages = ipcRenderer.sendSync("getAllLanguagesFile")
+var languageData = ipcRenderer.sendSync("getCurrentLanguageFile")
+languageFile = languageData.data
+document.getElementById("flag").src = "../../files/images/languages/"+languageData.language+".png"
 while (document.body.innerHTML.includes("{")) {
-    for (var i in languageFile) {
-        document.body.innerHTML = document.body.innerHTML.replace(languageFile[i].dest, languageFile[i].translation)
+    for (var i in allLanguages) {
+        document.body.innerHTML = document.body.innerHTML.replace(allLanguages[i], languageFile[allLanguages[i]])
     }
 }
 
@@ -145,3 +149,7 @@ ipcRenderer.on("append", async function (event, data) {
     scEl.src = "../main-script.js"
     document.body.appendChild(scEl)
 })
+
+function modifyLanguage(){
+    ipcRenderer.send("modifyLanguage")
+}
