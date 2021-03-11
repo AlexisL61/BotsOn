@@ -1,18 +1,42 @@
+:root {
+
+	/* body */
+	--body-bg-color: #2c2f33; /* #2c2f33 */
+	--body-margin: 0; /* 0 */
+	--body-font-family: ; /*  */
+ 
+	/* Loading section */
+	--loading-bg-img: url("../files/images/background.png"); /* url("../files/images/background.png") */
+	--loading-bg-repeat: repeat; /* repeat */
+	--loading-bg-size: cover; /* cover */
+
+	/* a */
+	--a-padding: 7px; /* 7px */
+
+	/* title */
+	--title-color: white; /* white */
+	--title-size: 35px; /* 35px */
+	--title-align: center; /* center */
+	--title-line-height: 35px; /* 35px */
+	--title-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
+}
+
 #loading-section {
-	background-image: url("../files/images/background.png");
-	background-repeat:repeat;
-	background-size: cover;
+	background-image: var(--loading-bg-img);
+	background-repeat: var(--loading-bg-repeat);
+	background-size: var(--loading-bg-size);
 	width:100vw;
 	height:100vh;
     backdrop-filter: blur(5px);
     z-index:3;
 }
 a{
-	padding:7px;
+	padding: var(--a-padding);
 }
 body {
-	background-color:#2c2f33;
-	margin:0px;
+	background-color: var(--body-bg-color);
+	margin: var(--body-margin);
+	font-family: var(--body-font-family);
 }
 
 section {
@@ -21,11 +45,11 @@ section {
 }
 
 	.title{
-		color:white;
-		font-size:35px;
-		text-align:center;
-		line-height:35px;
-		font-family: Arial, Helvetica, sans-serif;
+		color: var(--title-color);
+		font-size: var(--title-size);
+		text-align: var(--title-align);
+		line-height: var(--title-line-height);
+		font-family: var(--title-font-family);
 	}
 
 	.download-extension-title{

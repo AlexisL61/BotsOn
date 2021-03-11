@@ -10,6 +10,7 @@ module.exports={
             startTimestamp: Date.now(),
             largeImageKey: 'logo',
             instance: true,
+            buttons: [{label: "WebSite", url: "https://botsonapp.me"}],
         })
     }
 }
