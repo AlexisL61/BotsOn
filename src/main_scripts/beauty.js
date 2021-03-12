@@ -8,13 +8,9 @@ var path = dataFolder + "/cosmetics-install"
 
 fs.access(path, function(error) {
   if (error) {
-
-    console.log("Dossier cosmetiques non existant.")
     fs.mkdirSync(path)
 
   } else {
-
-    console.log("Dossier cosmetiques trouvait.")
 
     fs.readdir(path, (err, files) => {
 
@@ -23,7 +19,6 @@ fs.access(path, function(error) {
             fs.access(path + '/' + file + '/style.css', function(error) {
 
                 if(error) {
-                    console.log('dossier sans rien.')
                 } else {
 
                     ipc.on('loadCss', function(c) {
@@ -33,13 +28,9 @@ fs.access(path, function(error) {
 
                     })
 
-                    console.log('oui')
-
                 }
 
             });
-
-            console.log(file);
 
         });
     });
