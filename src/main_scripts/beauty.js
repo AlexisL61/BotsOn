@@ -18,9 +18,7 @@ fs.access(path, function(error) {
 
             fs.access(path + '/' + file + '/style.css', function(error) {
 
-                if(error) {
-                } else {
-
+                if(!error) {
                     ipc.on('loadCss', function(c) {
                         var element = `${path + '\\' + file + '\\style.css'}`;
                         console.log('css element : ' + element)
