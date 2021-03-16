@@ -14,12 +14,14 @@ function copyDebugFile() {
                 console.log(thisBotData)
                 thisBotData.token = "***"
                 var extensionsData = []
-                var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot + "/extensions")
-                extensions.forEach(function (extension) {
-                    if (! extension.startsWith(".")) {
-                        extensionsData.push(extension)
-                    }
-                })
+                if (fs.existsSync(dataFolder + "/bots/"+bot+"/extensions")){
+                    var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot + "/extensions")
+                    extensions.forEach(function (extension) {
+                        if (! extension.startsWith(".")) {
+                            extensionsData.push(extension)
+                        }
+                    })
+                }
                 currentBots.push({"data": thisBotData, "extensions": extensionsData})
             }
         })
