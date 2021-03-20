@@ -100,7 +100,6 @@ function openDownloadWindow(screen) {
 
     // load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname,'../download.html'))
-    mainWindow.webContents.openDevTools()
     return mainWindow
 }
 
