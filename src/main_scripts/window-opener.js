@@ -83,7 +83,7 @@ function openExportWindow() {
     return mainWindow
 }
 
-function openDownloadWindow() {
+function openDownloadWindow(screen) {
     var mainScreen = screen.getPrimaryDisplay();
     var dimensions = mainScreen.workAreaSize;
     var mainWindow = new BrowserWindow({
@@ -99,8 +99,8 @@ function openDownloadWindow() {
     })
 
     // load the index.html of the app.
-    mainWindow.loadFile('../download.html')
-    mainWindow.setMenu(null)
+    mainWindow.loadFile(path.join(__dirname,'../download.html'))
+    mainWindow.webContents.openDevTools()
     return mainWindow
 }
 

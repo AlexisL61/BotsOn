@@ -3,7 +3,7 @@
 // Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 // Modules and variables
-const {app, BrowserWindow, Notification, shell} = require('electron')
+const {app, BrowserWindow, Notification, shell,screen} = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -74,8 +74,7 @@ function createWindow() { // Création de la fenêtre principale
 }
 
 function createDownloadWindow() { // Création de la fenêtre d'installation d'extension
-    console.log(dimensions)
-    mainWindow = windowOpenerModule.openDownloadWindow
+    mainWindow = windowOpenerModule.openDownloadWindow(screen)
 
     // Fermeture de la fenêtre si l'utilisateur appuie sur la croix
     ipc.once("closeDownload", function () {
