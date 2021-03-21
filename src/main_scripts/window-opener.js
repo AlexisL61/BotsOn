@@ -10,7 +10,7 @@ function copyDebugFile() {
         var bots = fs.readdirSync(dataFolder + "/bots")
         bots.forEach(function (bot) {
             if (! bot.startsWith(".")) {
-                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botdata.json", "utf8"))
                 console.log(thisBotData)
                 thisBotData.token = "***"
                 var extensionsData = []

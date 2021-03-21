@@ -772,7 +772,7 @@ ipc.on("getBotExtensions", async function (event, args) {
 
 // Récupération des données d'un bot
 ipc.on("getBotData", function (event, args) {
-    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botData.json", "utf8"))
+    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botdata.json", "utf8"))
 })
 
 // Récupération de l'utlisateur qui utilise BotsOn
@@ -793,7 +793,7 @@ ipc.on("getUserBots", function (event) {
         var bots = fs.readdirSync(dataFolder + "/bots")
         bots.forEach(function (bot) {
             if (! bot.startsWith(".")) {
-                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botdata.json", "utf8"))
                 console.log(thisBotData)
                 currentBots.push(thisBotData)
             }
