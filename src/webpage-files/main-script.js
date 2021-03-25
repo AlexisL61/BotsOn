@@ -558,7 +558,7 @@ async function verifyBotToken() {
 			
 			document.getElementById("add-bot-second-div-img").src = tokenVerifierResult.bot.avatar
 			document.getElementById("add-bot-second-div-bot-name").innerHTML = tokenVerifierResult.bot.name
-			
+			document.getElementById("add-bot-token-btn").removeAttribute("disabled")
 			updateBotsMenu()
 		}
 	})
