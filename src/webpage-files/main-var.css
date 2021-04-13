@@ -1,0 +1,118 @@
+:root {
+
+	/* body */
+	--body-bg-color: #2c2f33; /* #2c2f33 */
+	--body-margin: 0; /* 0 */
+	--body-font-family: ; /*  */
+ 
+	/* Loading section */
+	--loading-bg-img: url("../files/images/background.png"); /* url("../files/images/background.png") */
+	--loading-bg-repeat: repeat; /* repeat */
+	--loading-bg-size: cover; /* cover */
+	--loading-bkp-filter: blur(5px);
+
+	/* loading section title */
+	--loading-title-transition: 0.7s; /* 0.7s */
+	--loading-title-mgt: 20vh; /* 20vh */
+	--loading-title-opacity: 0; /* 0 */
+
+	/* a */
+	--a-padding: 7px; /* 7px */
+
+	/* white */
+	--white-color: white;
+
+	/* title */
+	--title-color: white; /* white */
+	--title-size: 35px; /* 35px */
+	--title-align: center; /* center */
+	--title-line-height: 35px; /* 35px */
+	--title-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
+
+	/* download title */
+	--download-title-size: 20px; /* 20px */
+	--download-title-align: center; /* center */
+	--download-title-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
+	--download-title-color: white; /* white */
+	--download-title-size: 1; /* 1 */
+
+	/* subtitle */
+	--subtitle-color: rgb(211, 209, 209); /* rgb(211, 209, 209) */
+	--subtitle-size: 20px; /* 20px */
+	--subtitle-align: center; /* center */
+	--subtitle-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
+
+	/* sidenav */
+	--sidenav-width: 300px; /* 300px */
+	--sidenav-bg-color: #2f3136; /* #2f3136 */
+	--sidenav-transition: 0.5s; /* 0.5s */
+	--sidenav-postion: absolute; /* absolute */
+		/* close */
+		--sidenav-width-close: -300px; /* -300px */
+		/* open */
+		--sidenav-width-open: 0px; /* 0px */
+	
+	/* liste */
+	--list-bg-color: #2c2f33; /* #2c2f33 */
+	--list-bg-img: ; /*  */
+
+	/* section */
+	--section-position: absolute; /* absolute */
+	--section-transition: 1s; /* 1s */
+
+	/* center */
+	--center-display: flex; /* flex */
+	--center-justify-content: center; /* center */
+	--center-align-items: center; /* center */
+
+	/* bots placement */
+	--bots-pl-width: 90%; /* 90% */
+	--bots-pl-mgl: 5%; /* 5% */
+
+	/* bot menu btn */
+	--bot-btn-width: 100px; /* 100px */
+	--bot-btn-height: 150px; /* 150px */
+	--bot-btn-border-r: 10px; /* 10px */
+	--bot-btn-border-s: solid; /* solid */
+	--bot-btn-border-color: #1b1b1b; /* #1b1b1b */
+	--bot-btn-float: left; /* left */
+	--bot-btn-mgr: 10px; /* 10px */
+	--bot-btn-mgt: 10px; /* 10px */
+	--bot-btn-bg-color: #23272a; /* #23272a */
+		/* hover */
+		--bot-btn-mgt_hover: 0px; /* 0px */
+
+	/* update-extension-btn */
+	--update-ext-btn-width: 60px; /* 60px */
+
+	/* avtar */
+	--avatar-border-r: 50%; /* 50% */
+
+	/* text-color */
+	--text-color-color: white; /* white */
+
+	/* bot-menu-btn div img */
+	--bot-btn-img-width: 50px;
+	--bot-btn-img-height: 50px;
+
+	/* bot-menu-btn div */
+	--bot-btn-div-text-align: center;
+
+	/* bot-menu-btn-no-color */
+	--bot-btn-none-border-s: dashed;
+
+	/* main-menu-button-activation */
+	--main-btn-active-mgl: 10px; /* 10px */
+	--main-btn-active-mgt: 10px; /* 10px */
+	--main-btn-active-postion: absolute; /* absolute */
+
+	/* parameters-button-opener */
+    --para-btn-open-width: 180px; /* 180px */
+    --para-btn-open-heigth: 180px; /* 180px */
+    --para-btn-open-mgl: 10px; /* 10px */
+    --para-btn-open-border-r: 10px; /* 10px */
+    --para-btn-open-border: 1px solid #191c1f; /* 1px solid #191c1f */
+    --para-btn-open-bg-color: #23272a; /* #23272a */
+    --para-btn-open-float: left; /* left */
+
+}

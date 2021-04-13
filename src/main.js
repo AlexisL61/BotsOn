@@ -3,7 +3,7 @@
 // Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 // Modules and variables
-const {app, BrowserWindow, Notification, shell} = require('electron')
+const {app, BrowserWindow, Notification, shell,screen} = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -74,8 +74,7 @@ function createWindow() { // Création de la fenêtre principale
 }
 
 function createDownloadWindow() { // Création de la fenêtre d'installation d'extension
-    console.log(dimensions)
-    mainWindow = windowOpenerModule.openDownloadWindow
+    mainWindow = windowOpenerModule.openDownloadWindow(screen)
 
     // Fermeture de la fenêtre si l'utilisateur appuie sur la croix
     ipc.once("closeDownload", function () {
@@ -773,7 +772,7 @@ ipc.on("getBotExtensions", async function (event, args) {
 
 // Récupération des données d'un bot
 ipc.on("getBotData", function (event, args) {
-    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botData.json", "utf8"))
+    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botdata.json", "utf8"))
 })
 
 // Récupération de l'utlisateur qui utilise BotsOn
@@ -794,7 +793,7 @@ ipc.on("getUserBots", function (event) {
         var bots = fs.readdirSync(dataFolder + "/bots")
         bots.forEach(function (bot) {
             if (! bot.startsWith(".")) {
-                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botdata.json", "utf8"))
                 console.log(thisBotData)
                 currentBots.push(thisBotData)
             }

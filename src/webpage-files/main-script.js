@@ -300,6 +300,10 @@ function openBotMenu(){
 	document.getElementById("my-bots-section").style.display = "block"
 }
 
+function openBeautyMenu() {
+	ipcRenderer.sendSync("beautyWindows", "")
+}
+
 async function openConfigPage(extensionId){
 	if (!currentlyInExtensionActiveMode){
 		var dataFolder = ipcRenderer.sendSync("getDataFolder")
@@ -558,7 +562,7 @@ async function verifyBotToken() {
 			
 			document.getElementById("add-bot-second-div-img").src = tokenVerifierResult.bot.avatar
 			document.getElementById("add-bot-second-div-bot-name").innerHTML = tokenVerifierResult.bot.name
-			
+			document.getElementById("add-bot-token-btn").removeAttribute("disabled")
 			updateBotsMenu()
 		}
 	})

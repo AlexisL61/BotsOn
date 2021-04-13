@@ -10,16 +10,18 @@ function copyDebugFile() {
         var bots = fs.readdirSync(dataFolder + "/bots")
         bots.forEach(function (bot) {
             if (! bot.startsWith(".")) {
-                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botdata.json", "utf8"))
                 console.log(thisBotData)
                 thisBotData.token = "***"
                 var extensionsData = []
-                var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot + "/extensions")
-                extensions.forEach(function (extension) {
-                    if (! extension.startsWith(".")) {
-                        extensionsData.push(extension)
-                    }
-                })
+                if (fs.existsSync(dataFolder + "/bots/"+bot+"/extensions")){
+                    var extensions = fs.readdirSync(dataFolder + "/bots" + "/" + bot + "/extensions")
+                    extensions.forEach(function (extension) {
+                        if (! extension.startsWith(".")) {
+                            extensionsData.push(extension)
+                        }
+                    })
+                }
                 currentBots.push({"data": thisBotData, "extensions": extensionsData})
             }
         })
@@ -81,7 +83,7 @@ function openExportWindow() {
     return mainWindow
 }
 
-function openDownloadWindow() {
+function openDownloadWindow(screen) {
     var mainScreen = screen.getPrimaryDisplay();
     var dimensions = mainScreen.workAreaSize;
     var mainWindow = new BrowserWindow({
@@ -97,8 +99,7 @@ function openDownloadWindow() {
     })
 
     // load the index.html of the app.
-    mainWindow.loadFile('../download.html')
-    mainWindow.setMenu(null)
+    mainWindow.loadFile(path.join(__dirname,'../download.html'))
     return mainWindow
 }
 

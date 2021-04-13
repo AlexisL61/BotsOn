@@ -33,7 +33,7 @@ class Hosting{
     }
 
     
-    startCanvas(){
+    async startCanvas(){
         var hostingNeedCanvas = false
         for (var i in this.extensions){
             var thisExtension = this.extensions[i]
@@ -44,7 +44,7 @@ class Hosting{
             }
         }
         if (hostingNeedCanvas){
-            var currentOpenWebPage = openCanvasWindow()
+            var currentOpenWebPage = await openCanvasWindow()
             this.currentOpenWebPage = currentOpenWebPage
             canvas.init(currentOpenWebPage.webContents, ipcMain)
         }
@@ -101,6 +101,7 @@ class Hosting{
             "title":"Help",
             "fields":[]
         }
+        var thisHosting = this
         if (this.bot.generalCommands.help){
             for (var i in this.extensions){
                 if (this.extensions[i].status.active){
@@ -123,7 +124,7 @@ class Hosting{
                 })
             }
             this.client.on("message",function(message){
-                if (message.content.toLowerCase().startsWith(this.prefix+"help")){
+                if (message.content.toLowerCase().startsWith(thisHosting.bot.prefix+"help")){
                     message.channel.send({"embed":helpEmbed})
                 }
             })
@@ -144,6 +145,7 @@ class Hosting{
         client.once("ready",function(){
             currentHosting.startCanvas()
             currentHosting.launchExtensions()
+            currentHosting.startHelpFunction()
             currentHosting.client.emit("botLogin",{"success":true})
         })
         return new Promise((resolve) => {
