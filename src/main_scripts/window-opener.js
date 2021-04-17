@@ -36,7 +36,7 @@ function copyDebugFile() {
 function openMainWindow() {
     var mainWindow
     mainWindow = new BrowserWindow({
-        icon: __dirname + '\\..\\files\\images\\logo.png',
+        icon: __dirname + '\\..\\files\\images\\logos\\logo.png',
         width: 1000,
         height: 1000,
         center: true,
@@ -70,7 +70,7 @@ function openMainWindow() {
 
 function openExportWindow() {
     var mainWindow = new BrowserWindow({
-        icon: __dirname + '\\..\\files\\images\\logo.png',
+        icon: __dirname + '\\..\\files\\images\\logos\\logo.png',
         width: 1000,
         height: 1000,
         center: true,
@@ -87,7 +87,7 @@ function openDownloadWindow(screen) {
     var mainScreen = screen.getPrimaryDisplay();
     var dimensions = mainScreen.workAreaSize;
     var mainWindow = new BrowserWindow({
-        icon: __dirname + '\\..\\files\\images\\logo.png',
+        icon: __dirname + '\\..\\files\\images\\logos\\logo.png',
         width: 400,
         height: 100,
         x: dimensions.width - 410,
