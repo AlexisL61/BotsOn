@@ -523,7 +523,7 @@ ipc.on("getConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        event.sender.send("getConfigData",thisBotExtension.getConfig())
+        event.sender.send("getConfigData",{"success":true,data:thisBotExtension.getConfig()})
     } else {
         new Notification(createErrorCode("config-2")).show()
     }
@@ -534,7 +534,7 @@ ipc.on("saveConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        event.sender.send("saveConfigData",thisBotExtension.saveConfig(args.config))
+        event.sender.send("saveConfigData",{"success":true,data:thisBotExtension.saveConfig(args.config)})
     } else {
         new Notification(createErrorCode("config-1")).show()
     }
