@@ -25,6 +25,7 @@
 	/* title */
 	--title-color: white; /* white */
 	--title-size: 35px; /* 35px */
+	--title-weigth: normal; /* normal */
 	--title-align: center; /* center */
 	--title-line-height: 35px; /* 35px */
 	--title-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
@@ -203,5 +204,128 @@
         /* focus */
         --form-control_focus-color: #dcddde; /* #dcddde */
         --form-control_focus-bg-color: #202225; /* #202225 */
+	
+	/* extension-in-line */
+	--extension-line-width: 100%; /* 100% */
+	--extension-line-padding: 5px; /* 5px */
+	--extension-line-display: flex; /* flex */
+	--extension-line-bg-color: #191c1f; /* #191c1f */
+	--extension-line-mgb: 5px; /* 5px */
+
+	/* .extension-in-line .left-part */
+	--extension-line-left-flex: 1; /* 1 */
+
+	/* extension-in-line button */
+	--extension-line-button-padding: 3px; /* 3px */
+	--extension-line-button-mgb: 5px; /* 5px */
+	--extension-line-button-width: 110px; /* 110px */
+
+	/* extension-in-line p */
+	--extension-line-p-color: white; /* white */
+	--extension-line-p-display: unset; /* unset */
+
+	/* extension-in-line img */
+	--extension-line-img-heigth: 72px; /* 72px */
+
+	/* update-extension-section */
+	--update-extension-section-position: fixed; /* fixed */
+	--update-extension-section-z-index: 3; /* 3 */
+	--update-extension-section-display: none; /* none */
+	--update-extension-section-width: 100vw; /* 100vw */
+	--update-extension-section-height: 100vh; /* 100vh */
+
+	/* uninstall-extension-section */
+	--uninstall-extension-section-position: fixed; /* fixed */
+	--uninstall-extension-section-z-index: 3; /* 3 */
+	--uninstall-extension-section-display: none; /* none */
+	--uninstall-extension-section-width: 100vw; /* 100vw */
+	--uninstall-extension-section-height: 100vh; /* 100vh */
+
+	/* delete-bot-section */
+	--delete-bot-section-position: fixed; /* fixed */
+	--delete-bot-section-z-index: 3; /* 3 */
+	--delete-bot-section-display: none; /* none */
+	--delete-bot-section-width: 100vw; /* 100vw */
+	--delete-bot-section-height: 100vh; /* 100vh */
+
+	/* add-extension-section */
+	--add-extension-section-position: fixed; /* fixed */
+	--add-extension-section-z-index: 3; /* 3 */
+	--add-extension-section-display: none; /* none */
+	--add-extension-section-width: 100vw; /* 100vw */
+	--add-extension-section-height: 100vh; /* 100vh */
+
+	/* popup-div */
+	--popup-div-z-index: 5; /* 5 */
+	--popup-div-position: absolute; /* absolute */ 
+	--popup-div-width: 400px; /* 400px */ 
+	--popup-div-height: 600px; /* 600px */ 
+	--popup-div-mgt: 250px; /* 250px */ 
+	--popup-div-opacity: 0; /* 0 */ 
+	--popup-div-bg-color: #2c2f33; /* #2c2f33 */ 
+	--popup-div-border-r: 10px; /* 10px */ 
+	--popup-div-transition: 0.8s; /* 0.8s */ 
+
+	/* popup-long-div */
+	--popup-long-div-z-index: 5; /* 5 */
+	--popup-long-div-position: absolute; /* absolute */
+	--popup-long-div-width: 600px; /* 600px */
+	--popup-long-div-height: 600px; /* 600px */
+	--popup-long-div-mgt: 250px; /* 250px */
+	--popup-long-div-opacity: 0; /* 0 */
+	--popup-long-div-bg-color: #2c2f33; /* #2c2f33 */
+	--popup-long-div-border-r: 10px; /* 10px */
+	--popup-long-div-transition: 0.8s; /* 0.8s */
+
+	/* popup-div h3 */
+	--popup-div-h3-text-align: center; /* center */
+	--popup-div-h3-mgt: 10px; /* 10px */
+	--popup-div-h3-mgl: 10px; /* 10px */
+
+	/* add-extension-confirmation-div */
+	--add-extension-conf-display: none; /* none */
+	--add-extension-conf-position: absolute; /* absolute */
+	--add-extension-conf-width: 400px; /* 400px */
+	--add-extension-conf-height: 250px; /* 250px */
+	--add-extension-conf-mgt: 250px; /* 250px */
+	--add-extension-conf-opacity: 0; /* 0 */
+	--add-extension-conf-bg-color: white; /* white */
+	--add-extension-conf-border-r: 10px; /* 10px */
+	--add-extension-conf-transition: 0.8s; /* 0.8s */
+
+	/* add-extension-confirmation-div h3 */
+	--add-extension-conf-h3-text-align: center; /* center */
+	--add-extension-conf-h3-mgt: 10px; /* 10px */
+
+	/* add-extension-confirmation-div p */
+	--add-extension-conf-p-text-align: center; /* center */
+	--add-extension-conf-p-mgt: 10px; /* 10px */
+
+	/* bot-extensions-list */
+	--bot-extensions-list-height: 590px; /* 590px */
+	--bot-extensions-list-overflow-y: scroll; /* scroll */
+	--bot-extensions-list-bg-color: #2c2f33; /* #2c2f33 */
+
+	/* context-menu */
+	--context-menu-postion: fixed; /* fixed */
+	--context-menu-width: 150px; /* 150px */
+	--context-menu-bg-color: #191c1f; /* #191c1f */
+	--context-menu-border-r: 5px; /* 5px */
+	--context-menu-padding: 10px; /* 10px */
+	--context-menu-z-index: 5; /* 5 */
+
+	/* context-menu-div div */
+	--context-menu-div-width: 100%; /* 100% */
+	--context-menu-div-color: white; /* white */
+	--context-menu-div-padding: 10px; /* 10px */
+	--context-menu-div-border-r: 5px; /* 5px */
+
+	/* context-menu-div div:hover */
+	--context-menu-div_hover-width: 100%; /* 100% */
+	--context-menu-div_hover-color: white; /* white */
+	--context-menu-div_hover-cursor: pointer; /* pointer */
+	--context-menu-div_hover-bg-color: #6274b8; /* #6274b8 */
+
+	/* context-menu-div .red */
 
 }

@@ -24,6 +24,7 @@ section {
 	.title{
 		color: var(--title-color);
 		font-size: var(--title-size);
+		font-weight: var(--title-weigth);
 		text-align: var(--title-align);
 		line-height: var(--title-line-height);
 		font-family: var(--title-font-family);
@@ -270,15 +271,15 @@ section {
 }
 
 .extension-in-line{
-	width:100%;
-	padding:5px;
-	display:flex;
-	background-color: #191c1f;
-	margin-bottom:5px;
+	width: var(--extension-line-width);
+	padding: var(--extension-line-padding);
+	display: var(--extension-line-display);
+	background-color: var(--extension-line-bg-color);
+	margin-bottom: var(--extension-line-mgb);
   }
   
   .extension-in-line .left-part{
-	flex:1
+	flex: var(--extension-line-left-flex);
   }
   
   .extension-in-line button{
@@ -288,125 +289,125 @@ section {
   }
   
   .extension-in-line p{
-	color:white;
-	display:unset
+	color: var(--extension-line-p-color);
+	display: var(--extension-line-p-display);
   }
   
   .extension-in-line img{
-	height:72px;
+	height: var(--extension-line-img-heigth);
   }
 
 #update-extension-section {
-	position:fixed;
-	z-index:3;
-	display:none;
-	width:100vw;
-	height:100vh;
+	position: var(--update-extension-section-position);
+	z-index: var(--update-extension-section-z-index);
+	display: var(--update-extension-section-display);
+	width: var(--update-extension-section-width);
+	height: var(--update-extension-section-height);
 }
 
 #uninstall-extension-section {
-	position:fixed;
-	z-index:3;
-	display:none;
-	width:100vw;
-	height:100vh;
+	position: var(--uninstall-extension-section-position);
+	z-index: var(--uninstall-extension-section-z-index);
+	display: var(--uninstall-extension-section-display);
+	width: var(--uninstall-extension-section-width);
+	height: var(--uninstall-extension-section-height);
 }
 
 #delete-bot-section {
-	position:fixed;
-	z-index:3;
-	display:none;
-	width:100vw;
-	height:100vh;
+	position: var(--delete-bot-section-position);
+	z-index: var(--delete-bot-section-z-index);
+	display: var(--delete-bot-section-display);
+	width: var(--delete-bot-section-width);
+	height: var(--delete-bot-section-height);
 }
 
 #add-extension-section {
-	position:fixed;
-	z-index:3;
-	display:none;
-	width:100vw;
-	height:100vh;
+	position: var(--add-extension-section-position);
+	z-index: var(--add-extension-section-z-index);
+	display: var(--add-extension-section-display);
+	width: var(--add-extension-section-width);
+	height: var(--add-extension-section-height);
 }
 
 .popup-div{
-	z-index:5;
-	position:absolute;
-	width:400px;
-	height:600px;
-	margin-top:250px;
-	opacity:0;
-	background-color: #2c2f33;
-	border-radius:10px;
-	transition:0.8s;
+	z-index: var(--popup-div-z-index);
+	position: var(--popup-div-position);
+	width: var(--popup-div-width);
+	height: var(--popup-div-height);
+	margin-top: var(--popup-div-mgt);
+	opacity: var(--popup-div-opacity);
+	background-color: var(--popup-div-bg-color);
+	border-radius: var(--popup-div-border-r);
+	transition: var(--popup-div-transition);
 }
 
 .popup-long-div{
-	z-index:5;
-	position:absolute;
-	width:600px;
-	height:600px;
-	margin-top:250px;
-	opacity:0;
-	background-color: #2c2f33;
-	border-radius:10px;
-	transition:0.8s;
+	z-index: var(--popup-long-div-z-index);
+	position: var(--popup-long-div-position);
+	width: var(--popup-long-div-width);
+	height: var(--popup-long-div-height);
+	margin-top: var(--popup-long-div-mgt);
+	opacity: var(--popup-long-div-opacity);
+	background-color: var(--popup-long-div-bg-color);
+	border-radius: var(--popup-long-div-border-r);
+	transition: var(--popup-long-div-transition);
 }
 
 .popup-div h3{
-	text-align:center;
-	margin-top: 10px;
-	margin-left:10px;
+	text-align: var(--popup-div-h3-text-align);
+	margin-top:  var(--popup-div-h3-mgt);
+	margin-left: var(--popup-div-h3-mgl);
 }
 
 .add-extension-confirmation-div{
-	display:none;
-	position:absolute;
-	width:400px;
-	height:250px;
-	margin-top:250px;
-	opacity:0;
-	background-color: white;
-	border-radius:10px;
-	transition:0.8s;
+	display: var(--add-extension-conf-display);
+	position: var(--add-extension-conf-position);
+	width: var(--add-extension-conf-width);
+	height: var(--add-extension-conf-height);
+	margin-top: var(--add-extension-conf-mgt);
+	opacity: var(--add-extension-conf-opacity);
+	background-color: var(--add-extension-conf-bg-color);
+	border-radius: var(--add-extension-conf-border-r);
+	transition: var(--add-extension-conf-transition);
 }
 
 .add-extension-confirmation-div h3{
-	text-align:center;
-	margin-top: 10px;
+	text-align: var(--add-extension-conf-h3-text-align);
+	margin-top: var(--add-extension-conf-h3-mgt);
 }
 
 .add-extension-confirmation-div p{
-	text-align:center;
-	margin-top: 10px;
+	text-align: var(--add-extension-conf-p-text-align);
+	margin-top: var(--add-extension-conf-p-mgt);
 }
 
 #bot-extensions-list{
-	height:590px;
-	overflow-y:scroll;
-	background-color: #2c2f33;
+	height: var(--bot-extensions-list-height);
+	overflow-y: var(--bot-extensions-list-overflow-y);
+	background-color: var(--bot-extensions-list-bg-color);
 }
 
 #context-menu {
-	position:fixed;
-	width:150px;
-	background-color:#191c1f;
-	border-radius:5px;
-	padding:10px;
-	z-index:5
+	position: var(--context-menu-postion);
+	width: var(--context-menu-width);
+	background-color: var(--context-menu-bg-color);
+	border-radius: var(--context-menu-border-r);
+	padding: var(--context-menu-padding);
+	z-index: var(--context-menu-z-index);
 }
 
 .context-menu-div div{
-	width:100%;
-	color:white;
-	padding:10px;
-	border-radius:5px;
+	width: var(--context-menu-div-width);
+	color: var(--context-menu-div-color);
+	padding: var(--context-menu-div-padding);
+	border-radius: var(--context-menu-div-border-r);
 }
 
 .context-menu-div div:hover{
-	width:100%;
-	color:white;
-	background-color:#6274b8;
-	cursor: pointer;
+	width: var(--context-menu-div_hover-width);
+	color: var(--context-menu-div_hover-color);
+	background-color: var(--context-menu-div_hover-bg-color);
+	cursor:  var(--context-menu-div_hover-cursor);
 }
 
 .context-menu-div .red{
