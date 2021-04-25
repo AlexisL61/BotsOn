@@ -470,7 +470,7 @@ async function openConfirmInstall(extensionId) {
 	document.getElementById("add-extension-confirmation-description").innerHTML = "Vous allez ajouter l'extension <b>" + extensionData.name + "</b>. Cette extension peut accéder à votre bot lorsque vous l'hébergez. Ajoutez donc seulement des extensions de sources connues."
 	document.getElementById("add-extension-confirmation-btn").setAttribute("onclick", "installExtension('" + extensionId + "')")
 	
-	document.getElementById("add-extension-main-div").style.marginTop = "-250px"
+	document.getElementById("add-extension-main-div").style.marginTop = "-350px"
 	document.getElementById("add-extension-main-div").style.opacity = "0"
 	document.getElementById("add-extension-confirmation-div").style.display = "block"
 	await delay(1)
