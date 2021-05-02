@@ -117,12 +117,6 @@ class Hosting{
                     }
                 }
             }
-            if (this.isPremium == false){
-                helpEmbed.fields.push({
-                    "name": "Crédits",
-                    "value": "Créé avec [BotsOn](https://botsonapp.me/)"
-                })
-            }
             this.client.on("message",function(message){
                 if (message.content.toLowerCase().startsWith(thisHosting.bot.prefix+"help")){
                     message.channel.send({"embed":helpEmbed})
