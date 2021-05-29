@@ -300,6 +300,10 @@ function openBotMenu(){
 	document.getElementById("my-bots-section").style.display = "block"
 }
 
+function openBeautyMenu() {
+	ipcRenderer.sendSync("beautyWindows", "")
+}
+
 async function openConfigPage(extensionId){
 	if (!currentlyInExtensionActiveMode){
 		var dataFolder = ipcRenderer.sendSync("getDataFolder")
