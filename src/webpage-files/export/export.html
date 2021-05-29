@@ -6,7 +6,8 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
 		integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	
-	<link rel="stylesheet" href="../main-style.css">
+		<link rel="stylesheet" href="../main-style.css">
+		<link rel="stylesheet" href="../main-var.css">
 
 </head>
 
@@ -27,6 +28,18 @@
 		</div>
 	</section>
 	<script>
+		ipcRenderer.send("loadCss", "")
+		ipcRenderer.once('displayCss', (event, css) => {
+			var headID = document.getElementsByTagName('head')[0];
+			var link = document.createElement('link');
+			link.type = 'text/css';
+			link.rel = 'stylesheet';
+
+			headID.appendChild(link);
+
+			link.href = css;
+
+        })
 		var finish = false
 		var botId;
 		ipcRenderer.send("confirmWebPageExport",{language:"fr_FR"})
