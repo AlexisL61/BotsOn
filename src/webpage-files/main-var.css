@@ -25,6 +25,7 @@
 	/* title */
 	--title-color: white; /* white */
 	--title-size: 35px; /* 35px */
+	--title-weigth: normal; /* normal */
 	--title-align: center; /* center */
 	--title-line-height: 35px; /* 35px */
 	--title-font-family: Arial, Helvetica, sans-serif; /* Arial, Helvetica, sans-serif */
@@ -114,5 +115,217 @@
     --para-btn-open-border: 1px solid #191c1f; /* 1px solid #191c1f */
     --para-btn-open-bg-color: #23272a; /* #23272a */
     --para-btn-open-float: left; /* left */
+
+    /* parameters-button-opener p */
+    --para-btn-open-p-color: white; /* white */
+    --para-btn-open-p-txt-align: center; /* center */
+    --para-btn-open-p-fs: 20px; /* 20px */ 
+    --para-btn-open-p-mgt: 20px; /* 20px */ 
+
+    /* parameters-button-opener img */
+    --para-btn-open-img-width: 80px; /* 80px */
+    --para-btn-open-img-mgt: 5px; /* 5px */
+
+    /* black-blur-background */
+    --black-blur-bg-position: fixed; /* fixed */
+    --black-blur-bg-transition: 1s; /* 1s */
+    --black-blur-bg-opacity: 0; /* 0 */
+    --black-blur-bg-display: none; /* none */
+    --black-blur-bg-bg-color: black; /* black */
+
+    /* add-bot-section */
+    --add-bot-section-position: fixed;
+    --add-bot-section-display: none;
+
+    /* add-bot-div */
+    --add-bot-div-position: absolute; /* absolute */
+    --add-bot-div-mgt: 250px; /* 250px */
+    --add-bot-div-opacity: 0; /* 0 */
+    --add-bot-div-bg-color: #36393f; /* #36393f */
+    --add-bot-div-border-r: 10px; /* 10px */
+    --add-bot-div-transition: 0.8s; /* 0.8s */
+
+    /* uninstall-extension-main-div */
+    --uninstall-extension-position: absolute; /* absolute */
+    --uninstall-extension-width: 400px; /* 400px */
+    --uninstall-extension-mgt: 250px; /* 250px */
+    --uninstall-extension-opacity: 0; /* 0 */
+    --uninstall-extension-bg-color: #36393f; /* #36393f */
+    --uninstall-extension-border-r: 10px; /* 10px */
+    --uninstall-extension-transition: 0.8s; /* 0.8s */
+
+    /* delete-bot-main-div */
+    --delete-bot-position: absolute; /* absolute */
+    --delete-bot-width: 400px; /* 400px */
+    --delete-bot-mgt: 250px; /* 250px */
+    --delete-bot-opacity: 0; /* 0 */
+    --delete-bot-bg-color: #36393f; /* #36393f */
+    --delete-bot-border-r: 10px; /* 10px */
+    --delete-bot-transition: 0.8s; /* 0.8s */
+
+    /* footer */
+    --footer-mgt: 16px; /* 16px */
+    --footer-txt-align: right; /* right */
+    --footer-display: flex; /* flex */
+    --footer-flex-direction: row-reverse; /* row-reverse */
+    --footer-border-r: 0px 0px 5px 5px; /* 0px 0px 5px 5px */
+    --footer-bg-color: #2f3136; /* #2f3136 */
+    --footer-padding: 15px; /* 15px */
+
+    /* connect-btn */
+    --connect-btn-opacity: 1; /* 1 */
+    --connect-btn-transition: 0.2s; /* 0.2s */
+
+    /* disappear */
+    --disappear-opacity: 0!important; /* 0!important */
+
+    /* connect-title */
+    --connect-title-mgt: 20vh; /* 20vh */
+    --connect-title-mgb: 10vh; /* 10vh */
+
+    /* connect-section */
+    --connect-section-width: 100vw; /* 100vw */
+    --connect-section-height: 100vh; /* 100vh */
+    --connect-section-txt-align: center; /* center */
+    --connect-section-position: absolute; /* absolute */
+
+    /* input-group-text */
+    --input-group-text-bg-color: #25282b; /* #25282b */
+    --input-group-text-border-color: #16191b; /* #16191b */
+    --input-group-text-color: white; /* white */
+
+    /* .form-control:disabled, .form-control[readonly] */
+    --form-control_disabled-bg-color: #202225; /* #202225 */
+
+    /* form-control */
+    --form-control-color: #dcddde; /* #dcddde */
+    --form-control-bg-color: #202225; /* #202225 */
+    --form-control-border-color: #191c1f; /* #191c1f */
+        /* focus */
+        --form-control_focus-color: #dcddde; /* #dcddde */
+        --form-control_focus-bg-color: #202225; /* #202225 */
+	
+	/* extension-in-line */
+	--extension-line-width: 100%; /* 100% */
+	--extension-line-padding: 5px; /* 5px */
+	--extension-line-display: flex; /* flex */
+	--extension-line-bg-color: #191c1f; /* #191c1f */
+	--extension-line-mgb: 5px; /* 5px */
+
+	/* .extension-in-line .left-part */
+	--extension-line-left-flex: 1; /* 1 */
+
+	/* extension-in-line button */
+	--extension-line-button-padding: 3px; /* 3px */
+	--extension-line-button-mgb: 5px; /* 5px */
+	--extension-line-button-width: 110px; /* 110px */
+
+	/* extension-in-line p */
+	--extension-line-p-color: white; /* white */
+	--extension-line-p-display: unset; /* unset */
+
+	/* extension-in-line img */
+	--extension-line-img-heigth: 72px; /* 72px */
+
+	/* update-extension-section */
+	--update-extension-section-position: fixed; /* fixed */
+	--update-extension-section-z-index: 3; /* 3 */
+	--update-extension-section-display: none; /* none */
+	--update-extension-section-width: 100vw; /* 100vw */
+	--update-extension-section-height: 100vh; /* 100vh */
+
+	/* uninstall-extension-section */
+	--uninstall-extension-section-position: fixed; /* fixed */
+	--uninstall-extension-section-z-index: 3; /* 3 */
+	--uninstall-extension-section-display: none; /* none */
+	--uninstall-extension-section-width: 100vw; /* 100vw */
+	--uninstall-extension-section-height: 100vh; /* 100vh */
+
+	/* delete-bot-section */
+	--delete-bot-section-position: fixed; /* fixed */
+	--delete-bot-section-z-index: 3; /* 3 */
+	--delete-bot-section-display: none; /* none */
+	--delete-bot-section-width: 100vw; /* 100vw */
+	--delete-bot-section-height: 100vh; /* 100vh */
+
+	/* add-extension-section */
+	--add-extension-section-position: fixed; /* fixed */
+	--add-extension-section-z-index: 3; /* 3 */
+	--add-extension-section-display: none; /* none */
+	--add-extension-section-width: 100vw; /* 100vw */
+	--add-extension-section-height: 100vh; /* 100vh */
+
+	/* popup-div */
+	--popup-div-z-index: 5; /* 5 */
+	--popup-div-position: absolute; /* absolute */ 
+	--popup-div-width: 400px; /* 400px */ 
+	--popup-div-height: 600px; /* 600px */ 
+	--popup-div-mgt: 250px; /* 250px */ 
+	--popup-div-opacity: 0; /* 0 */ 
+	--popup-div-bg-color: #2c2f33; /* #2c2f33 */ 
+	--popup-div-border-r: 10px; /* 10px */ 
+	--popup-div-transition: 0.8s; /* 0.8s */ 
+
+	/* popup-long-div */
+	--popup-long-div-z-index: 5; /* 5 */
+	--popup-long-div-position: absolute; /* absolute */
+	--popup-long-div-width: 600px; /* 600px */
+	--popup-long-div-height: 600px; /* 600px */
+	--popup-long-div-mgt: 250px; /* 250px */
+	--popup-long-div-opacity: 0; /* 0 */
+	--popup-long-div-bg-color: #2c2f33; /* #2c2f33 */
+	--popup-long-div-border-r: 10px; /* 10px */
+	--popup-long-div-transition: 0.8s; /* 0.8s */
+
+	/* popup-div h3 */
+	--popup-div-h3-text-align: center; /* center */
+	--popup-div-h3-mgt: 10px; /* 10px */
+	--popup-div-h3-mgl: 10px; /* 10px */
+
+	/* add-extension-confirmation-div */
+	--add-extension-conf-display: none; /* none */
+	--add-extension-conf-position: absolute; /* absolute */
+	--add-extension-conf-width: 400px; /* 400px */
+	--add-extension-conf-height: 250px; /* 250px */
+	--add-extension-conf-mgt: 250px; /* 250px */
+	--add-extension-conf-opacity: 0; /* 0 */
+	--add-extension-conf-bg-color: white; /* white */
+	--add-extension-conf-border-r: 10px; /* 10px */
+	--add-extension-conf-transition: 0.8s; /* 0.8s */
+
+	/* add-extension-confirmation-div h3 */
+	--add-extension-conf-h3-text-align: center; /* center */
+	--add-extension-conf-h3-mgt: 10px; /* 10px */
+
+	/* add-extension-confirmation-div p */
+	--add-extension-conf-p-text-align: center; /* center */
+	--add-extension-conf-p-mgt: 10px; /* 10px */
+
+	/* bot-extensions-list */
+	--bot-extensions-list-height: 590px; /* 590px */
+	--bot-extensions-list-overflow-y: scroll; /* scroll */
+	--bot-extensions-list-bg-color: #2c2f33; /* #2c2f33 */
+
+	/* context-menu */
+	--context-menu-postion: fixed; /* fixed */
+	--context-menu-width: 150px; /* 150px */
+	--context-menu-bg-color: #191c1f; /* #191c1f */
+	--context-menu-border-r: 5px; /* 5px */
+	--context-menu-padding: 10px; /* 10px */
+	--context-menu-z-index: 5; /* 5 */
+
+	/* context-menu-div div */
+	--context-menu-div-width: 100%; /* 100% */
+	--context-menu-div-color: white; /* white */
+	--context-menu-div-padding: 10px; /* 10px */
+	--context-menu-div-border-r: 5px; /* 5px */
+
+	/* context-menu-div div:hover */
+	--context-menu-div_hover-width: 100%; /* 100% */
+	--context-menu-div_hover-color: white; /* white */
+	--context-menu-div_hover-cursor: pointer; /* pointer */
+	--context-menu-div_hover-bg-color: #6274b8; /* #6274b8 */
+
+	/* context-menu-div .red */
 
 }
