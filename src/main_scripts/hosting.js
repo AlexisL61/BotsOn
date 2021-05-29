@@ -46,7 +46,7 @@ class Hosting{
         if (hostingNeedCanvas){
             var currentOpenWebPage = await openCanvasWindow()
             this.currentOpenWebPage = currentOpenWebPage
-            canvas.init(currentOpenWebPage.webContents, ipcMain)
+            canvas.init(true,currentOpenWebPage.webContents, ipcMain)
         }
     }
     launchExtensions(){
