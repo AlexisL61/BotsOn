@@ -52,7 +52,7 @@
 	<script>
 		var ipcRenderer = parent.ipcRenderer;
 		ipcRenderer.send("loadCss", "")
-		ipcRenderer.on('displayCss', (event, css) => {
+		ipcRenderer.once('displayCss', (event, css) => {
 			var headID = document.getElementsByTagName('head')[0];
 			var link = document.createElement('link');
 			link.type = 'text/css';

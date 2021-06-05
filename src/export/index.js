@@ -9,19 +9,14 @@
 
 console.log('\x1b[36m%s\x1b[0m', '---------------------------------------------------\n---------------------------------------------------\n                     BotsOn                        \n---------------------------------------------------\n---------------------------------------------------\n\nCe bot provient d\'une exportation de bot par BotsOn\nMerci d\'utiliser l\'application!'); 
 console.log("\x1b[0m")
+const fs = require("fs")
+if (!fs.existsSync("./node_modules")) console.warn("Vous devez tout d'abord lancer install.bat pour installer les modules requis")
 const Discord = require("discord.js")
 require('dotenv').config();
-const electron = require("electron")
 var canvas  = require("./main_scripts/canvas.js")
-const path = require('path')
 
-const fs = require("fs")
 var configData = JSON.parse(fs.readFileSync("./config.json","utf-8"))
 
-const {app, BrowserWindow} = require("electron")
-var directory = app.getAppPath()
-var dataExtensionFolder = directory+"/extensions-data"
-var ipcRenderer = electron.ipcMain
 var prefix = configData.prefix
 var intents = configData.intents
 var user = configData.user
@@ -43,7 +38,8 @@ if (intents.guild_members){
     totalIntentsBit.add("GUILD_MEMBERS")
 }
 
-client = new Discord.Client({ws:{intents:totalIntentsBit}})
+var client = new Discord.Client({ws:{intents:totalIntentsBit}})
+// eslint-disable-next-line no-undef
 client.login(process.env.botToken)
 .then()
 .catch(function(e){
@@ -63,27 +59,15 @@ client.once("ready",async function(){
         }
     }
     if (needCanvas == true){
-        console.log('\x1b[36m%s\x1b[0m', 'Démarrage du module Canvas',"\x1b[0m");
-        currentOpenWebPage = new BrowserWindow({
-            width:1000,
-            height:1000,
-            center: true,
-            show:false,
-            webPreferences: {
-                preload: path.join(__dirname, './preload.js')
-            }
-        })
-        await currentOpenWebPage.loadFile('./webpage-files/canvas/canvas.html')
-        currentOpenWebPage.webContents.openDevTools()
-        canvas.init(currentOpenWebPage.webContents,ipcRenderer)
+        canvas.init(false)
     }
     console.log('\x1b[36m%s\x1b[0m', 'Démarrage des extensions',"\x1b[0m");
-    for (var i in extensions){
+    for (i in extensions){
         if (extensions[i].active){
             var thisExtensionData = JSON.parse(fs.readFileSync("./extensions/"+extensions[i].id+"/extension-data.json"))
-            var thisExtensionHost = require("./extensions/"+extensions[i].id+"/back-end/main.js")
+            thisExtensionHost = require("./extensions/"+extensions[i].id+"/back-end/main.js")
             thisExtensionHost.client = client
-            thisExtensionHost.electron = electron
+            thisExtensionHost.electron = undefined
             thisExtensionHost.location = "./extensions/"+extensions[i].id
             thisExtensionHost.dataFolder = "./extensions-data/"+extensions[i].id+"/data"
             thisExtensionHost.prefix = prefix
@@ -128,7 +112,7 @@ if (generalCommands.help){
     })
 }
 
-function getBotExtensionsData(args){
+function getBotExtensionsData(){
     var botExtensions = []
       var extensions = fs.readdirSync("./extensions")
       extensions.forEach(function (extension) {

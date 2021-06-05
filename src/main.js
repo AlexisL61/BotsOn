@@ -305,7 +305,7 @@ ipc.on("exportBot", async function (event, args) {
                 )
             })
             console.log(extensions[i].id + "1/2")
-            await copyAsync(dataFolder + "/extension-install/" + extensions[i].id, dataFolder + "/export/" + args.bot + " - " + currentId + "/extensions/" + extensions[i].id)
+            await copyAsync(dataFolder + "/extension-install/" + extensions[i].id, dataFolder + "/export/" + args.bot + " - " + currentId + "/extensions/" + extensions[i].id,{"filter":(src)=>!src.endsWith("node_modules")})
             console.log(extensions[i].id + "2/2")
             event.sender.send("webPageExport", {
                 "subtitle": "Copie de l'extension: " + extensions[i].name + " (2/2)",
@@ -523,7 +523,7 @@ ipc.on("getConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        return thisBotExtension.getConfig()
+        event.sender.send("getConfigData",{"success":true,data:thisBotExtension.getConfig()})
     } else {
         new Notification(createErrorCode("config-2")).show()
     }
@@ -534,7 +534,7 @@ ipc.on("saveConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        return thisBotExtension.saveConfig(args.config)
+        event.sender.send("saveConfigData",{"success":true,data:thisBotExtension.saveConfig(args.config)})
     } else {
         new Notification(createErrorCode("config-1")).show()
     }

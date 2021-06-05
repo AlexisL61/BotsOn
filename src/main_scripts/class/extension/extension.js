@@ -38,6 +38,15 @@ class Extension{
         if (!this.version){
             this.version = "1"
         }
+
+        if (this.name == undefined){
+            this.name == this.id
+        }
+
+        if (this.smallDescription == undefined){
+            this.smallDescription = "Problème d'installation de l'extension!"
+        }
+
     }
     uninstall(){
         try {

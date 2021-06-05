@@ -46,7 +46,7 @@ class Hosting{
         if (hostingNeedCanvas){
             var currentOpenWebPage = await openCanvasWindow()
             this.currentOpenWebPage = currentOpenWebPage
-            canvas.init(currentOpenWebPage.webContents, ipcMain)
+            canvas.init(true,currentOpenWebPage.webContents, ipcMain)
         }
     }
     launchExtensions(){
@@ -116,12 +116,6 @@ class Hosting{
                         helpEmbed.fields.push(extensionData.help.field)
                     }
                 }
-            }
-            if (this.isPremium == false){
-                helpEmbed.fields.push({
-                    "name": "Crédits",
-                    "value": "Créé avec [BotsOn](https://botsonapp.me/)"
-                })
             }
             this.client.on("message",function(message){
                 if (message.content.toLowerCase().startsWith(thisHosting.bot.prefix+"help")){
