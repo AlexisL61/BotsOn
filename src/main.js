@@ -33,23 +33,24 @@ var mainWindow
 
 console.log(dataFolder)
 
-const discordTokenVerify = require("./main_scripts/verify-token.js")
-const api = require("./main_scripts/api.js")
-const richPresence = require("./main_scripts/rich-presence.js")
-const botsOnUserModule = require("./main_scripts/class/botson-user.js")
-const extensionModule = require("./main_scripts/class/extension/extension-utility.js")
-const Extension = require("./main_scripts/class/extension/extension.js")
-const BotExtension = require("./main_scripts/class/extension/bot-extension.js")
-const {BotsOnUser} = require('./main_scripts/class/botson-user.js')
-const Bot = require("./main_scripts/class/bot.js")
-const windowOpenerModule = require("./main_scripts/window-opener.js")
-const Hosting = require("./main_scripts/hosting.js")
-require("./main_scripts/beauty.js")
+/* Load Other files */
+const discordTokenVerify = require("./src/scripts/verify-token.js")
+const api = require("./src/scripts/api.js")
+const richPresence = require("./src/scripts/rich-presence.js")
+const botsOnUserModule = require("./src/scripts/class/botson-user.js")
+const extensionModule = require("./src/scripts/class/extension/extension-utility.js")
+const Extension = require("./src/scripts/class/extension/extension.js")
+const BotExtension = require("./src/scripts/class/extension/bot-extension.js")
+const {BotsOnUser} = require('./src/scripts/class/botson-user.js')
+const Bot = require("./src/scripts/class/bot.js")
+const windowOpenerModule = require("./src/scripts/window-opener.js")
+const Hosting = require("./src/scripts/hosting.js")
+require("./src/scripts/beauty.js")
 
 // Init module
 extensionModule.init(dataFolder);
 
-const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname, "jsonFolder/notifications/notifications.json"), "utf8"))
+const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname, "src/json/notifications.json"), "utf8"))
 console.log(process.arch)
 
 function createErrorCode(errorCode) {
@@ -189,7 +190,7 @@ ipc.on("modifyLanguage", function () {
     currentUserData.language = languagesAvailable[index]
     setUserDataFile(currentUserData)
     currentLanguage = currentUserData.language
-    mainWindow.loadFile("./webpage-files/connect/connect.html")
+    mainWindow.loadFile("./views/connect/connect.html")
 })
 // Initialisation de la connexion avec Discord
 ipc.on("connect-discord", async function (event) {
@@ -210,14 +211,14 @@ ipc.on("connect-discord", async function (event) {
             "type": "start"
         })
 
-        var mainWebFile = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8")
+        var mainWebFile = fs.readFileSync(path.join(__dirname, "public/index.html"), "utf-8")
         mainWindow.setAlwaysOnTop(true);
         setTimeout(function () {
             mainWindow.setAlwaysOnTop(false);
         }, 500)
 
-        var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + currentLanguage + ".json"), "utf8"))
-        var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + "translations" + ".json"), "utf8"))
+        var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + currentLanguage + ".json"), "utf8"))
+        var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + "translations" + ".json"), "utf8"))
         while (mainWebFile.includes("{")) {
             for (var i in allLanguagesFile) {
                 mainWebFile = mainWebFile.replace(allLanguagesFile[i], languageFile[allLanguagesFile[i]])
@@ -236,12 +237,12 @@ ipc.on("connect-discord", async function (event) {
 
 // Récupère le fichier de langage
 ipc.on("getLanguageFile", function (event, language) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/" + language + ".json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/" + language + ".json"), "utf8")
     event.returnValue = JSON.parse(languageFile)
 })
 
 ipc.on("getCurrentLanguageFile", function (event) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/" + currentLanguage + ".json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/" + currentLanguage + ".json"), "utf8")
     event.returnValue = {
         "language": currentLanguage,
         "data": JSON.parse(languageFile)
@@ -249,7 +250,7 @@ ipc.on("getCurrentLanguageFile", function (event) {
 })
 
 ipc.on("getAllLanguagesFile", function (event) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/translations.json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/translations.json"), "utf8")
     event.returnValue = JSON.parse(languageFile)
 })
 
@@ -264,7 +265,7 @@ ipc.on("firstTimeOpenApp", function (event) {
 
 // Récupère la traduction
 function getTranslate(lang, tr) {
-    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + lang + ".json"), "utf8"))
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + lang + ".json"), "utf8"))
     return languageFile["{" + tr + "}"]
 }
 
@@ -338,8 +339,8 @@ ipc.on("exportBot", async function (event, args) {
             finalData.user = thisBotUser
         }
         var thisBotIntents = {
-            "presence": false,
-            "guild_members": false
+            "presence": true,
+            "guild_members": true
         }
         if (botData.intents) {
             thisBotIntents = botData.intents

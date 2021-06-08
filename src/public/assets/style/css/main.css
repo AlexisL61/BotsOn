@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+body {
+  margin: 0;
+  background-color: #23272A;
+  font-family: "Roboto", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+}
+
+.card {
+  border-radius: 10px;
+}
+.card.extension-card {
+  display: flex;
+  background-color: #2C2F33;
+}
+.card.extension-card .bg {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 120px;
+  display: flex;
+  justify-content: center;
+}
+.card.extension-card .bg .icon {
+  border: 1px solid #ffffff;
+  width: 75px;
+  height: 75px;
+}
+.card.extension-card .name {
+  position: relative;
+  font-size: 35px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 10px;
+}
+.card.extension-card .description {
+  position: relative;
+  font-size: 25px;
+  color: #ffffff;
+  margin-left: 10px;
+}
+.card.extension-card .link {
+  color: #ffffff;
+  opacity: 0.6;
+}
+
+/*# sourceMappingURL=main.css.map */
