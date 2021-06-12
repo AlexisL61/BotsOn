@@ -3,7 +3,7 @@
 // Pour la communication entre l'interface et ce script, il est utilisé l'objet ipcMain provenant de electron
 
 // Modules and variables
-const {app, BrowserWindow, Notification, shell} = require('electron')
+const {app, BrowserWindow, Notification, shell,screen} = require('electron')
 const electron = require("electron")
 const ipc = electron.ipcMain
 const path = require('path')
@@ -33,23 +33,24 @@ var mainWindow
 
 console.log(dataFolder)
 
-const discordTokenVerify = require("./main_scripts/verify-token.js")
-const api = require("./main_scripts/api.js")
-const richPresence = require("./main_scripts/rich-presence.js")
-const botsOnUserModule = require("./main_scripts/class/botson-user.js")
-const extensionModule = require("./main_scripts/class/extension/extension-utility.js")
-const Extension = require("./main_scripts/class/extension/extension.js")
-const BotExtension = require("./main_scripts/class/extension/bot-extension.js")
-const {BotsOnUser} = require('./main_scripts/class/botson-user.js')
-const Bot = require("./main_scripts/class/bot.js")
-const windowOpenerModule = require("./main_scripts/window-opener.js")
-const Hosting = require("./main_scripts/hosting.js")
-require("./main_scripts/beauty.js")
+/* Load Other files */
+const discordTokenVerify = require("./src/scripts/verify-token.js")
+const api = require("./src/scripts/api.js")
+const richPresence = require("./src/scripts/rich-presence.js")
+const botsOnUserModule = require("./src/scripts/class/botson-user.js")
+const extensionModule = require("./src/scripts/class/extension/extension-utility.js")
+const Extension = require("./src/scripts/class/extension/extension.js")
+const BotExtension = require("./src/scripts/class/extension/bot-extension.js")
+const {BotsOnUser} = require('./src/scripts/class/botson-user.js')
+const Bot = require("./src/scripts/class/bot.js")
+const windowOpenerModule = require("./src/scripts/window-opener.js")
+const Hosting = require("./src/scripts/hosting.js")
+require("./src/scripts/beauty.js")
 
 // Init module
 extensionModule.init(dataFolder);
 
-const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname, "jsonFolder/notifications/notifications.json"), "utf8"))
+const notificationFile = JSON.parse(fs.readFileSync(path.join(__dirname, "src/json/notifications.json"), "utf8"))
 console.log(process.arch)
 
 function createErrorCode(errorCode) {
@@ -74,8 +75,7 @@ function createWindow() { // Création de la fenêtre principale
 }
 
 function createDownloadWindow() { // Création de la fenêtre d'installation d'extension
-    console.log(dimensions)
-    mainWindow = windowOpenerModule.openDownloadWindow
+    mainWindow = windowOpenerModule.openDownloadWindow(screen)
 
     // Fermeture de la fenêtre si l'utilisateur appuie sur la croix
     ipc.once("closeDownload", function () {
@@ -190,7 +190,7 @@ ipc.on("modifyLanguage", function () {
     currentUserData.language = languagesAvailable[index]
     setUserDataFile(currentUserData)
     currentLanguage = currentUserData.language
-    mainWindow.loadFile("./webpage-files/connect/connect.html")
+    mainWindow.loadFile("./views/connect/connect.html")
 })
 // Initialisation de la connexion avec Discord
 ipc.on("connect-discord", async function (event) {
@@ -211,14 +211,14 @@ ipc.on("connect-discord", async function (event) {
             "type": "start"
         })
 
-        var mainWebFile = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8")
+        var mainWebFile = fs.readFileSync(path.join(__dirname, "public/index.html"), "utf-8")
         mainWindow.setAlwaysOnTop(true);
         setTimeout(function () {
             mainWindow.setAlwaysOnTop(false);
         }, 500)
 
-        var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + currentLanguage + ".json"), "utf8"))
-        var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + "translations" + ".json"), "utf8"))
+        var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + currentLanguage + ".json"), "utf8"))
+        var allLanguagesFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + "translations" + ".json"), "utf8"))
         while (mainWebFile.includes("{")) {
             for (var i in allLanguagesFile) {
                 mainWebFile = mainWebFile.replace(allLanguagesFile[i], languageFile[allLanguagesFile[i]])
@@ -237,12 +237,12 @@ ipc.on("connect-discord", async function (event) {
 
 // Récupère le fichier de langage
 ipc.on("getLanguageFile", function (event, language) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/" + language + ".json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/" + language + ".json"), "utf8")
     event.returnValue = JSON.parse(languageFile)
 })
 
 ipc.on("getCurrentLanguageFile", function (event) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/" + currentLanguage + ".json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/" + currentLanguage + ".json"), "utf8")
     event.returnValue = {
         "language": currentLanguage,
         "data": JSON.parse(languageFile)
@@ -250,7 +250,7 @@ ipc.on("getCurrentLanguageFile", function (event) {
 })
 
 ipc.on("getAllLanguagesFile", function (event) {
-    var languageFile = fs.readFileSync(path.join(__dirname, "languages/translations.json"), "utf8")
+    var languageFile = fs.readFileSync(path.join(__dirname, "public/assets/languages/translations.json"), "utf8")
     event.returnValue = JSON.parse(languageFile)
 })
 
@@ -265,7 +265,7 @@ ipc.on("firstTimeOpenApp", function (event) {
 
 // Récupère la traduction
 function getTranslate(lang, tr) {
-    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "languages/" + lang + ".json"), "utf8"))
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + lang + ".json"), "utf8"))
     return languageFile["{" + tr + "}"]
 }
 
@@ -306,7 +306,7 @@ ipc.on("exportBot", async function (event, args) {
                 )
             })
             console.log(extensions[i].id + "1/2")
-            await copyAsync(dataFolder + "/extension-install/" + extensions[i].id, dataFolder + "/export/" + args.bot + " - " + currentId + "/extensions/" + extensions[i].id)
+            await copyAsync(dataFolder + "/extension-install/" + extensions[i].id, dataFolder + "/export/" + args.bot + " - " + currentId + "/extensions/" + extensions[i].id,{"filter":(src)=>!src.endsWith("node_modules")})
             console.log(extensions[i].id + "2/2")
             event.sender.send("webPageExport", {
                 "subtitle": "Copie de l'extension: " + extensions[i].name + " (2/2)",
@@ -339,8 +339,8 @@ ipc.on("exportBot", async function (event, args) {
             finalData.user = thisBotUser
         }
         var thisBotIntents = {
-            "presence": false,
-            "guild_members": false
+            "presence": true,
+            "guild_members": true
         }
         if (botData.intents) {
             thisBotIntents = botData.intents
@@ -524,7 +524,7 @@ ipc.on("getConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        return thisBotExtension.getConfig()
+        event.sender.send("getConfigData",{"success":true,data:thisBotExtension.getConfig()})
     } else {
         new Notification(createErrorCode("config-2")).show()
     }
@@ -535,7 +535,7 @@ ipc.on("saveConfigData", function (event, args) {
     if (args.botId && args.extensionId) {
         var thisBot = new Bot(args.botId)
         var thisBotExtension = new BotExtension(args.extensionId, thisBot)
-        return thisBotExtension.saveConfig(args.config)
+        event.sender.send("saveConfigData",{"success":true,data:thisBotExtension.saveConfig(args.config)})
     } else {
         new Notification(createErrorCode("config-1")).show()
     }
@@ -773,7 +773,7 @@ ipc.on("getBotExtensions", async function (event, args) {
 
 // Récupération des données d'un bot
 ipc.on("getBotData", function (event, args) {
-    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botData.json", "utf8"))
+    event.returnValue = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + args.id + "/botdata.json", "utf8"))
 })
 
 // Récupération de l'utlisateur qui utilise BotsOn
@@ -794,7 +794,7 @@ ipc.on("getUserBots", function (event) {
         var bots = fs.readdirSync(dataFolder + "/bots")
         bots.forEach(function (bot) {
             if (! bot.startsWith(".")) {
-                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botData.json", "utf8"))
+                var thisBotData = JSON.parse(fs.readFileSync(dataFolder + "/bots" + "/" + bot + "/botdata.json", "utf8"))
                 console.log(thisBotData)
                 currentBots.push(thisBotData)
             }
