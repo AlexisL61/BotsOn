@@ -15,7 +15,7 @@ function connectToDiscord() {
 var allLanguages = ipcRenderer.sendSync("getAllLanguagesFile")
 var languageData = ipcRenderer.sendSync("getCurrentLanguageFile")
 languageFile = languageData.data
-document.getElementById("flag").src = "../../files/images/languages/"+languageData.language+".png"
+document.getElementById("flag").src = "../../public/assets/images/languages/"+languageData.language+".png"
 while (document.body.innerHTML.includes("{")) {
     for (var i in allLanguages) {
         document.body.innerHTML = document.body.innerHTML.replace(allLanguages[i], languageFile[allLanguages[i]])
