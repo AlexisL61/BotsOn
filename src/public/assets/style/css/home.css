@@ -1,0 +1,18 @@
+body {
+  display: flex;
+}
+
+.main {
+  background-color: #23272A;
+  width: 100%;
+  height: 100vh;
+}
+.main .add-bots {
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #2C2F33;
+  color: #206d38;
+  font-size: 35px;
+}
+
+/*# sourceMappingURL=home.css.map */

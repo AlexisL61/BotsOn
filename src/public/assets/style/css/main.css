@@ -3,9 +3,10 @@ body {
   margin: 0;
   background-color: #23272A;
   font-family: "Roboto", sans-serif;
+  height: 100vh;
 }
 
-* {
+*, *::after, *::before {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -49,6 +50,68 @@ body {
 .card.extension-card .link {
   color: #ffffff;
   opacity: 0.6;
+}
+
+.sidenav {
+  position: relative;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #2C2F33;
+  color: #ffffff;
+  padding-top: 30px;
+}
+.sidenav .items {
+  position: relative;
+}
+.sidenav .items .item {
+  position: relative;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.sidenav .items .item:hover {
+  transition: 0.3s;
+  border-radius: 40%;
+}
+.sidenav .items .active {
+  border: 4px solid #206d38;
+}
+.sidenav .items .tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  width: 120px;
+  background-color: #2C2F33;
+  color: #ffffff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s;
+  top: 20px;
+  left: 125%;
+}
+.sidenav .items .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #2C2F33 transparent transparent;
+}
+.sidenav .items:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
 
 /*# sourceMappingURL=main.css.map */

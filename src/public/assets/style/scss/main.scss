@@ -5,9 +5,10 @@ body {
     margin: 0;
     background-color: $primary-dark;
     font-family: 'Roboto', sans-serif;
+    height: 100vh;
 }
 
-* {
+*, *::after, *::before {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -15,3 +16,4 @@ body {
 }
 
 @import "./components/card";
+@import "./components/sidenav";
