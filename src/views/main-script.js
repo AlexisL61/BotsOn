@@ -109,6 +109,7 @@ async function closeCreateNewBot(){
 }
 
 function updateBotsMenu() {
+	console.log('okey1')
 	var botsData = ipcRenderer.sendSync("getUserBots", "")
 	console.log(botsData)
 	var botList = document.getElementById("my-bots-placement")
@@ -119,6 +120,7 @@ function updateBotsMenu() {
 		}
 	}
 	for (var i in botsData) {
+		console.log('okey')
 		var thisBot = botsData[i]
 		var thisBotDiv = mainMenuBotButton
 		thisBotDiv = thisBotDiv.replace("{onClickFunction}", "openBot('" + thisBot.id + "')")

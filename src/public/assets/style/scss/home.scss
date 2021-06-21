@@ -1,12 +1,12 @@
 @import "./components/color";
-body {
+.main-content {
     display: flex;
 }
 
 .main {
     background-color: $primary-dark;
+    padding: 12px;
     width: 100%;
-    height: 100vh;
 
     .add-bots {
         border-radius: 10px;
@@ -14,5 +14,6 @@ body {
         background-color: $secondary-dark;
         color: $green;
         font-size: 35px;
+        cursor: pointer;
     }
-}
+}   

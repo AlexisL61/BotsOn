@@ -143,6 +143,7 @@ ipcRenderer.on("append", async function (event, data) {
     stopLoadingScreen()
     await delay(500)
     var seEl = document.createElement("section")
+    seEl.className += "main-content"
     seEl.innerHTML = data.file
     document.body.appendChild(seEl)
     var scEl = document.createElement("SCRIPT")

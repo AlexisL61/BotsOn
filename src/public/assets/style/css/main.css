@@ -13,6 +13,10 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+#loadingScreen {
+  overflow: hidden;
+}
+
 .card {
   border-radius: 10px;
 }

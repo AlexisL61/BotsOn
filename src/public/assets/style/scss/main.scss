@@ -15,5 +15,9 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+#loadingScreen {
+    overflow: hidden;
+}
+
 @import "./components/card";
 @import "./components/sidenav";
