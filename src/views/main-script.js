@@ -9,14 +9,7 @@ var languageFile
 var ipcRenderer
 
 console.log("HEY")
-var mainMenuBotButton = `<div onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="bot-menu-btn center">
-<div>
-<img src="{botImg}" class="avatar">
-<p class="text-white">
-{botName}
-</p>
-</div>
-</div>`
+var mainMenuBotButton = `<a onclick="{onClickFunction}" oncontextmenu="{openContextMenuFunction}" id="{botId}" class="items" ><img class="item" src="{botImg}" alt="{botName}" > <span class="tooltiptext">{botName}</span> </a>`;
 
 var extensionActivateBtn = `<div onclick="{modifyConfigFunction}" id="{extensionId}" oncontextmenu="{openContextMenuFunction}" class="extension-bot-menu-btn {inactiveClass}" >
 <span></span>
@@ -116,7 +109,9 @@ async function closeCreateNewBot(){
 }
 
 function updateBotsMenu() {
+	console.log('okey1')
 	var botsData = ipcRenderer.sendSync("getUserBots", "")
+	console.log(botsData)
 	var botList = document.getElementById("my-bots-placement")
 	console.log(botList.childNodes.length)
 	for (var i in botList.childNodes) {
@@ -125,6 +120,7 @@ function updateBotsMenu() {
 		}
 	}
 	for (var i in botsData) {
+		console.log('okey')
 		var thisBot = botsData[i]
 		var thisBotDiv = mainMenuBotButton
 		thisBotDiv = thisBotDiv.replace("{onClickFunction}", "openBot('" + thisBot.id + "')")

@@ -45,7 +45,7 @@ const {BotsOnUser} = require('./src/scripts/class/botson-user.js')
 const Bot = require("./src/scripts/class/bot.js")
 const windowOpenerModule = require("./src/scripts/window-opener.js")
 const Hosting = require("./src/scripts/hosting.js")
-require("./src/scripts/beauty.js")
+require("./src/scripts/beauty.js");
 
 // Init module
 extensionModule.init(dataFolder);
@@ -156,6 +156,69 @@ function getBotExtensionsData(args) {
     return botExtensions
 }
 
+// Récupère la traduction
+function getTranslate(lang, tr) {
+    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + lang + ".json"), "utf8"))
+    return languageFile["{" + tr + "}"]
+}
+
+/**
+ * Télécharge le product et l'ajoute dans son dossier dans l'extension voulue
+ * @param {string} extension Id de l'extension
+ * @param {string} id Id du product
+ * @param {string} downloadLink Lien de téléchargement du product
+ */
+async function installProduct(extension, id, downloadLink) {
+    const rmdirAsync = promisify(fs.rmdir)
+    return new Promise((resolve) => {
+        axios({method: "get", url: downloadLink, responseType: "stream"}).then(async function (response) {
+            var stream = fs.createWriteStream(dataFolder + "/temp.zip")
+            response.data.pipe(stream);
+            stream.on("finish", async function () {
+                if (! fs.existsSync(dataFolder + "/extension-install/" + extension + "/products")) {
+                    fs.mkdirSync(dataFolder + "/extension-install/" + extension + "/products")
+                }
+                if (fs.existsSync(dataFolder + "/extension-install/" + extension + "/products/" + id)) {
+                    await rmdirAsync(dataFolder + "/extension-install/" + extension + "/products/" + id, {recursive: true})
+                }
+                fs.mkdirSync(dataFolder + "/extension-install/" + extension + "/products/" + id)
+                await unzip(dataFolder + "/temp.zip", {
+                    dir: dataFolder + "/extension-install/" + extension + "/products/" + id
+                })
+                resolve()
+            })
+        })
+    });
+
+}
+
+function getToken(id) {
+    return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json", "utf8")).token
+}
+
+function getUserDataFile() {
+    if (! fs.existsSync(dataFolder + "/user_data")) 
+        fs.mkdirSync(dataFolder + "/user_data")
+    
+    if (! fs.existsSync(dataFolder + "/user_data/data.json")) 
+        fs.writeFileSync(dataFolder + "/user_data/data.json", "{}")
+    
+    return JSON.parse(fs.readFileSync(dataFolder + "/user_data/data.json", "utf-8"))
+}
+
+function setUserDataFile(data) {
+    if (! fs.existsSync(dataFolder + "/user_data")) 
+        fs.mkdirSync(dataFolder + "/user_data")
+    
+    if (! fs.existsSync(dataFolder + "/user_data/data.json")) 
+        fs.writeFileSync(dataFolder + "/user_data/data.json", "{}")
+    
+    return fs.writeFileSync(dataFolder + "/user_data/data.json", JSON.stringify(data))
+}
+
+
+// IPC
+
 // Suppression d'une extension pour un bot
 ipc.on("deleteExtensionFromBot", function (event, args) {
     var thisBot = new Bot(args.botId)
@@ -263,12 +326,6 @@ ipc.on("firstTimeOpenApp", function (event) {
     }
 })
 
-// Récupère la traduction
-function getTranslate(lang, tr) {
-    var languageFile = JSON.parse(fs.readFileSync(path.join(__dirname, "public/assets/languages/" + lang + ".json"), "utf8"))
-    return languageFile["{" + tr + "}"]
-}
-
 // Démarre l'exportation du bot
 ipc.on("exportBot", async function (event, args) {
     const copyAsync = promisify(fse.copy)
@@ -365,7 +422,7 @@ ipc.on("exportBot", async function (event, args) {
 
     // Ouvre la fenêtre de l'exportation
     currentWindow = windowOpenerModule.openExportWindow()
-})
+});
 
 // Ouvre le dossier d'exportation
 ipc.on("openExportFolder", function () {
@@ -385,36 +442,6 @@ ipc.on("startDownloadFromLink", function (event, url) {
     linkSave = url
     createDownloadWindow()
 })
-
-/**
- * Télécharge le product et l'ajoute dans son dossier dans l'extension voulue
- * @param {string} extension Id de l'extension
- * @param {string} id Id du product
- * @param {string} downloadLink Lien de téléchargement du product
- */
-async function installProduct(extension, id, downloadLink) {
-    const rmdirAsync = promisify(fs.rmdir)
-    return new Promise((resolve) => {
-        axios({method: "get", url: downloadLink, responseType: "stream"}).then(async function (response) {
-            var stream = fs.createWriteStream(dataFolder + "/temp.zip")
-            response.data.pipe(stream);
-            stream.on("finish", async function () {
-                if (! fs.existsSync(dataFolder + "/extension-install/" + extension + "/products")) {
-                    fs.mkdirSync(dataFolder + "/extension-install/" + extension + "/products")
-                }
-                if (fs.existsSync(dataFolder + "/extension-install/" + extension + "/products/" + id)) {
-                    await rmdirAsync(dataFolder + "/extension-install/" + extension + "/products/" + id, {recursive: true})
-                }
-                fs.mkdirSync(dataFolder + "/extension-install/" + extension + "/products/" + id)
-                await unzip(dataFolder + "/temp.zip", {
-                    dir: dataFolder + "/extension-install/" + extension + "/products/" + id
-                })
-                resolve()
-            })
-        })
-    });
-
-}
 
 // Commence le téléchargement d'une extension
 ipc.on("downloadExtensionFromURL", function (event) {
@@ -652,11 +679,6 @@ ipc.on("checkUpdateExtensions", async function (event) {
     event.sender.send("checkUpdateExtensions", toSend)
 })
 
-function getToken(id) {
-    return JSON.parse(fs.readFileSync(dataFolder + "/bots/" + id + "/botdata.json", "utf8")).token
-}
-
-
 ipc.on("getProductInfo", async function (event, args) {
     if (args.productId) {
         event.sender.send("getProductInfo", await api.getProductInfo(args.productId))
@@ -802,24 +824,3 @@ ipc.on("getUserBots", function (event) {
     }
     event.returnValue = currentBots
 })
-
-
-function getUserDataFile() {
-    if (! fs.existsSync(dataFolder + "/user_data")) 
-        fs.mkdirSync(dataFolder + "/user_data")
-    
-    if (! fs.existsSync(dataFolder + "/user_data/data.json")) 
-        fs.writeFileSync(dataFolder + "/user_data/data.json", "{}")
-    
-    return JSON.parse(fs.readFileSync(dataFolder + "/user_data/data.json", "utf-8"))
-}
-
-function setUserDataFile(data) {
-    if (! fs.existsSync(dataFolder + "/user_data")) 
-        fs.mkdirSync(dataFolder + "/user_data")
-    
-    if (! fs.existsSync(dataFolder + "/user_data/data.json")) 
-        fs.writeFileSync(dataFolder + "/user_data/data.json", "{}")
-    
-    return fs.writeFileSync(dataFolder + "/user_data/data.json", JSON.stringify(data))
-}
