@@ -1,1 +1,0 @@
-npm i -g --add-python-to-path --vs2015 --production windows-build-tools
