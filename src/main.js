@@ -8,7 +8,7 @@ const { app, BrowserWindow } = require('electron');
  * 
  * @returns BrowserWindow
  */
-function createWindow () {
+function createMainWindow () {
     const win = new BrowserWindow({
         width: 1200,
         height: 700,
@@ -27,6 +27,7 @@ function createWindow () {
     return win;
 }
 
+//////////////////////////////////////////////
 app.on('ready', () => {
 
     let main = null
@@ -36,7 +37,7 @@ app.on('ready', () => {
     loading.loadFile('./public/loading.html')
 
     loading.once('show', () => {
-        main = createWindow()
+        main = createMainWindow()
         main.webContents.once('dom-ready', () => {
             console.log('main loaded')
             main.show()
@@ -47,7 +48,7 @@ app.on('ready', () => {
     loading.show()
 
     app.on('activate', function () {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow()
+        if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
     })
 });
 

@@ -1,6 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const element = <h1>Hello World</h1>;
+const element = <div className="content">
+        <form> 
+            test
+        </form>
+
+        <div className="ico">
+            Test
+        </div>
+    </div>;
 
 ReactDOM.render(element, document.querySelector('#root'));

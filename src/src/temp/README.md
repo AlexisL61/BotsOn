@@ -1,1 +1,0 @@
-Ce fichier est temporaire, les fichiers/dossier si trouvant sont vouer à disparaître dans le futur.
