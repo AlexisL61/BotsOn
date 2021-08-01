@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
 body {
     margin: 0;
 }
@@ -12,7 +14,10 @@ body {
     height: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
+    color: #FFF;
+    font-family: 'Roboto';
 
     .load {
         border: 10px solid transparent;
@@ -22,6 +27,10 @@ body {
         height: 150px;
         -webkit-animation: load 1s linear infinite; /* Safari */
         animation: load 1s linear infinite;
+    }
+
+    #r-phrasing {
+        margin-top: 35px;
     }
 
     @-webkit-keyframes load {

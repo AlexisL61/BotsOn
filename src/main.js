@@ -1,6 +1,6 @@
 // Import des scripts / modules
 const { app, BrowserWindow } = require('electron');
-const rpc = require('./src/utils/rpc');
+// const rpc = require('./src/utils/rpc');
 
 /**
  * 
@@ -15,11 +15,12 @@ function createWindow () {
         show: false, 
         icon: __dirname + '/src/img/ico/logo.ico',
         webPreferences: {
+            preload: 'preload.js',
             nodeIntegration: true
         }
     });
 
-    rpc.changeRPC({"state": "Sélectionne son bot"})
+    // rpc.changeRPC({"state": "Sélectionne son bot"})
 
     win.loadFile('./public/index.html')
 

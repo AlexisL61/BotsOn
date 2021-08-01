@@ -10,7 +10,22 @@
         
         <div class="loading">
             <div class="load"></div>
+            <p id="r-phrasing"></p>
         </div>
+
+        <script>
+            let phrasing = [
+                "BotsOn a été créé par Alexis !",
+                "Pirouette Cacahouète !",
+                "Welcomme à toi"
+            ]
+
+            let p = document.querySelector('#r-phrasing');
+            let random = Math.floor(Math.random() * phrasing.length);
+            
+            p.innerHTML = phrasing[random];
+            console.log(phrasing[random])
+        </script>
 
     </body>
 </html>
