@@ -1,13 +1,27 @@
+// Import des scripts / modules
 const { app, BrowserWindow } = require('electron');
+const rpc = require('./src/utils/rpc');
 
+/**
+ * 
+ * @description Permet de crée la première window
+ * 
+ * @returns BrowserWindow
+ */
 function createWindow () {
     const win = new BrowserWindow({
         width: 1200,
         height: 700,
-        show: false
-    })
+        show: false, 
+        icon: __dirname + '/src/img/ico/logo.ico',
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
 
-    win.loadFile('./pages/home.html')
+    rpc.changeRPC({"state": "Sélectionne son bot"})
+
+    win.loadFile('./public/index.html')
 
     return win;
 }
@@ -15,9 +29,10 @@ function createWindow () {
 app.on('ready', () => {
 
     let main = null
-    let loading = new BrowserWindow({show: false, frame: false, width: 300, height: 400})
+    // Création d'une fenetre de chargement
+    let loading = new BrowserWindow({show: false, frame: false, width: 300, height: 400, icon: __dirname + '/src/img/ico/logo.ico',})
   
-    loading.loadFile('./pages/loading.html')
+    loading.loadFile('./public/loading.html')
 
     loading.once('show', () => {
         main = createWindow()
