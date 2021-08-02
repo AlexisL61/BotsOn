@@ -1,6 +1,0 @@
-{
-    "extension_error":{
-        "title":"Erreur d'extension",
-        "body":"Code d'erreur: {errorCode}"
-    }
-}
