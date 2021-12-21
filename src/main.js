@@ -31,6 +31,8 @@ var botsOnUser
 
 var mainWindow
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 console.log(dataFolder)
 
 const discordTokenVerify = require("./main_scripts/verify-token.js")
